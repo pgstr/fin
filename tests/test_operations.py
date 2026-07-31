@@ -236,7 +236,7 @@ def test_podium_demo_stack_is_private_synthetic_and_egress_blocked() -> None:
     assert len(stack["services"]) == 1
     app = stack["services"][0]
     assert app["id"] == "app"
-    assert app["image"] == "localhost/finanzplaner-demo:1.2.0-rc.1"
+    assert app["image"] == "localhost/finanzplaner-demo:1.2.0-rc.2"
     assert app["entrypoint"] == ["/usr/local/bin/finanzplaner-demo-entrypoint"]
     assert app["env"]["COOKIE_SECURE"] == "true"
     assert app["env"]["TRUSTED_HOSTS"] == (
@@ -252,7 +252,7 @@ def test_podium_demo_stack_is_private_synthetic_and_egress_blocked() -> None:
 
     dockerfile = Path("Dockerfile.demo").read_text()
     entrypoint = Path("docker/demo-entrypoint.sh").read_text()
-    assert "ARG FIN_IMAGE=localhost/finanzplaner:1.2.0-rc.1" in dockerfile
+    assert "ARG FIN_IMAGE=localhost/finanzplaner:1.2.0-rc.2" in dockerfile
     assert "apt-get install --no-install-recommends -y iptables" in dockerfile
     assert "iptables -P OUTPUT DROP" in entrypoint
     assert "ip6tables -P OUTPUT DROP" in entrypoint

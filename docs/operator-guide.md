@@ -193,8 +193,8 @@ docker image load --input dist/finanzplaner-1.2.0-rc.2-arm64.oci.tar
 docker buildx build \
   --platform linux/arm64 \
   --file Dockerfile.demo \
-  --tag localhost/finanzplaner-demo:1.2.0-rc.1 \
-  --output type=oci,dest=dist/finanzplaner-demo-1.2.0-rc.1-arm64.oci.tar \
+  --tag localhost/finanzplaner-demo:1.2.0-rc.2 \
+  --output type=oci,dest=dist/finanzplaner-demo-1.2.0-rc.2-arm64.oci.tar \
   .
 ```
 
@@ -206,6 +206,13 @@ For the image built and loaded on 2026-07-31, the ARM64 OCI manifest digest is
 `sha256:4c496d3a021e764d73c5c2ad38440d439172a33c41ac90168a0d88dc7a4425c6`.
 The exported archive SHA-256 is
 `99f552e8772af7f3a1c9f57109a2c6db4043c436c75b1120fffe40f8f3cde9e1`.
+
+For the `1.2.0-rc.2` demo image (interface redesign, derived from the
+`1.2.0-rc.2` base) built and loaded on 2026-07-31, the ARM64 OCI manifest
+digest is
+`sha256:8fcf4729451f054b97469c306ab94cd250f5129449450889a6604da18ef56796`.
+The exported archive SHA-256 is
+`51a3177e518e1d7ffaed9458e40f76159ce8875909c8aa39dde1a85c5c0139d3`.
 The local smoke test proved readiness through mapped loopback ingress, default
 `DROP` policies for IPv4 and IPv6 output, and rejection of a new outbound
 connection. The checked-in stack template also passed `podium validate` on the
@@ -237,7 +244,7 @@ podium validate "$demo_stack_path"
 The rendered stack must retain all of these properties:
 
 - name `finanzplaner-demo`;
-- image `localhost/finanzplaner-demo:1.2.0-rc.1`;
+- image `localhost/finanzplaner-demo:1.2.0-rc.2`;
 - only the volume `finanzdaten-demo` mounted at `/data`;
 - no backup service or production/acceptance volume;
 - `COOKIE_SECURE=true`;
