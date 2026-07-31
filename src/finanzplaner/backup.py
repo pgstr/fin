@@ -4,6 +4,7 @@ import os
 import shutil
 import sqlite3
 import tempfile
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -23,7 +24,7 @@ def verify_backup(path: Path) -> bool:
         return False
     try:
         uri = f"file:{path.resolve()}?mode=ro"
-        with sqlite3.connect(uri, uri=True) as connection:
+        with closing(sqlite3.connect(uri, uri=True)) as connection:
             result = connection.execute("PRAGMA integrity_check").fetchone()
             return bool(result and result[0] == "ok")
     except sqlite3.Error:
@@ -70,9 +71,13 @@ def create_backup(
     os.close(descriptor)
     temporary = Path(temporary_name)
     try:
-        with sqlite3.connect(config.database_path) as source, sqlite3.connect(temporary) as target:
+        with (
+            closing(sqlite3.connect(config.database_path)) as source,
+            closing(sqlite3.connect(temporary)) as target,
+        ):
             source.backup(target)
             target.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            target.commit()
         if not verify_backup(temporary):
             raise RuntimeError("backup integrity_check failed")
         os.replace(temporary, daily)
@@ -93,4 +98,3 @@ def list_backups(settings: Settings | None = None) -> list[BackupInfo]:
     config = settings or get_settings()
     paths = sorted(config.backup_dir.glob("**/finanzplaner-*.sqlite3"), reverse=True)
     return [BackupInfo(path=path, valid=verify_backup(path), size=path.stat().st_size) for path in paths]
-

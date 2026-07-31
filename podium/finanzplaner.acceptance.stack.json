@@ -1,5 +1,5 @@
 {
-  "name": "finanzplaner",
+  "name": "finanzplaner-acceptance",
   "dns": true,
   "services": [
     {
@@ -13,7 +13,7 @@
         "DATABASE_PATH": "/data/finanzplaner.db",
         "BACKUP_DIR": "/backups",
         "COOKIE_SECURE": "false",
-        "TRUSTED_HOSTS": "finanzen.home.arpa,m1-pro.local,localhost,127.0.0.1",
+        "TRUSTED_HOSTS": "finanzplaner-acceptance.home.arpa,localhost,127.0.0.1",
         "TZ": "Europe/Berlin",
         "LOG_LEVEL": "INFO"
       },
@@ -25,8 +25,8 @@
       "memoryMB": 512,
       "rootfsGB": 1,
       "volumes": [
-        {"name": "finanzdaten", "destination": "/data"},
-        {"name": "finanzbackups", "destination": "/backups"}
+        {"name": "finanzdaten-acceptance", "destination": "/data"},
+        {"name": "finanzbackups-acceptance", "destination": "/backups"}
       ],
       "healthCheck": ["curl", "--fail", "--silent", "http://127.0.0.1:8080/health/ready"],
       "healthTimeoutSeconds": 90,
@@ -55,19 +55,22 @@
       "memoryMB": 256,
       "rootfsGB": 1,
       "volumes": [
-        {"name": "finanzdaten", "destination": "/data"},
-        {"name": "finanzbackups", "destination": "/backups"}
+        {"name": "finanzdaten-acceptance", "destination": "/data"},
+        {"name": "finanzbackups-acceptance", "destination": "/backups"}
       ],
       "schedule": "15 3 * * *",
       "restartPolicy": "no"
     }
   ],
   "ingress": {
-    "hostPort": 8080,
-    "bindAddress": "0.0.0.0",
+    "hostPort": 18081,
+    "bindAddress": "127.0.0.1",
     "routes": [
-      {"host": "finanzen.home.arpa", "service": "app", "port": 8080},
-      {"host": "m1-pro.local", "service": "app", "port": 8080}
+      {
+        "host": "finanzplaner-acceptance.home.arpa",
+        "service": "app",
+        "port": 8080
+      }
     ]
   }
 }

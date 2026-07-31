@@ -320,7 +320,7 @@ def get_category_trend(account_id: str, category_id: str) -> dict[str, Any]:
     return tool_call(lambda service, principal: service.trend(principal, account_id, category_id))
 
 
-@mcp.tool(description="Get the deterministic six-calendar-month account balance forecast.")
+@mcp.tool(description="Get the deterministic annual account balance forecast through December.")
 def get_balance_forecast(account_id: str) -> dict[str, Any]:
     return tool_call(lambda service, principal: service.forecast(principal, account_id))
 
@@ -333,6 +333,7 @@ def list_recurring_series(account_id: str) -> dict[str, Any]:
                 "id": series.id,
                 "account_id": series.account_id,
                 "counterparty": series.normalized_counterparty,
+                "direction": series.direction,
                 "cadence": series.cadence,
                 "typical_amount_minor": series.typical_amount_cents,
                 "currency": "EUR",

@@ -27,8 +27,9 @@ Every import records DKB's reported closing balance and date. To calculate a
 balance on another date, Fin starts from the newest snapshot and
 adds or subtracts signed transactions between the two dates.
 
-A derived balance is marked reliable only when an import batch covers the
-complete intervening period. Otherwise the UI labels it potentially
+A derived balance is marked reliable only when the union of adjacent or
+overlapping import periods covers the complete intervening period. A real
+date gap remains incomplete. Otherwise the UI labels the balance potentially
 incomplete instead of displaying false precision.
 
 ## Internal transfers
@@ -63,24 +64,25 @@ and disabling set a manual flag that later detection runs do not overwrite.
 ## Category trends
 
 Only complete calendar months are fitted, up to the latest 12. A
-three-calendar-month arithmetic moving average appears when three points
-exist. With at least three points, the linear trend is ordinary least squares
-against month index. There is no polynomial fit.
+three-calendar-month arithmetic moving average appears only for three
+consecutive calendar months. With at least three points, the linear trend is
+ordinary least squares against each observation's real calendar-month
+position, so a missing month is not compressed away. There is no polynomial
+fit.
 
-## Six-month balance forecast
+## Annual balance forecast
 
 The forecast starts from the newest reported balance and excludes the current
-partial month from history.
+partial month from history. It projects the remaining months of the snapshot
+year through December.
 
 Confirmed recurring entries are projected individually on their expected
 dates. Historical transaction IDs supporting those series are removed from
 the variable baseline to prevent double counting.
 
-Remaining cash flow is grouped by leaf category (including uncategorized) and
-sign. With at least three complete observations, each bucket uses ordinary
-linear least squares over at most 12 months; otherwise it uses the arithmetic
-mean. Positive buckets are clamped at zero before crossing negative, and
-negative buckets are clamped before crossing positive.
+Remaining cash flow uses the median of up to the latest six complete monthly
+residual totals. This deliberately favors a stable household-level estimate
+over a more sensitive category-by-category extrapolation.
 
 Monthly projected flows accumulate into the balance. Population standard
 deviation of historical total residuals is multiplied by the square root of
