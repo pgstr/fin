@@ -6,7 +6,7 @@ import socket
 import subprocess
 import sys
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 import httpx
 import pytest
@@ -16,7 +16,7 @@ from sqlalchemy import select
 
 from finanzplaner.categories import stable_category_id
 from finanzplaner.db import SessionLocal
-from finanzplaner.models import Account, Transaction
+from finanzplaner.models import Account, RecurringSeries, Transaction
 from finanzplaner.security import Actor
 from finanzplaner.services import CAPABILITIES, FinanceService
 
@@ -158,7 +158,32 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
         )
         db.add(private_account)
         db.flush()
-        transaction = db.scalar(select(Transaction).where(Transaction.amount_cents < 0))
+        service.import_dkb(
+            Actor.human(admin),
+            dkb_csv(iban=private_account.iban),
+            max_bytes=10_000_000,
+            expected_account_id=private_account.id,
+        )
+        transaction = db.scalar(
+            select(Transaction).where(
+                Transaction.account_id == shared_account.id,
+                Transaction.amount_cents < 0,
+            )
+        )
+        private_transaction = db.scalar(
+            select(Transaction).where(Transaction.account_id == private_account.id)
+        )
+        recurring = RecurringSeries(
+            account_id=shared_account.id,
+            normalized_counterparty="test recurring",
+            direction="outgoing",
+            cadence="monthly",
+            typical_amount_cents=-4_567,
+            expected_next_date=date(2026, 2, 3),
+            evidence={"transaction_ids": [transaction.id]},
+        )
+        db.add(recurring)
+        db.commit()
         _record, raw_token = service.create_agent_token(
             Actor.human(admin),
             name="MCP integration",
@@ -173,9 +198,17 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
             capabilities=["transactions:read"],
             expires_at=None,
         )
+        _review_record, review_token = service.create_agent_token(
+            Actor.human(admin),
+            name="MCP review-only",
+            account_ids=[shared_account.id],
+            capabilities=["reviews:read"],
+            expires_at=None,
+        )
         transaction_id = transaction.id
         revision = transaction.revision
         private_account_id = private_account.id
+        private_transaction_id = private_transaction.id
 
     endpoint, _process = running_mcp_server
     async with httpx.AsyncClient(
@@ -195,6 +228,37 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                 assert accounts.structuredContent["ok"]
                 assert accounts.structuredContent["data"][0]["id"] == shared_account.id
 
+                categories = await session.call_tool("list_categories", {})
+                assert categories.structuredContent["ok"]
+                assert any(
+                    category["id"] == stable_category_id("groceries.general")
+                    for category in categories.structuredContent["data"]
+                )
+
+                transactions = await session.call_tool(
+                    "list_transactions",
+                    {"account_id": shared_account.id, "month": "2026-01", "page_size": 1},
+                )
+                assert transactions.structuredContent["ok"]
+                transaction_page = transactions.structuredContent["data"]
+                assert len(transaction_page["items"]) == 1
+                assert transaction_page["next_cursor"]
+                next_page = await session.call_tool(
+                    "list_transactions",
+                    {
+                        "account_id": shared_account.id,
+                        "month": "2026-01",
+                        "cursor": transaction_page["next_cursor"],
+                        "page_size": 1,
+                    },
+                )
+                assert len(next_page.structuredContent["data"]["items"]) == 1
+                invalid_cursor = await session.call_tool(
+                    "list_transactions",
+                    {"account_id": shared_account.id, "cursor": "not-a-cursor"},
+                )
+                assert invalid_cursor.structuredContent["error"]["code"] == "invalid_cursor"
+
                 page = await session.call_tool(
                     "list_uncategorized_transactions",
                     {"account_id": shared_account.id, "month": "2026-01", "page_size": 1},
@@ -202,6 +266,11 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                 assert page.structuredContent["ok"]
                 assert len(page.structuredContent["data"]["items"]) == 1
                 assert page.structuredContent["data"]["next_cursor"]
+
+                detail = await session.call_tool(
+                    "get_transaction", {"transaction_id": transaction_id}
+                )
+                assert detail.structuredContent["data"]["id"] == transaction_id
 
                 categorized = await session.call_tool(
                     "categorize_transactions",
@@ -216,7 +285,24 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                         "idempotency_key": "mcp-integration-categorize",
                     },
                 )
-                assert categorized.structuredContent["data"]["results"][0]["status"] == "applied"
+                category_result = categorized.structuredContent["data"]["results"][0]
+                assert category_result["status"] == "applied"
+                uncategorized = await session.call_tool(
+                    "uncategorize_transactions",
+                    {
+                        "assignments": [
+                            {
+                                "transaction_id": transaction_id,
+                                "expected_revision": category_result["revision"],
+                            }
+                        ],
+                        "idempotency_key": "mcp-integration-uncategorize",
+                    },
+                )
+                assert (
+                    uncategorized.structuredContent["data"]["results"][0]["status"]
+                    == "applied"
+                )
 
                 note = await session.call_tool(
                     "add_transaction_note",
@@ -229,6 +315,25 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                 )
                 assert tags.structuredContent["data"]["tags"] == ["geprüft"]
 
+                trend = await session.call_tool(
+                    "get_category_trend",
+                    {
+                        "account_id": shared_account.id,
+                        "category_id": stable_category_id("groceries.general"),
+                    },
+                )
+                assert trend.structuredContent["data"]["category_id"] == stable_category_id(
+                    "groceries.general"
+                )
+                forecast = await session.call_tool(
+                    "get_balance_forecast", {"account_id": shared_account.id}
+                )
+                assert forecast.structuredContent["data"]["available"]
+                recurring_result = await session.call_tool(
+                    "list_recurring_series", {"account_id": shared_account.id}
+                )
+                assert recurring_result.structuredContent["data"][0]["direction"] == "outgoing"
+
                 review = await session.call_tool(
                     "save_monthly_review",
                     {
@@ -239,6 +344,21 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                     },
                 )
                 assert review.structuredContent["data"]["revision"] == 1
+                current_review = await session.call_tool(
+                    "get_monthly_review",
+                    {"account_id": shared_account.id, "month": "2026-01"},
+                )
+                assert current_review.structuredContent["data"]["revision"] == 1
+                review_conflict = await session.call_tool(
+                    "save_monthly_review",
+                    {
+                        "account_id": shared_account.id,
+                        "month": "2026-01",
+                        "content": "Stale revision",
+                        "expected_revision": 0,
+                    },
+                )
+                assert review_conflict.structuredContent["error"]["code"] == "revision_conflict"
                 summary = await session.call_tool(
                     "get_month_summary",
                     {"account_id": shared_account.id, "month": "2026-01"},
@@ -249,6 +369,10 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                     {"account_id": private_account_id, "month": "2026-01"},
                 )
                 assert hidden.structuredContent["error"]["code"] == "not_found"
+                hidden_transaction = await session.call_tool(
+                    "get_transaction", {"transaction_id": private_transaction_id}
+                )
+                assert hidden_transaction.structuredContent["error"]["code"] == "not_found"
                 invalid_month = await session.call_tool(
                     "get_month_summary",
                     {"account_id": shared_account.id, "month": "not-a-month"},
@@ -270,6 +394,26 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                     {"account_id": shared_account.id, "month": "2026-01"},
                 )
                 assert denied.structuredContent["error"]["code"] == "permission_denied"
+
+    async with httpx.AsyncClient(
+        headers={"Authorization": f"Bearer {review_token}"}, follow_redirects=True
+    ) as http_client:
+        async with streamable_http_client(endpoint, http_client=http_client) as (
+            read_stream,
+            write_stream,
+            _session_id,
+        ):
+            async with ClientSession(read_stream, write_stream) as session:
+                await session.initialize()
+                denied_discovery = await session.call_tool("list_accounts", {})
+                assert denied_discovery.structuredContent["error"]["code"] == "permission_denied"
+                denied_taxonomy = await session.call_tool("list_categories", {})
+                assert denied_taxonomy.structuredContent["error"]["code"] == "permission_denied"
+                allowed_review = await session.call_tool(
+                    "get_monthly_review",
+                    {"account_id": shared_account.id, "month": "2026-01"},
+                )
+                assert allowed_review.structuredContent["data"]["revision"] == 1
 
 
 @pytest.mark.asyncio

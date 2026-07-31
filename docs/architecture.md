@@ -47,8 +47,12 @@ operator responsibilities.
 - Setup and login forms use separately signed expiring form tokens; all
   authenticated browser mutations require the server-side CSRF token.
 - Login attempts are rate-limited by client address and normalized username.
+- Disabling a user or resetting a password deletes every existing browser
+  session for that user.
 - Agent tokens contain high-entropy random bytes. Plaintext appears once;
   SQLite stores only SHA-256 plus a non-secret prefix.
+- MCP account and taxonomy discovery requires `transactions:read`; analytics
+  and review capabilities do not implicitly grant transaction discovery.
 
 ## Content and audit safety
 

@@ -18,6 +18,6 @@ var
 dist
 *.egg-info
 tests
-FINANZPLANER_GOAL.md
+PLAN.md
 playwright-report
 test-results

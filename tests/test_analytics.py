@@ -2,17 +2,87 @@ from __future__ import annotations
 
 from datetime import date
 
+import pytest
 from sqlalchemy import select
 
-from finanzplaner.analytics import balance_forecast, month_summary
+from finanzplaner.analytics import (
+    balance_forecast,
+    category_trend,
+    complete_coverage,
+    month_summary,
+)
 from finanzplaner.categories import stable_category_id
 from finanzplaner.db import SessionLocal
-from finanzplaner.models import Transaction, TransferLink, User
+from finanzplaner.models import Category, ImportBatch, Transaction, TransferLink, User
 from finanzplaner.security import Actor, hash_password
 from finanzplaner.services import FinanceService
 from finanzplaner.web import build_chart
 
 from .conftest import dkb_csv
+
+
+def add_coverage_batch(
+    db, admin, shared_account, start: date, end: date, suffix: str
+) -> None:
+    db.add(
+        ImportBatch(
+            account_id=shared_account.id,
+            uploader_id=admin.id,
+            file_sha256=suffix.rjust(64, "0"),
+            export_from=start,
+            export_to=end,
+            reported_balance_cents=0,
+            reported_balance_date=end,
+            row_count=0,
+            inserted_count=0,
+            duplicate_count=0,
+        )
+    )
+
+
+def test_coverage_merges_adjacent_and_overlapping_import_periods(
+    admin, shared_account
+) -> None:
+    with SessionLocal() as db:
+        add_coverage_batch(
+            db, admin, shared_account, date(2026, 1, 1), date(2026, 1, 15), "1"
+        )
+        add_coverage_batch(
+            db, admin, shared_account, date(2026, 1, 16), date(2026, 1, 31), "2"
+        )
+        db.flush()
+
+        assert complete_coverage(
+            db, shared_account.id, date(2026, 1, 1), date(2026, 1, 31)
+        )
+
+        db.query(ImportBatch).delete()
+        add_coverage_batch(
+            db, admin, shared_account, date(2026, 1, 1), date(2026, 1, 20), "3"
+        )
+        add_coverage_batch(
+            db, admin, shared_account, date(2026, 1, 10), date(2026, 1, 31), "4"
+        )
+        db.flush()
+
+        assert complete_coverage(
+            db, shared_account.id, date(2026, 1, 1), date(2026, 1, 31)
+        )
+
+
+def test_coverage_keeps_real_date_gap_incomplete(admin, shared_account) -> None:
+    with SessionLocal() as db:
+        add_coverage_batch(
+            db, admin, shared_account, date(2026, 1, 1), date(2026, 1, 15), "1"
+        )
+        add_coverage_batch(
+            db, admin, shared_account, date(2026, 1, 17), date(2026, 1, 31), "2"
+        )
+        db.flush()
+
+        assert not complete_coverage(
+            db, shared_account.id, date(2026, 1, 1), date(2026, 1, 31)
+        )
 
 
 def test_unique_transfer_matching_never_assigns_category(admin) -> None:
@@ -106,6 +176,65 @@ def test_internal_transfers_are_excluded_from_budget_totals(admin, shared_accoun
         assert summary["outgoing_cents"] == 4_567
         assert summary["net_cents"] == -4_567
         assert {item["key"] for item in summary["breakdown"]} == {"groceries"}
+
+
+def test_category_trend_preserves_calendar_spacing_and_archived_history(
+    admin, shared_account
+) -> None:
+    actor = Actor.human(admin)
+    category_id = stable_category_id("groceries.general")
+    months = [(1, -10_000), (3, -20_000), (4, -30_000)]
+
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        for month, amount in months:
+            amount_text = f"-{abs(amount) // 100},{abs(amount) % 100:02d}"
+            batch = service.import_dkb(
+                actor,
+                dkb_csv(
+                    [
+                        [
+                            f"15.{month:02d}.26",
+                            f"15.{month:02d}.26",
+                            "Gebucht",
+                            "",
+                            "Trend",
+                            f"Monat {month}",
+                            "Karte",
+                            "",
+                            amount_text,
+                            "",
+                            "",
+                            "",
+                        ]
+                    ],
+                    start=f"01.{month:02d}.26",
+                    end=f"{31 if month in {1, 3} else 30}.{month:02d}.26",
+                    balance_date=f"{31 if month in {1, 3} else 30}.{month:02d}.26",
+                ),
+                max_bytes=10_000_000,
+                expected_account_id=shared_account.id,
+            )
+            transaction = db.scalar(
+                select(Transaction).where(Transaction.import_batch_id == batch.id)
+            )
+            service.categorize(actor, transaction.id, category_id, transaction.revision)
+            db.commit()
+
+        category = db.get(Category, category_id)
+        category.active = False
+        db.commit()
+
+        trend = service.trend(actor, shared_account.id, category_id)
+        direct = category_trend(
+            db, shared_account.id, category_id, "de", today=date(2026, 5, 15)
+        )
+
+        assert trend["category_id"] == category_id
+        assert direct["linear_monthly_change_cents"] == -6_429
+        assert all(
+            item["amount_cents"] is None for item in direct["moving_average"]
+        )
 
 
 def test_current_month_uses_today_balance_without_future_coverage(
@@ -209,6 +338,67 @@ def test_recurring_detection_and_forecast_are_deterministic(admin, shared_accoun
         assert all(point["low_cents"] <= point["balance_cents"] <= point["high_cents"] for point in first["points"])
 
 
+def test_recurring_series_keep_incoming_and_outgoing_directions_separate(
+    admin, shared_account
+) -> None:
+    rows = []
+    for month in range(1, 7):
+        rows.extend(
+            [
+                [
+                    f"01.{month:02d}.26",
+                    f"01.{month:02d}.26",
+                    "Gebucht",
+                    "Gleicher Partner",
+                    "",
+                    "Erstattung",
+                    "Überweisung",
+                    "",
+                    "100,00",
+                    "",
+                    "",
+                    "",
+                ],
+                [
+                    f"03.{month:02d}.26",
+                    f"03.{month:02d}.26",
+                    "Gebucht",
+                    "",
+                    "Gleicher Partner",
+                    "Abbuchung",
+                    "Lastschrift",
+                    "",
+                    "-100,00",
+                    "",
+                    "",
+                    "",
+                ],
+            ]
+        )
+
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        series = service.import_dkb(
+            Actor.human(admin),
+            dkb_csv(
+                rows,
+                start="01.01.26",
+                end="30.06.26",
+                balance_date="30.06.26",
+            ),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+        assert series.inserted_count == 12
+        detected = service.detect_recurring(Actor.human(admin), shared_account.id)
+
+        partner_series = [
+            item for item in detected if item.normalized_counterparty == "gleicher partner"
+        ]
+        assert {item.direction for item in partner_series} == {"incoming", "outgoing"}
+        assert {item.typical_amount_cents for item in partner_series} == {10_000, -10_000}
+
+
 def test_forecast_uses_stable_total_cashflow_and_stops_in_december(
     admin, shared_account
 ) -> None:
@@ -274,3 +464,55 @@ def test_forecast_uses_stable_total_cashflow_and_stops_in_december(
         assert [point["month"].month for point in chart["forecast_dots"]] == list(
             range(7, 13)
         )
+
+
+@pytest.mark.parametrize(
+    ("snapshot_month", "expected_point_count"),
+    [(1, 12), (6, 7), (12, 1)],
+)
+def test_annual_forecast_horizon_ends_in_december(
+    admin, shared_account, snapshot_month: int, expected_point_count: int
+) -> None:
+    last_day = 31 if snapshot_month in {1, 3, 5, 7, 8, 10, 12} else 30
+    rows = [
+        [
+            f"15.{month:02d}.26",
+            f"15.{month:02d}.26",
+            "Gebucht",
+            "Test",
+            "",
+            "Monatlicher Saldo",
+            "Überweisung",
+            "",
+            "100,00",
+            "",
+            "",
+            "",
+        ]
+        for month in range(1, snapshot_month + 1)
+    ]
+    next_month = (
+        date(2027, 1, 15)
+        if snapshot_month == 12
+        else date(2026, snapshot_month + 1, 15)
+    )
+
+    with SessionLocal() as db:
+        FinanceService(db).import_dkb(
+            Actor.human(admin),
+            dkb_csv(
+                rows,
+                start="01.01.26",
+                end=f"{last_day:02d}.{snapshot_month:02d}.26",
+                balance="500,00",
+                balance_date=f"{last_day:02d}.{snapshot_month:02d}.26",
+            ),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+
+        forecast = balance_forecast(db, shared_account.id, today=next_month)
+
+        assert forecast["available"]
+        assert len(forecast["points"]) == expected_point_count
+        assert forecast["points"][-1]["month"] == date(2026, 12, 1)

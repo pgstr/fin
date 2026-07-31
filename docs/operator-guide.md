@@ -7,7 +7,7 @@ internet exposure.
 ## 1. Requirements
 
 - Podium on an Apple-silicon Mac that satisfies Podium's compatibility guide
-- Docker Buildx, another OCI-compatible ARM64 builder, or a CI builder
+- Docker Buildx or another OCI-compatible ARM64 builder
 - local DNS for `finanzen.home.arpa`
 - the checked-in `uv.lock`, stack file, and this repository
 
@@ -21,16 +21,24 @@ From the repository root:
 mkdir -p dist
 docker buildx build \
   --platform linux/arm64 \
-  --tag localhost/finanzplaner:1.0.8 \
-  --output type=oci,dest=dist/finanzplaner-1.0.8-arm64.oci.tar \
+  --tag localhost/finanzplaner:1.1.0 \
+  --output type=oci,dest=dist/finanzplaner-1.1.0-arm64.oci.tar \
   .
-podium load dist/finanzplaner-1.0.8-arm64.oci.tar
+podium load dist/finanzplaner-1.1.0-arm64.oci.tar
 ```
 
 Podium does not build Compose projects. The stack uses the exact image name
-`localhost/finanzplaner:1.0.8`; if the builder records another reference,
+`localhost/finanzplaner:1.1.0`; if the builder records another reference,
 change the stack's two `image` fields to the reference printed by
 `podium load`.
+
+For the `1.1.0` release build verified on 2026-07-31, the ARM64 OCI manifest
+digest was
+`sha256:300e17152721342bc5736f833789e1a70128030969b64f2c8083cb7b94d96add`.
+The exported OCI archive SHA-256 was
+`0ab97046ea557bc7b69bef21894802930afbb2a13ef164df30b4b96deb5a2a57`.
+Rebuilds must be treated as different artifacts even when they use the same
+source and tag.
 
 ## 3. Create file secrets
 
@@ -77,6 +85,35 @@ For a temporary host-only check, change ingress `bindAddress` to `127.0.0.1`.
 For HTTPS ingress, terminate TLS in an approved local proxy, set
 `COOKIE_SECURE=true`, and update `TRUSTED_HOSTS`.
 
+### Isolated acceptance stack
+
+Never use the live `finanzplaner` stack for release acceptance. The checked-in
+`podium/finanzplaner.acceptance.stack.json` uses a separate stack name,
+separate managed volumes, loopback-only port 18081, and the hostname
+`finanzplaner-acceptance.home.arpa`.
+
+Install a generated test-only secret file at
+`~/.podium/finanzplaner-acceptance/secrets.env`, then run:
+
+```sh
+podium validate podium/finanzplaner.acceptance.stack.json
+podium apply podium/finanzplaner.acceptance.stack.json
+podium ps --stack finanzplaner-acceptance
+curl --resolve finanzplaner-acceptance.home.arpa:18081:127.0.0.1 \
+  http://finanzplaner-acceptance.home.arpa:18081/health/ready
+podium exec --stack finanzplaner-acceptance app -- \
+  getent hosts app.podium.local
+podium restart --stack finanzplaner-acceptance app
+podium describe --stack finanzplaner-acceptance app
+podium describe --stack finanzplaner-acceptance backup
+```
+
+After the acceptance and recovery checks, remove only the isolated resources:
+
+```sh
+podium down --stack finanzplaner-acceptance --volumes -y
+```
+
 ## 5. First-run setup and first import
 
 Open `http://finanzen.home.arpa:8080`, enter the setup token, and create the
@@ -105,7 +142,8 @@ podium ps --stack finanzplaner
 podium describe --stack finanzplaner app
 podium logs --stack finanzplaner --tail 100 app
 podium events --stack finanzplaner
-podium exec --stack finanzplaner app -- finanzplaner backup list
+podium exec --stack finanzplaner app -- \
+  gosu finanzplaner finanzplaner backup list
 ```
 
 Normal logs omit access payloads and bearer tokens. Do not enable verbose
@@ -136,10 +174,12 @@ months. Files live in the separate `finanzbackups` managed volume.
 Create and verify an extra backup:
 
 ```sh
-podium exec --stack finanzplaner app -- /usr/bin/env \
+podium exec --stack finanzplaner app -- \
+  gosu finanzplaner /usr/bin/env \
   DATABASE_PATH=/data/finanzplaner.db BACKUP_DIR=/backups \
   /app/.venv/bin/finanzplaner backup create
-podium exec --stack finanzplaner app -- /usr/bin/env \
+podium exec --stack finanzplaner app -- \
+  gosu finanzplaner /usr/bin/env \
   DATABASE_PATH=/data/finanzplaner.db BACKUP_DIR=/backups \
   /app/.venv/bin/finanzplaner backup list
 ```
@@ -153,10 +193,12 @@ the populated secret file separately as well.
 Before an upgrade:
 
 ```sh
-podium exec --stack finanzplaner app -- /usr/bin/env \
+podium exec --stack finanzplaner app -- \
+  gosu finanzplaner /usr/bin/env \
   DATABASE_PATH=/data/finanzplaner.db BACKUP_DIR=/backups \
   /app/.venv/bin/finanzplaner backup create
-podium exec --stack finanzplaner app -- /usr/bin/env \
+podium exec --stack finanzplaner app -- \
+  gosu finanzplaner /usr/bin/env \
   DATABASE_PATH=/data/finanzplaner.db BACKUP_DIR=/backups \
   /app/.venv/bin/finanzplaner backup list
 ```
@@ -198,6 +240,7 @@ mv finanzplaner.db finanzplaner.db-wal finanzplaner.db-shm \
   "$failed_dir"/ 2>/dev/null || true
 cp ~/.podium/finanzplaner/volumes/finanzbackups/daily/SELECTED.sqlite3 \
   finanzplaner.db
+chmod 600 finanzplaner.db
 sqlite3 finanzplaner.db 'PRAGMA integrity_check;'
 podium validate /absolute/path/to/podium/finanzplaner.stack.json
 podium apply /absolute/path/to/podium/finanzplaner.stack.json
@@ -205,6 +248,11 @@ podium apply /absolute/path/to/podium/finanzplaner.stack.json
 
 The integrity command must print exactly `ok`. Do not use
 `podium down --volumes`; that command destroys both data and backups.
+Keep the restored database owned by the Podium host user; Podium maps that host
+ownership into its VM. Do not change the host file to container UID/GID 10001.
+Perform recovery first against the isolated acceptance volumes, and verify
+login, import history, transactions, monthly reviews, and the latest balance
+before touching a live stack.
 
 ## 10. Troubleshooting
 

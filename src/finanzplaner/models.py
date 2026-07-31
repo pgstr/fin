@@ -248,6 +248,7 @@ class RecurringSeries(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
     account_id: Mapped[str] = mapped_column(ForeignKey("accounts.id", ondelete="RESTRICT"), index=True)
     normalized_counterparty: Mapped[str] = mapped_column(Text)
+    direction: Mapped[str] = mapped_column(String(10))
     cadence: Mapped[str] = mapped_column(String(20))
     typical_amount_cents: Mapped[int] = mapped_column(Integer)
     expected_next_date: Mapped[date] = mapped_column(Date)
@@ -258,7 +259,16 @@ class RecurringSeries(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
     __table_args__ = (
-        UniqueConstraint("account_id", "normalized_counterparty", "cadence", name="uq_recurring_identity"),
+        UniqueConstraint(
+            "account_id",
+            "normalized_counterparty",
+            "direction",
+            "cadence",
+            name="uq_recurring_identity",
+        ),
+        CheckConstraint(
+            "direction IN ('incoming', 'outgoing')", name="ck_recurring_direction"
+        ),
         CheckConstraint(
             "cadence IN ('weekly', 'monthly', 'quarterly', 'yearly')", name="ck_recurring_cadence"
         ),

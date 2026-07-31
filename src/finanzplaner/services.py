@@ -13,7 +13,7 @@ from typing import Any
 
 import bleach
 from markdown_it import MarkdownIt
-from sqlalchemy import func, or_, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.orm import Session, joinedload
 
 from .analytics import (
@@ -49,6 +49,7 @@ from .models import (
     TransactionTag,
     TransferLink,
     User,
+    WebSession,
     utc_now,
 )
 from .security import Actor, digest_token, hash_password, validate_username, verify_password
@@ -168,6 +169,8 @@ class FinanceService:
         return query.where(or_(Account.visibility == "shared", Account.owner_id == actor.user_id))
 
     def list_accounts(self, actor: Actor) -> list[Account]:
+        if actor.actor_type == "agent" and "transactions:read" not in actor.capabilities:
+            raise PermissionDeniedError()
         return self.db.scalars(
             self.visible_account_query(actor).order_by(
                 (Account.visibility == "shared").desc(), Account.created_at, Account.display_name
@@ -766,11 +769,13 @@ class FinanceService:
             "quarterly": (80, 100),
             "yearly": (350, 380),
         }
-        for (counterparty, _direction), items in groups.items():
-            if len(items) < 3:
+        for (counterparty, direction), items in groups.items():
+            if direction not in {"incoming", "outgoing"} or len(items) < 3:
                 continue
             amounts = [tx.amount_cents for tx in items]
             typical = round(statistics.median(amounts))
+            if typical == 0:
+                continue
             tolerance = max(abs(typical) * 0.05, 100)
             compatible = [tx for tx in items if abs(tx.amount_cents - typical) <= tolerance]
             if len(compatible) < 3:
@@ -797,6 +802,7 @@ class FinanceService:
                 select(RecurringSeries).where(
                     RecurringSeries.account_id == account_id,
                     RecurringSeries.normalized_counterparty == counterparty,
+                    RecurringSeries.direction == direction,
                     RecurringSeries.cadence == cadence,
                 )
             )
@@ -810,6 +816,7 @@ class FinanceService:
                 series = RecurringSeries(
                     account_id=account_id,
                     normalized_counterparty=counterparty,
+                    direction=direction,
                     cadence=cadence,
                     typical_amount_cents=typical,
                     expected_next_date=next_date,
@@ -882,7 +889,9 @@ class FinanceService:
 
     def trend(self, actor: Actor, account_id: str, category_id: str) -> dict:
         self.get_account(actor, account_id, "analytics:read")
-        self._category_for_assignment(category_id)
+        category = self.db.get(Category, category_id)
+        if not category or not category.assignable or category.parent_id is None:
+            raise ValidationError("category_not_assignable", "error.category_leaf")
         return category_trend(self.db, account_id, category_id, actor.locale)
 
     def forecast(self, actor: Actor, account_id: str) -> dict:
@@ -988,6 +997,8 @@ class FinanceService:
         if user.id == actor.user_id and not active:
             raise ConflictError()
         user.active = active
+        if not active:
+            self.db.execute(delete(WebSession).where(WebSession.user_id == user.id))
         audit(self.db, actor, "user.status", "user", user.id, {"active": active})
         self.db.commit()
 
@@ -999,6 +1010,7 @@ class FinanceService:
         if not user:
             raise NotFoundError()
         user.password_hash = hash_password(password)
+        self.db.execute(delete(WebSession).where(WebSession.user_id == user.id))
         audit(self.db, actor, "user.password.reset", "user", user.id)
         self.db.commit()
 

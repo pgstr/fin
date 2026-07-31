@@ -15,9 +15,11 @@ from finanzplaner.models import (
     CategoryAssignmentEvent,
     Transaction,
     User,
+    WebSession,
 )
-from finanzplaner.security import Actor, hash_password
+from finanzplaner.security import Actor, create_web_session, hash_password, verify_password
 from finanzplaner.services import FinanceService
+from finanzplaner.web import settings
 
 from .conftest import dkb_csv
 
@@ -137,6 +139,64 @@ def test_agent_scope_and_annotations_preserve_authorship(admin, shared_account) 
         }
         with pytest.raises(PermissionDeniedError):
             service.categorize(agent, tx.id, stable_category_id("groceries.general"), tx.revision)
+
+
+def test_account_discovery_requires_transaction_read_capability(admin, shared_account) -> None:
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        human = Actor.human(admin)
+        _review_token, review_raw = service.create_agent_token(
+            human,
+            name="Review-only agent",
+            account_ids=[shared_account.id],
+            capabilities=["reviews:read"],
+            expires_at=None,
+        )
+        review_agent = service.authenticate_agent(review_raw)
+        assert review_agent
+        with pytest.raises(PermissionDeniedError):
+            service.list_accounts(review_agent)
+
+        _read_token, read_raw = service.create_agent_token(
+            human,
+            name="Reader",
+            account_ids=[shared_account.id],
+            capabilities=["transactions:read"],
+            expires_at=None,
+        )
+        read_agent = service.authenticate_agent(read_raw)
+        assert read_agent
+        assert [account.id for account in service.list_accounts(read_agent)] == [
+            shared_account.id
+        ]
+
+
+def test_disabling_user_and_resetting_password_invalidate_browser_sessions(admin) -> None:
+    with SessionLocal() as db:
+        user = make_user(db, "session-owner")
+        create_web_session(db, settings, user)
+        create_web_session(db, settings, user)
+        db.commit()
+        assert db.scalar(
+            select(func.count(WebSession.token_hash)).where(WebSession.user_id == user.id)
+        ) == 2
+
+        service = FinanceService(db)
+        service.set_user_active(Actor.human(admin), user.id, False)
+        assert db.scalar(
+            select(func.count(WebSession.token_hash)).where(WebSession.user_id == user.id)
+        ) == 0
+
+        service.set_user_active(Actor.human(admin), user.id, True)
+        create_web_session(db, settings, user)
+        db.commit()
+        service.reset_password(Actor.human(admin), user.id, "a replacement password")
+        db.refresh(user)
+        assert db.scalar(
+            select(func.count(WebSession.token_hash)).where(WebSession.user_id == user.id)
+        ) == 0
+        assert verify_password(user.password_hash, "a replacement password")
+        assert not verify_password(user.password_hash, "a secure password")
 
 
 def test_archived_root_hides_its_active_leaves(admin) -> None:

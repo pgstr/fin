@@ -42,16 +42,26 @@ def month_range(value: date) -> tuple[date, date]:
 
 
 def complete_coverage(db: Session, account_id: str, start: date, end: date) -> bool:
-    return (
-        db.scalar(
-            select(func.count(ImportBatch.id)).where(
-                ImportBatch.account_id == account_id,
-                ImportBatch.export_from <= start,
-                ImportBatch.export_to >= end,
-            )
+    if start > end:
+        return True
+    intervals = db.execute(
+        select(ImportBatch.export_from, ImportBatch.export_to)
+        .where(
+            ImportBatch.account_id == account_id,
+            ImportBatch.export_from <= end,
+            ImportBatch.export_to >= start,
         )
-        or 0
-    ) > 0
+        .order_by(ImportBatch.export_from, ImportBatch.export_to)
+    ).all()
+    next_uncovered = start
+    for interval_start, interval_end in intervals:
+        if interval_start > next_uncovered:
+            return False
+        if interval_end >= next_uncovered:
+            next_uncovered = interval_end + timedelta(days=1)
+        if next_uncovered > end:
+            return True
+    return False
 
 
 def signed_total(db: Session, account_id: str, start: date, end: date) -> int:
@@ -234,13 +244,17 @@ def month_summary(
     }
 
 
-def least_squares(values: list[float]) -> tuple[float, float, list[float]]:
+def least_squares(
+    values: list[float], positions: list[float] | None = None
+) -> tuple[float, float, list[float]]:
     if not values:
         return 0.0, 0.0, []
     if len(values) < 3:
         mean = statistics.fmean(values)
         return mean, 0.0, [value - mean for value in values]
-    xs = list(range(len(values)))
+    xs = positions if positions is not None else list(range(len(values)))
+    if len(xs) != len(values):
+        raise ValueError("positions and values must have equal length")
     x_mean = statistics.fmean(xs)
     y_mean = statistics.fmean(values)
     denominator = sum((x - x_mean) ** 2 for x in xs)
@@ -257,7 +271,6 @@ def category_trend(
     now = today or date.today()
     current = month_start(now)
     points = []
-    values: list[float] = []
     for offset in range(-12, 0):
         month = add_months(current, offset)
         start, end = month_range(month)
@@ -273,20 +286,29 @@ def category_trend(
             )
             or 0
         )
-        if complete:
-            values.append(float(total))
         points.append({"month": month, "amount_cents": total, "complete": complete})
     complete_points = [point for point in points if point["complete"]]
     complete_values = [float(point["amount_cents"]) for point in complete_points]
-    intercept, slope, _ = least_squares(complete_values[-12:])
+    complete_positions = [
+        point["month"].year * 12 + point["month"].month for point in complete_points
+    ]
+    if complete_positions:
+        origin = complete_positions[0]
+        complete_positions = [position - origin for position in complete_positions]
+    intercept, slope, _ = least_squares(complete_values[-12:], complete_positions[-12:])
     moving = []
     for index, point in enumerate(complete_points):
         subset = complete_points[max(0, index - 2) : index + 1]
+        consecutive = (
+            len(subset) == 3
+            and subset[1]["month"] == add_months(subset[0]["month"], 1)
+            and subset[2]["month"] == add_months(subset[0]["month"], 2)
+        )
         moving.append(
             {
                 "month": point["month"],
                 "amount_cents": round(statistics.fmean(item["amount_cents"] for item in subset))
-                if len(subset) == 3
+                if consecutive
                 else None,
             }
         )

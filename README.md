@@ -14,7 +14,8 @@ SQLite.
 - Supports human- or agent-authored categories, notes, tags, and versioned
   monthly reviews without automatic categorization.
 - Detects recurring entries, links unambiguous internal transfers, shows
-  category trends, and creates a deterministic six-month balance forecast.
+  category trends, and creates a deterministic annual balance forecast for the
+  remaining months through December.
 - Exposes 15 scoped MCP tools over stateless Streamable HTTP at `/mcp`.
 - Creates verified online SQLite backups with daily and monthly retention.
 
@@ -37,10 +38,19 @@ uv run ruff check src tests
 ```
 
 The MCP tests bind a temporary loopback port. Environments that sandbox
-listening sockets must permit localhost for that part of the suite.
+listening sockets must permit localhost for that part of the suite. The real
+browser smoke test also starts a loopback server and requires Chromium:
+
+```sh
+uv run playwright install chromium
+uv run pytest tests/test_browser.py
+```
 
 ## Documentation
 
+- [Development plan](PLAN.md): authoritative product decisions, ordered work,
+  and release gates.
+- [Changelog](CHANGELOG.md): released corrections and verification outcomes.
 - [Operator guide](docs/operator-guide.md): build, deploy, initialize, back up,
   upgrade, restore, and troubleshoot.
 - [MCP agent guide](docs/mcp-agent-guide.md): create a scoped token and connect

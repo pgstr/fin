@@ -106,6 +106,7 @@ def dkb_csv(
 def app_client() -> Iterator[TestClient]:
     with TestClient(app) as client:
         yield client
+    engine.dispose()
 
 
 @pytest.fixture(autouse=True)
@@ -119,6 +120,7 @@ def clean_database(app_client: TestClient) -> Iterator[None]:
         seed_categories(db)
     app_client.cookies.clear()
     yield
+    engine.dispose()
 
 
 @pytest.fixture
