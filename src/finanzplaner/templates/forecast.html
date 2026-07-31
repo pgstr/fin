@@ -1,22 +1,68 @@
 {% extends "base.html" %}
 {% block content %}
-  <header class="page-heading split"><div><p class="eyebrow">{{ account.display_name }}</p><h1>{{ t("forecast.title") }}</h1><p class="lede">{{ t("forecast.subtitle") }}</p></div><a class="button quiet" href="/accounts/{{ account.id }}/trends">{{ t("trend.title") }}</a></header>
+  <header class="page-heading split">
+    <div><p class="eyebrow">{{ account.display_name }}</p><h1>{{ t("forecast.title") }}</h1><p class="lede">{{ t("forecast.subtitle") }}</p></div>
+    <a class="button quiet" href="/accounts/{{ account.id }}/trends">{{ t("trend.title") }} →</a>
+  </header>
   <div class="alert info">{{ t("forecast.notice") }}</div>
   {% if forecast.available %}
-    <section class="section">
-      {% if chart.actual_points or chart.forecast_points %}
-        {% set chart_id = "forecast-chart" %}
-        {% set chart_title_key = "forecast.title" %}
-        {% set chart_class = "large" %}
-        {% include "_balance_chart.html" %}
-      {% endif %}
-      <div class="table-wrap"><table><thead><tr><th>{{ t("month.choose") }}</th><th class="number">{{ t("common.estimated") }}</th><th class="number">{{ t("forecast.minimum") }}</th><th class="number">{{ t("forecast.maximum") }}</th></tr></thead>
-      <tbody>{% for point in forecast.points[1:] %}<tr><td>{{ datefmt(point.month, "MMM y") }}</td><td class="number">{{ money(point.balance_cents) }}</td><td class="number">{{ money(point.low_cents) }}</td><td class="number">{{ money(point.high_cents) }}</td></tr>{% endfor %}</tbody></table></div>
-    </section>
-    <section class="section"><div class="section-heading split"><h2>{{ t("forecast.recurring") }}</h2><a class="button quiet" href="/accounts/{{ account.id }}/recurring">{{ t("common.edit") }}</a></div>
-      <div class="recurring-list">{% for item in forecast.recurring %}<div><span>{{ item.counterparty }}<small>{{ datefmt(item.date) }} · {{ t("recurring." ~ item.cadence) }}</small></span><strong>{{ money(item.amount_cents) }}</strong></div>{% else %}<p>{{ t("forecast.no_recurring") }}</p>{% endfor %}</div>
-    </section>
+    <div class="dashboard-grid">
+      <section class="section" aria-labelledby="forecast-chart-title">
+        <div class="section-heading split">
+          <h2 id="forecast-chart-title">{{ t("forecast.title") }}</h2>
+          <div class="legend">
+            <span><i class="legend-line actual"></i>{{ t("common.observed") }}</span>
+            <span><i class="legend-line forecast"></i>{{ t("common.estimated") }}</span>
+          </div>
+        </div>
+        {% if chart.actual_points or chart.forecast_points %}
+          {% set chart_id = "forecast-chart" %}
+          {% set chart_title_key = "forecast.title" %}
+          {% set chart_class = "large" %}
+          {% include "_balance_chart.html" %}
+        {% endif %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>{{ t("month.choose") }}</th><th class="number">{{ t("common.estimated") }}</th><th class="number">{{ t("forecast.minimum") }}</th><th class="number">{{ t("forecast.maximum") }}</th></tr></thead>
+            <tbody>
+              {% for point in forecast.points[1:] %}
+                <tr>
+                  <td>{{ datefmt(point.month, "MMM y") }}</td>
+                  <td class="number">{{ money(point.balance_cents) }}</td>
+                  <td class="number quiet">{{ money(point.low_cents) }}</td>
+                  <td class="number quiet">{{ money(point.high_cents) }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="recurring-title">
+        <div class="section-heading split">
+          <h2 id="recurring-title">{{ t("forecast.recurring") }}</h2>
+          <a class="button quiet" href="/accounts/{{ account.id }}/recurring">{{ t("common.edit") }}</a>
+        </div>
+        <div class="recurring-list">
+          {% for item in forecast.recurring %}
+            <div>
+              <span>{{ item.counterparty }}<small>{{ datefmt(item.date) }} · {{ t("recurring." ~ item.cadence) }}</small></span>
+              <strong class="{{ 'pos' if item.amount_cents > 0 else 'neg' if item.amount_cents < 0 }}">{{ money(item.amount_cents) }}</strong>
+            </div>
+          {% else %}
+            <p class="empty-inline">{{ t("forecast.no_recurring") }}</p>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
   {% else %}
-    <section class="empty-state"><h2>{{ t("forecast.insufficient") }}</h2></section>
+    <section class="section">
+      <div class="empty-state">
+        <span class="empty-icon" aria-hidden="true">⌁</span>
+        <strong>{{ t("forecast.insufficient") }}</strong>
+        <p>{{ t("forecast.subtitle") }}</p>
+        <a class="button" href="/accounts/{{ account.id }}/import">{{ t("import.title") }} →</a>
+      </div>
+    </section>
   {% endif %}
 {% endblock %}

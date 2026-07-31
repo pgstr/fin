@@ -1,44 +1,106 @@
 {% extends "base.html" %}
 {% block content %}
-  <header class="page-heading">
-    <p class="eyebrow">{{ account.display_name }}</p>
-    <h1>{{ t("trend.title") }}</h1>
+  <header class="page-heading split">
+    <div><p class="eyebrow">{{ account.display_name }}</p><h1>{{ t("trend.title") }}</h1></div>
+    <form method="get" class="inline-form">
+      <label>{{ t("trend.category") }}
+        <select name="category_id" data-auto-submit>
+          {% for root in categories if not root.parent_id %}
+            <optgroup label="{{ root.label_en if locale == 'en' and root.label_en else root.label_de }}">
+              {% for category in categories if category.parent_id == root.id and category.assignable %}
+                <option value="{{ category.id }}" {% if category.id == selected_id %}selected{% endif %}>{{ category.label_en if locale == "en" and category.label_en else category.label_de }}</option>
+              {% endfor %}
+            </optgroup>
+          {% endfor %}
+        </select>
+      </label>
+    </form>
   </header>
-  <form class="section narrow" method="get">
-    <label>{{ t("trend.category") }}
-      <select name="category_id" data-auto-submit>
-        {% for root in categories if not root.parent_id %}
-          <optgroup label="{{ root.label_en if locale == 'en' and root.label_en else root.label_de }}">
-            {% for category in categories if category.parent_id == root.id and category.assignable %}
-              <option value="{{ category.id }}" {% if category.id == selected_id %}selected{% endif %}>{{ category.label_en if locale == "en" and category.label_en else category.label_de }}</option>
-            {% endfor %}
-          </optgroup>
-        {% endfor %}
-      </select>
-    </label>
-  </form>
+
   {% if trend %}
     {% if trend.sparse %}<div class="alert warning">{{ t("trend.sparse") }}</div>{% endif %}
-    <section class="section">
-      <div class="section-heading split">
-        <h2>{{ trend.category_label }}</h2>
-        <p>{{ t("trend.monthly_change") }}: {{ money(trend.linear_monthly_change_cents) if trend.linear_monthly_change_cents is not none else "—" }}</p>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>{{ t("month.choose") }}</th><th>{{ t("common.incomplete") }}</th><th class="number">{{ t("transactions.amount") }}</th><th class="number">{{ t("trend.moving_average") }}</th></tr></thead>
-          <tbody>
-            {% for point in trend.points %}
-              <tr>
-                <td>{{ datefmt(point.month, "MMM y") }}</td>
-                <td>{{ t("common.no") if point.complete else t("common.yes") }}</td>
-                <td class="number">{{ money(point.amount_cents) }}</td>
-                <td class="number">{{ money(moving_by_month.get(point.month)) if moving_by_month.get(point.month) is not none else "—" }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </section>
+
+    {# Bar chart of monthly amounts with the moving average overlaid. Geometry is
+       derived here so the page stays server-rendered and needs no chart script. #}
+    {% set count = trend.points | length %}
+    {% set peak = (trend.points | map(attribute='amount_cents') | map('abs') | list | max) if count else 0 %}
+    {% set step = (640 / count) if count else 640 %}
+    {% set bar_width = [step * 0.62, 56] | min %}
+    {% set ns = namespace(average_points=[]) %}
+    {% for point in trend.points %}
+      {% set average = moving_by_month.get(point.month) %}
+      {% if average is not none and peak %}
+        {% set x = 40 + (loop.index0 + 0.5) * step %}
+        {% set y = 180 - (average | abs) / peak * 150 %}
+        {% set ns.average_points = ns.average_points + ['%.1f,%.1f' | format(x, y)] %}
+      {% endif %}
+    {% endfor %}
+
+    <div class="dashboard-grid">
+      <section class="section" aria-labelledby="trend-chart-title">
+        <div class="section-heading split">
+          <h2 id="trend-chart-title">{{ trend.category_label }}</h2>
+          <div class="legend">
+            <span><i class="legend-bar"></i>{{ t("transactions.amount") }}</span>
+            <span><i class="legend-line actual"></i>{{ t("trend.moving_average") }}</span>
+          </div>
+        </div>
+        {% if count and peak %}
+          <div class="chart-shell">
+            <svg class="trend-chart" viewBox="0 0 720 220" role="img" aria-labelledby="trend-chart-heading">
+              <title id="trend-chart-heading">{{ trend.category_label }} — {{ t("trend.monthly_change") }}</title>
+              <line x1="40" x2="680" y1="30" y2="30"></line>
+              <line x1="40" x2="680" y1="105" y2="105"></line>
+              <line x1="40" x2="680" y1="180" y2="180"></line>
+              {% for point in trend.points %}
+                {% set height = (point.amount_cents | abs) / peak * 150 %}
+                {% set x = 40 + (loop.index0 + 0.5) * step - bar_width / 2 %}
+                <rect class="trend-bar {% if not point.complete %}incomplete{% endif %}"
+                      x="{{ '%.1f'|format(x) }}" y="{{ '%.1f'|format(180 - height) }}"
+                      width="{{ '%.1f'|format(bar_width) }}" height="{{ '%.1f'|format(height) }}" rx="2">
+                  <title>{{ datefmt(point.month, "MMM y") }} · {{ money(point.amount_cents) }}</title>
+                </rect>
+              {% endfor %}
+              {% if ns.average_points | length > 1 %}
+                <polyline class="actual-line" points="{{ ns.average_points | join(' ') }}"></polyline>
+              {% endif %}
+              {% for point in trend.points %}
+                {% if count <= 14 or loop.index0 % 2 == 0 %}
+                  <text x="{{ '%.1f'|format(40 + (loop.index0 + 0.5) * step) }}" y="200" text-anchor="middle">{{ datefmt(point.month, "MMM") }}</text>
+                {% endif %}
+              {% endfor %}
+              <text x="4" y="34">{{ money(peak) }}</text>
+            </svg>
+          </div>
+        {% else %}
+          <p class="empty-inline">{{ t("trend.sparse") }}</p>
+        {% endif %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>{{ t("month.choose") }}</th><th>{{ t("common.incomplete") }}</th><th class="number">{{ t("transactions.amount") }}</th><th class="number">{{ t("trend.moving_average") }}</th></tr></thead>
+            <tbody>
+              {% for point in trend.points %}
+                <tr>
+                  <td>{{ datefmt(point.month, "MMM y") }}</td>
+                  <td>{{ t("common.no") if point.complete else t("common.yes") }}</td>
+                  <td class="number">{{ money(point.amount_cents) }}</td>
+                  <td class="number quiet">{{ money(moving_by_month.get(point.month)) if moving_by_month.get(point.month) is not none else "—" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="trend-facts-title">
+        <div class="section-heading"><h2 id="trend-facts-title">{{ trend.category_label }}</h2></div>
+        <dl class="facts-list">
+          <div>
+            <dt>{{ t("trend.monthly_change") }}</dt>
+            <dd class="{{ 'neg' if trend.linear_monthly_change_cents and trend.linear_monthly_change_cents > 0 else 'pos' if trend.linear_monthly_change_cents }}">{{ money(trend.linear_monthly_change_cents) if trend.linear_monthly_change_cents is not none else "—" }}</dd>
+          </div>
+        </dl>
+      </section>
+    </div>
   {% endif %}
 {% endblock %}

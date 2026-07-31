@@ -588,7 +588,9 @@ def format_money(cents: int | None, locale: str = "de") -> str:
     if cents is None:
         return "—"
     babel_locale = "de_DE" if normalize_locale(locale) == "de" else "en_GB"
-    return babel_format_currency(cents / 100, "EUR", locale=babel_locale)
+    formatted = babel_format_currency(cents / 100, "EUR", locale=babel_locale)
+    # Babel emits an ASCII hyphen-minus; amounts are typeset with U+2212.
+    return formatted.replace("-", "−")
 
 
 def format_date(value: date | None, locale: str = "de", format: str = "medium") -> str:

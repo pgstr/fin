@@ -1039,6 +1039,44 @@ legend {
   color: var(--acc);
   border-top-style: dashed;
 }
+.legend-bar {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.7rem;
+  border-radius: 1px;
+  background: var(--mint);
+}
+
+/* category trend bars */
+.trend-chart { width: 100%; display: block; }
+.trend-chart line { stroke: var(--track); stroke-width: 1; }
+.trend-chart text {
+  fill: var(--mut);
+  font-family: var(--mono);
+  font-size: 9px;
+}
+.trend-chart .trend-bar { fill: var(--mint); opacity: 0.85; }
+.trend-chart .trend-bar.incomplete { opacity: 0.4; }
+.trend-chart .actual-line {
+  fill: none;
+  stroke: var(--sky);
+  stroke-width: 2;
+}
+
+.facts-list { display: grid; gap: 0.6rem; }
+.facts-list dt {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mut);
+}
+.facts-list dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
 
 .chart-fallback { margin-top: 0.6rem; font-size: 0.74rem; }
 .chart-fallback > summary {
