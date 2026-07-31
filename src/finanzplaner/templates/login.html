@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+  <div class="auth-brand">
+    <span class="brand-mark" aria-hidden="true">F</span>
+    <strong>{{ t("app.name")|upper }}</strong>
+    <button class="theme-toggle" type="button" data-theme-toggle title="{{ t('theme.toggle') }}" aria-label="{{ t('theme.toggle') }}">
+      <span class="toggle-moon" aria-hidden="true">☾</span>
+      <span class="toggle-sun" aria-hidden="true">☀</span>
+    </button>
+  </div>
   <section class="auth-card" aria-labelledby="login-title">
-    <div class="auth-brand"><span class="brand-mark" aria-hidden="true">F</span>{{ t("app.name") }}</div>
     <h1 id="login-title">{{ t("login.title") }}</h1>
     {% if login_error %}<div class="alert error" role="alert">{{ t(login_error) }}</div>{% endif %}
     <form method="post" class="stack">
@@ -9,7 +16,7 @@
       <input type="hidden" name="next_url" value="{{ next_url }}">
       <label>{{ t("login.username") }}<input name="username" autocomplete="username" required autofocus></label>
       <label>{{ t("login.password") }}<input name="password" type="password" autocomplete="current-password" required></label>
-      <button class="button primary" type="submit">{{ t("login.submit") }}</button>
+      <button class="button" type="submit">{{ t("login.submit") }} →</button>
     </form>
     <p class="locale-links"><a href="/login?lang=de" lang="de">Deutsch</a> · <a href="/login?lang=en" lang="en">English</a></p>
   </section>

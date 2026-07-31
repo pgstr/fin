@@ -1,8 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
   <header class="page-heading"><h1>{{ t("users.title") }}</h1></header>
-  <section class="section"><h2>{{ t("users.create") }}</h2><form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label>{{ t("users.username") }}<input name="username" required></label><label>{{ t("users.password") }}<input name="password" type="password" minlength="12" required></label><label>{{ t("users.language") }}<select name="locale"><option value="de">{{ t("settings.german") }}</option><option value="en">{{ t("settings.english") }}</option></select></label><label class="check"><input name="is_admin" type="checkbox" value="true">{{ t("users.admin") }}</label><button class="button primary" type="submit">{{ t("common.create") }}</button></form></section>
-  <section class="section"><div class="table-wrap"><table><thead><tr><th>{{ t("users.username") }}</th><th>{{ t("users.admin") }}</th><th>{{ t("users.language") }}</th><th>{{ t("users.status") }}</th><th></th></tr></thead><tbody>
-    {% for item in users %}<tr><td>{{ item.username }}</td><td>{{ t("common.yes") if item.is_admin else t("common.no") }}</td><td>{{ item.locale }}</td><td>{{ t("users.active") if item.active else t("users.disabled") }}</td><td><form method="post" action="/users/{{ item.id }}/status"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="active" value="{{ 'false' if item.active else 'true' }}"><button class="button quiet" type="submit">{{ t("common.disable") if item.active else t("common.activate") }}</button></form><form method="post" action="/users/{{ item.id }}/password" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input name="password" type="password" minlength="12" placeholder="{{ t('users.password') }}" required><button class="button quiet" type="submit">{{ t("users.reset_password") }}</button></form></td></tr>{% endfor %}
-  </tbody></table></div></section>
+  <section class="section">
+    <div class="section-heading"><h2>{{ t("users.create") }}</h2></div>
+    <form method="post" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>{{ t("users.username") }}<input name="username" required></label>
+      <label>{{ t("users.password") }}<input name="password" type="password" minlength="12" required></label>
+      <label>{{ t("users.language") }}<select name="locale"><option value="de">{{ t("settings.german") }}</option><option value="en">{{ t("settings.english") }}</option></select></label>
+      <div class="filter-actions">
+        <label class="check"><input name="is_admin" type="checkbox" value="true">{{ t("users.admin") }}</label>
+        <button class="button" type="submit">{{ t("common.create") }}</button>
+      </div>
+    </form>
+  </section>
+  <section class="section">
+    <div class="section-heading"><h2>{{ t("users.title") }}</h2></div>
+    <div class="table-wrap"><table><thead><tr><th>{{ t("users.username") }}</th><th>{{ t("users.admin") }}</th><th>{{ t("users.language") }}</th><th>{{ t("users.status") }}</th><th></th></tr></thead><tbody>
+      {% for item in users %}
+        <tr>
+          <td>{{ item.username }}</td>
+          <td>{% if item.is_admin %}<span class="badge muted">{{ t("users.admin") }}</span>{% else %}<span class="quiet">—</span>{% endif %}</td>
+          <td class="code-label">{{ item.locale|upper }}</td>
+          <td>{% if item.active %}<span class="badge success">{{ t("users.active") }}</span>{% else %}<span class="badge">{{ t("users.disabled") }}</span>{% endif %}</td>
+          <td>
+            <div class="row-actions">
+              <form method="post" action="/users/{{ item.id }}/status">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="active" value="{{ 'false' if item.active else 'true' }}">
+                <button class="button {{ 'danger' if item.active else 'quiet' }}" type="submit">{{ t("common.disable") if item.active else t("common.activate") }}</button>
+              </form>
+              <form method="post" action="/users/{{ item.id }}/password" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <label><span class="sr-only">{{ t("users.password") }}</span><input name="password" type="password" minlength="12" placeholder="{{ t('users.password') }}" required></label>
+                <button class="button quiet" type="submit">{{ t("users.reset_password") }}</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody></table></div>
+  </section>
 {% endblock %}

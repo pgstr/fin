@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+  <div class="auth-brand">
+    <span class="brand-mark" aria-hidden="true">F</span>
+    <strong>{{ t("app.name")|upper }}</strong>
+    <button class="theme-toggle" type="button" data-theme-toggle title="{{ t('theme.toggle') }}" aria-label="{{ t('theme.toggle') }}">
+      <span class="toggle-moon" aria-hidden="true">☾</span>
+      <span class="toggle-sun" aria-hidden="true">☀</span>
+    </button>
+  </div>
   <section class="auth-card" aria-labelledby="setup-title">
-    <div class="auth-brand"><span class="brand-mark" aria-hidden="true">F</span>{{ t("app.name") }}</div>
     <h1 id="setup-title">{{ t("setup.title") }}</h1>
     <p class="lede">{{ t("setup.intro") }}</p>
     <form method="post" class="stack">
@@ -9,7 +16,7 @@
       <label>{{ t("setup.token") }}<input name="setup_token" type="password" autocomplete="off" required></label>
       <label>{{ t("setup.username") }}<input name="username" autocomplete="username" minlength="3" maxlength="80" required></label>
       <label>{{ t("setup.password") }}<input name="password" type="password" autocomplete="new-password" minlength="12" required><small>{{ t("setup.password_hint") }}</small></label>
-      <button class="button primary" type="submit">{{ t("setup.submit") }}</button>
+      <button class="button" type="submit">{{ t("setup.submit") }} →</button>
     </form>
   </section>
 {% endblock %}

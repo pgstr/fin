@@ -327,6 +327,10 @@ img, svg { max-width: 100%; }
 
 .topbar-user { white-space: nowrap; text-transform: uppercase; }
 
+/* pushed right on pages without an account, where no sync chip precedes it */
+.topbar .theme-toggle { margin-left: auto; }
+.topbar-sync + .theme-toggle { margin-left: 0; }
+
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -1325,17 +1329,33 @@ progress::-moz-progress-bar { background: var(--bar, var(--sky)); border-radius:
 .timeline small { display: block; font-size: 0.68rem; color: var(--mut); }
 
 .token-once {
-  padding: 0.6rem 0.7rem;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.7rem 0.8rem;
   border: 1px dashed var(--acc);
   border-radius: var(--radius-sm);
   background: var(--field);
   overflow-wrap: anywhere;
 }
+.token-once strong {
+  font-size: 0.74rem;
+  font-weight: 400;
+  color: var(--mut);
+}
 .token-once code {
   font-family: var(--mono);
-  font-size: 0.8rem;
+  font-size: 0.86rem;
   color: var(--acc);
 }
+
+/* stacked per-row controls in admin tables */
+.row-actions {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+.row-actions .inline-form { gap: 0.4rem; }
+td small.code-label { display: block; margin-top: 0.15rem; }
 
 .prose { font-size: 0.82rem; line-height: 1.65; }
 .prose > * + * { margin-top: 0.6rem; }
@@ -1552,16 +1572,23 @@ progress::-moz-progress-bar { background: var(--bar, var(--sky)); border-radius:
   font-weight: 600;
 }
 .auth-brand strong {
-  display: block;
   font-family: var(--mono);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 400;
   letter-spacing: 0.14em;
 }
 .auth-brand small { display: block; font-size: 0.7rem; color: var(--mut); }
+.auth-brand .theme-toggle { margin-left: auto; }
 
-.auth-card { display: grid; gap: 0.7rem; }
-.auth-card h1 { font-size: 1rem; font-weight: 600; }
-.auth-card .button { width: 100%; }
+.auth-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+.auth-card h1 { font-size: 1.15rem; font-weight: 600; }
+.auth-card .button { width: 100%; padding: 0.65rem; }
+.auth-card .locale-links { justify-content: center; }
 
 /* ----------------------------------------------------------- error page -- */
 

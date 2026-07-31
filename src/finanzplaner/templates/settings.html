@@ -1,5 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
   <header class="page-heading"><h1>{{ t("settings.title") }}</h1></header>
-  <section class="section narrow"><form method="post" class="stack"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label>{{ t("settings.language") }}<select name="locale"><option value="de" {% if user.locale == "de" %}selected{% endif %}>{{ t("settings.german") }}</option><option value="en" {% if user.locale == "en" %}selected{% endif %}>{{ t("settings.english") }}</option></select></label><button class="button primary" type="submit">{{ t("common.save") }}</button></form></section>
+
+  <section class="section narrow">
+    <div class="section-heading"><h2>{{ t("settings.language") }}</h2></div>
+    <form method="post" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label><span class="sr-only">{{ t("settings.language") }}</span>
+        <select name="locale">
+          <option value="de" {% if user.locale == "de" %}selected{% endif %}>{{ t("settings.german") }}</option>
+          <option value="en" {% if user.locale == "en" %}selected{% endif %}>{{ t("settings.english") }}</option>
+        </select>
+      </label>
+      <button class="button" type="submit">{{ t("common.save") }}</button>
+    </form>
+  </section>
+
+  {# The theme is a client-side preference held in localStorage, so this control
+     deliberately has no form or submit button — app.js applies it directly. #}
+  <section class="section narrow">
+    <div class="section-heading"><h2>{{ t("settings.appearance") }}</h2></div>
+    <fieldset class="checks">
+      <legend class="sr-only">{{ t("settings.appearance") }}</legend>
+      <label class="check"><input type="radio" name="fin-theme" value="dark" data-theme-option>{{ t("theme.dark") }}</label>
+      <label class="check"><input type="radio" name="fin-theme" value="light" data-theme-option>{{ t("theme.light") }}</label>
+    </fieldset>
+  </section>
 {% endblock %}
