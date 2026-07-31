@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-  <header class="page-heading split"><div><p class="eyebrow">{{ account.display_name }}</p><h1>{{ t("recurring.title") }}</h1></div><form method="post" action="/accounts/{{ account.id }}/recurring/detect"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="button primary" type="submit">{{ t("recurring.detect") }}</button></form></header>
+  <header class="page-heading split"><div><p class="eyebrow">{{ account.display_name }}</p><h1>{{ t("recurring.title") }}</h1></div><form method="post" action="/accounts/{{ account.id }}/recurring/detect"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="button" type="submit">{{ t("recurring.detect") }}</button></form></header>
   <div class="recurring-cards">
     {% for item in recurring %}
       <form method="post" action="/recurring/{{ item.id }}" class="section recurring-card">
