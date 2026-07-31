@@ -1,8 +1,8 @@
 <div class="month-nav" aria-label="{{ t('month.choose') }}">
-  <a class="icon-button" href="{{ base_url }}?month={{ previous_month.strftime('%Y-%m') }}" aria-label="{{ t('month.previous') }}">‹</a>
+  <a class="month-step" href="{{ base_url }}?month={{ previous_month.strftime('%Y-%m') }}" aria-label="{{ t('month.previous') }}"><span aria-hidden="true">‹</span>{{ datefmt(previous_month, "MMM") }}</a>
   <form method="get">
     <label class="sr-only" for="month-picker">{{ t("month.choose") }}</label>
     <input id="month-picker" name="month" type="month" value="{{ month.strftime('%Y-%m') }}" data-auto-submit>
   </form>
-  <a class="icon-button" href="{{ base_url }}?month={{ next_month.strftime('%Y-%m') }}" aria-label="{{ t('month.next') }}">›</a>
+  <a class="month-step" href="{{ base_url }}?month={{ next_month.strftime('%Y-%m') }}" aria-label="{{ t('month.next') }}">{{ datefmt(next_month, "MMM") }}<span aria-hidden="true">›</span></a>
 </div>

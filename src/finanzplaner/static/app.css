@@ -868,13 +868,36 @@ legend {
 }
 .month-nav form,
 .year-nav form { margin: 0; }
+/* segmented ‹ APR | MAI 2026 | JUN › switcher; the current month stays a real
+   month input so an arbitrary month can still be picked */
 .month-nav input,
 .year-nav input {
   width: auto;
   padding: 0.3rem 0.5rem;
   border-color: var(--acc);
+  border-radius: 0.3rem;
   background: none;
   font-size: 0.74rem;
+}
+
+.month-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--line2);
+  border-radius: 0.3rem;
+  color: var(--mut);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: border-color 0.16s ease, color 0.16s ease;
+}
+.month-step:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+  text-decoration: none;
 }
 
 /* --------------------------------------------------------------- chart -- */
@@ -990,12 +1013,13 @@ progress::-webkit-progress-bar { background: var(--track); border-radius: 3px; }
 progress::-webkit-progress-value { background: var(--bar, var(--sky)); border-radius: 3px; }
 progress::-moz-progress-bar { background: var(--bar, var(--sky)); border-radius: 3px; }
 
-/* one pastel per category bar, rotating */
-.bar-row:nth-of-type(5n + 1) { --bar: var(--sky); }
-.bar-row:nth-of-type(5n + 2) { --bar: var(--mint); }
-.bar-row:nth-of-type(5n + 3) { --bar: var(--peach); }
-.bar-row:nth-of-type(5n + 4) { --bar: var(--rose); }
-.bar-row:nth-of-type(5n) { --bar: var(--lav); }
+/* one pastel per category bar, rotating; the index comes from the template so
+   it does not depend on how many non-bar siblings precede the list */
+.bar-0 { --bar: var(--sky); }
+.bar-1 { --bar: var(--mint); }
+.bar-2 { --bar: var(--peach); }
+.bar-3 { --bar: var(--rose); }
+.bar-4 { --bar: var(--lav); }
 
 /* ------------------------------------------------------ page-level grid -- */
 

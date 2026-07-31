@@ -12,31 +12,46 @@
 
   <section class="summary-grid" aria-label="{{ t('dashboard.title') }}">
     <article class="summary-item balance">
-      <span class="summary-icon" aria-hidden="true">€</span>
-      <div>
-        <p>{{ t("dashboard.balance") }}</p>
-        <strong>{{ money(summary.closing_balance_cents) if summary.balance_reliable else "—" }}</strong>
-        <small>
-          {% if summary.balance_reliable %}{{ t("dashboard.balance_as_of", date=datefmt(summary.balance_effective_date)) }}
-          {% else %}{{ t("dashboard.balance_unavailable") }}{% endif %}
-        </small>
-      </div>
+      <p>{{ t("dashboard.balance") }}</p>
+      <strong>{{ money(summary.closing_balance_cents) if summary.balance_reliable else "—" }}</strong>
+      <small>
+        {% if summary.balance_reliable %}{{ t("dashboard.balance_as_of", date=datefmt(summary.balance_effective_date)) }}
+        {% else %}{{ t("dashboard.balance_unavailable") }}{% endif %}
+      </small>
     </article>
     <article class="summary-item incoming">
-      <span class="summary-icon" aria-hidden="true">↙</span>
-      <div>
-        <p>{{ t("dashboard.incoming") }}</p>
-        <strong>+{{ money(summary.incoming_cents) }}</strong>
-        <small>{{ t("dashboard.household_contribution", amount=money(summary.household_contribution_cents)) }}</small>
-      </div>
+      <p>{{ t("dashboard.incoming") }}</p>
+      <strong>+{{ money(summary.incoming_cents) }}</strong>
+      <small>{{ t("dashboard.household_contribution", amount=money(summary.household_contribution_cents)) }}</small>
     </article>
     <article class="summary-item outgoing">
-      <span class="summary-icon" aria-hidden="true">↗</span>
-      <div>
-        <p>{{ t("dashboard.outgoing") }}</p>
-        <strong>−{{ money(summary.outgoing_cents) }}</strong>
-        <small>{{ t("dashboard.uncategorized_count", count=summary.uncategorized_count) }}</small>
-      </div>
+      <p>{{ t("dashboard.outgoing") }}</p>
+      <strong>−{{ money(summary.outgoing_cents) }}</strong>
+      <small>{{ t("dashboard.uncategorized_count", count=summary.uncategorized_count) }}</small>
+    </article>
+    <article class="summary-item">
+      <p>{{ t("dashboard.net") }}</p>
+      <strong class="{{ 'pos' if summary.net_cents > 0 else 'neg' if summary.net_cents < 0 }}">{{ money(summary.net_cents) }}</strong>
+      <small>
+        {% if summary.previous_month_net_cents is not none %}{{ t("dashboard.previous_month") }} {{ money(summary.net_cents - summary.previous_month_net_cents) }}
+        {% else %}{{ t("dashboard.no_comparison") }}{% endif %}
+      </small>
+    </article>
+    <article class="summary-item uncategorized">
+      <p>{{ t("dashboard.uncategorized") }}</p>
+      <strong>{{ money(summary.uncategorized_cents) }}</strong>
+      <small>{{ t("dashboard.uncategorized_count", count=summary.uncategorized_count) }}</small>
+    </article>
+    <article class="summary-item">
+      <p>{{ t("nav.forecast") }}</p>
+      {% if chart.projected %}
+        {% set last_projection = chart.projected[-1] %}
+        <strong>{{ money(last_projection.value) }}</strong>
+        <small>{{ datefmt(last_projection.month, "MMM y") }} · {{ t("common.estimated") }}</small>
+      {% else %}
+        <strong>—</strong>
+        <small>{{ t("forecast.insufficient") }}</small>
+      {% endif %}
     </article>
   </section>
 
@@ -49,9 +64,7 @@
     <dl>
       <div><dt>{{ t("dashboard.opening_balance") }}</dt><dd>{{ money(summary.opening_balance_cents) if summary.opening_balance_reliable else "—" }}</dd></div>
       <div><dt>{{ t("dashboard.closing_balance") }}</dt><dd>{{ money(summary.closing_balance_cents) if summary.closing_balance_reliable else "—" }}</dd></div>
-      <div><dt>{{ t("dashboard.net") }}</dt><dd>{{ money(summary.net_cents) }}</dd></div>
       <div><dt>{{ t("dashboard.categorized") }}</dt><dd>{{ money(summary.categorized_cents) }}</dd></div>
-      <div><dt>{{ t("dashboard.uncategorized") }}</dt><dd>{{ money(summary.uncategorized_cents) }}</dd></div>
       <div><dt>{{ t("dashboard.previous_month") }}</dt><dd>{% if summary.previous_month_net_cents is not none %}{{ money(summary.net_cents - summary.previous_month_net_cents) }}{% else %}{{ t("dashboard.no_comparison") }}{% endif %}</dd></div>
       <div><dt>{{ t("dashboard.previous_year") }}</dt><dd>{% if summary.previous_year_net_cents is not none %}{{ money(summary.net_cents - summary.previous_year_net_cents) }}{% else %}{{ t("dashboard.no_comparison") }}{% endif %}</dd></div>
     </dl>
@@ -95,7 +108,7 @@
       </div>
       {% set max_expense = summary.breakdown[0].amount_cents if summary.breakdown else 1 %}
       {% for item in summary.breakdown[:6] %}
-        <div class="bar-row">
+        <div class="bar-row bar-{{ loop.index0 % 5 }}">
           <div><span>{{ item.label or t("category.uncategorized") }}</span><strong>{{ money(item.amount_cents) }}</strong></div>
           <progress max="{{ max_expense }}" value="{{ item.amount_cents }}">{{ item.amount_cents }}</progress>
         </div>
@@ -119,7 +132,7 @@
               <td><a href="/transactions/{{ transaction.id }}">{{ datefmt(transaction.booking_date, "dd.MM.") }}</a></td>
               <td><a class="transaction-name" href="/transactions/{{ transaction.id }}">{{ transaction.display_counterparty or transaction.transaction_type }}<small>{{ transaction.purpose }}</small></a></td>
               <td><span class="badge {% if not transaction.category %}muted{% endif %}">{{ transaction.category and (transaction.category.label_en if locale == "en" and transaction.category.label_en else transaction.category.label_de) or t("category.uncategorized") }}</span></td>
-              <td class="number amount">{{ "+" if transaction.amount_cents > 0 else "−" if transaction.amount_cents < 0 else "" }}{{ money(transaction.amount_cents|abs) }}</td>
+              <td class="number amount {{ 'pos' if transaction.amount_cents > 0 else 'neg' if transaction.amount_cents < 0 }}">{{ "+" if transaction.amount_cents > 0 else "−" if transaction.amount_cents < 0 else "" }}{{ money(transaction.amount_cents|abs) }}</td>
             </tr>
           {% else %}<tr><td colspan="4" class="empty-cell">{{ t("transactions.no_results") }}</td></tr>{% endfor %}
         </tbody>
