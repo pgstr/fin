@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from pathlib import Path
 
@@ -15,7 +16,18 @@ def hidden_value(html: str, name: str) -> str:
     return match.group(1)
 
 
-def initialize(base_url: str, fixture: Path) -> dict[str, str]:
+def setup_token(token_file: Path | None) -> str:
+    value = os.environ.get("SETUP_TOKEN")
+    if value:
+        return value
+    if token_file is not None:
+        return token_file.read_text().strip()
+    raise RuntimeError("SETUP_TOKEN or --setup-token-file is required")
+
+
+def initialize(
+    base_url: str, fixture: Path, token_file: Path | None
+) -> dict[str, str]:
     with httpx.Client(base_url=base_url, follow_redirects=False, timeout=15) as client:
         setup = client.get("/setup")
         setup.raise_for_status()
@@ -23,7 +35,7 @@ def initialize(base_url: str, fixture: Path) -> dict[str, str]:
             "/setup",
             data={
                 "form_token": hidden_value(setup.text, "form_token"),
-                "setup_token": "container-setup-token",
+                "setup_token": setup_token(token_file),
                 "username": "container-admin",
                 "password": "correct horse battery",
             },
@@ -127,11 +139,12 @@ def main() -> None:
     parser.add_argument("mode", choices=("initialize", "prepare-recovery", "verify"))
     parser.add_argument("base_url")
     parser.add_argument("--fixture", type=Path)
+    parser.add_argument("--setup-token-file", type=Path)
     args = parser.parse_args()
     if args.mode == "initialize":
         if args.fixture is None:
             parser.error("--fixture is required for initialize")
-        result = initialize(args.base_url, args.fixture)
+        result = initialize(args.base_url, args.fixture, args.setup_token_file)
     elif args.mode == "prepare-recovery":
         result = prepare_recovery(args.base_url)
     else:

@@ -240,7 +240,7 @@ mv finanzplaner.db finanzplaner.db-wal finanzplaner.db-shm \
   "$failed_dir"/ 2>/dev/null || true
 cp ~/.podium/finanzplaner/volumes/finanzbackups/daily/SELECTED.sqlite3 \
   finanzplaner.db
-chown 10001:10001 finanzplaner.db
+chmod 600 finanzplaner.db
 sqlite3 finanzplaner.db 'PRAGMA integrity_check;'
 podium validate /absolute/path/to/podium/finanzplaner.stack.json
 podium apply /absolute/path/to/podium/finanzplaner.stack.json
@@ -248,10 +248,11 @@ podium apply /absolute/path/to/podium/finanzplaner.stack.json
 
 The integrity command must print exactly `ok`. Do not use
 `podium down --volumes`; that command destroys both data and backups.
-The ownership step is required because Fin runs as UID/GID 10001 after its
-entrypoint prepares the volume. Perform recovery first against the isolated
-acceptance volumes, and verify login, import history, transactions, monthly
-reviews, and the latest balance before touching a live stack.
+Keep the restored database owned by the Podium host user; Podium maps that host
+ownership into its VM. Do not change the host file to container UID/GID 10001.
+Perform recovery first against the isolated acceptance volumes, and verify
+login, import history, transactions, monthly reviews, and the latest balance
+before touching a live stack.
 
 ## 10. Troubleshooting
 
