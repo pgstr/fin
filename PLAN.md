@@ -1,6 +1,6 @@
 # Fin development plan
 
-Status: active  
+Status: completed for `1.1.0`
 Last updated: 2026-07-31
 
 This is the single source of truth for future Fin development. Product and
@@ -37,8 +37,9 @@ they should change.
 - Import coverage may be assembled from multiple adjacent or overlapping import
   batches. A real date gap must still make derived balances unreliable.
 - Historical analytics remain readable after categories are archived.
-- The next verified release will be `1.1.0`. It will be published from a private
-  GitHub repository with automated lint and test checks.
+- The verified release is `1.1.0`. It is published to a private
+  GitHub repository used only as a version-control remote. Release verification
+  runs locally and on the approved Podium host, not in GitHub Actions.
 
 ## Scope boundaries
 
@@ -99,15 +100,15 @@ for January, June, and December balance snapshots.
 Done when every user-facing and agent-facing description matches the
 implementation, and no six-month or per-category forecast claim remains.
 
-### F-02 — Publish the private repository and add core CI
+### F-02 — Publish the private repository and define local release checks
 
-Create the private GitHub repository, add it as the remote, and run locked
-dependency installation, Ruff, and pytest on every pull request. MCP tests must
-be allowed to bind a loopback port. Add secret scanning before publishing the
-history.
+Create the private GitHub repository and add it as the remote. Before publishing
+a release, run locked dependency installation, Ruff, pytest, and secret scanning
+locally. MCP and browser tests must be allowed to bind loopback ports.
 
-Done when a clean clone can reproduce the non-browser test suite and `main`
-cannot accept a failing change.
+Done when a clean clone can reproduce the complete local test suite and the
+verified history is pushed without relying on GitHub Actions or another paid
+GitHub feature.
 
 ## Phase 2 — Correctness and data integrity
 
@@ -195,8 +196,8 @@ labels, long purposes, large euro values, empty/error states, English locale,
 and chart text/table fallbacks. Keep screenshots as failure artifacts rather
 than brittle pixel-perfect golden tests.
 
-Done when the browser suite runs locally and in CI and the required pages pass
-at both representative widths.
+Done when the browser suite runs locally and the required pages pass at both
+representative widths.
 
 ## Phase 5 — Prove operations and release `1.1.0`
 
@@ -250,3 +251,25 @@ published.
 6. README, algorithm, MCP, and operator documentation match released behavior.
 7. The repository and release history contain no secrets or private financial
    data.
+
+## Completion record
+
+All tasks F-01 through F-14 and all release gates were completed on 2026-07-31.
+
+- Ruff passed for application code, tests, migrations, and release scripts.
+- The warning-strict pytest suite passed all 55 tests, including real Chromium,
+  official MCP-client, migration, CLI, and security coverage.
+- Gitleaks scanned the complete repository history without finding a leak.
+- The final ARM64 OCI manifest is
+  `sha256:300e17152721342bc5736f833789e1a70128030969b64f2c8083cb7b94d96add`.
+- The isolated `m1-pro` Podium stack passed liveness, readiness, loopback
+  ingress, internal DNS, resource-limit, restart, setup, import, scheduled
+  backup, and restore checks. Its disposable resources were removed afterward;
+  the live stack was not changed.
+- Private GitHub repository `pgstr/fin` is the version-control remote. GitHub
+  Actions and other paid GitHub features are intentionally not part of the
+  development or release process.
+
+There is no additional open product work in this plan. New product scope should
+be chosen from evidence gathered during real household use and added here before
+implementation.

@@ -7,7 +7,7 @@ internet exposure.
 ## 1. Requirements
 
 - Podium on an Apple-silicon Mac that satisfies Podium's compatibility guide
-- Docker Buildx, another OCI-compatible ARM64 builder, or a CI builder
+- Docker Buildx or another OCI-compatible ARM64 builder
 - local DNS for `finanzen.home.arpa`
 - the checked-in `uv.lock`, stack file, and this repository
 
