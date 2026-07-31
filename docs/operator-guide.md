@@ -21,14 +21,14 @@ From the repository root:
 mkdir -p dist
 docker buildx build \
   --platform linux/arm64 \
-  --tag localhost/finanzplaner:1.2.0-rc.1 \
-  --output type=oci,dest=dist/finanzplaner-1.2.0-rc.1-arm64.oci.tar \
+  --tag localhost/finanzplaner:1.2.0-rc.2 \
+  --output type=oci,dest=dist/finanzplaner-1.2.0-rc.2-arm64.oci.tar \
   .
-podium load dist/finanzplaner-1.2.0-rc.1-arm64.oci.tar
+podium load dist/finanzplaner-1.2.0-rc.2-arm64.oci.tar
 ```
 
 Podium does not build Compose projects. The stack uses the exact image name
-`localhost/finanzplaner:1.2.0-rc.1`; if the builder records another reference,
+`localhost/finanzplaner:1.2.0-rc.2`; if the builder records another reference,
 change the stack's two `image` fields to the reference printed by
 `podium load`.
 
@@ -45,6 +45,14 @@ manifest digest is
 `sha256:2e74869625175a71f9390577f443a31aa3e70b1f6036a4441c90d83939e00a0c`.
 The exported OCI archive SHA-256 is
 `cf9afdd1b22eecf92f3d0898dd3f4a294d0c2e7a147f1c82ab24ae8f7214f9bd`.
+
+For the `1.2.0-rc.2` prerelease build (interface redesign) verified on
+2026-07-31, the ARM64 OCI manifest digest is
+`sha256:d56f31b00f3732f18327b7e46951735d929b3e366b53c0683ecccc95c813de9c`.
+The exported OCI archive SHA-256 is
+`10ca27c205c0401c4fdbea2bee3aba2e1a30a40986274d8f6bdf92d5b828830d`.
+This build carries no Alembic revision beyond `20260731_0003`, so the
+entrypoint's `alembic upgrade head` is a no-op against an `rc.1` database.
 
 ## 3. Create file secrets
 
@@ -181,7 +189,7 @@ Load the verified base OCI archive into the builder, then export the derived
 ARM64 image:
 
 ```sh
-docker image load --input dist/finanzplaner-1.2.0-rc.1-arm64.oci.tar
+docker image load --input dist/finanzplaner-1.2.0-rc.2-arm64.oci.tar
 docker buildx build \
   --platform linux/arm64 \
   --file Dockerfile.demo \

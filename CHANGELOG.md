@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.0-rc.2 — 2026-07-31
+
+- Rebuilt the interface on the terminal-dense design system: one token set with
+  a dark default and a user-switchable light theme, replacing the purple theme.
+- Replaced the wide sidebar with a 3.5rem icon rail and a monospace breadcrumb
+  strip; moved Einstellungen, Agent-Zugänge, Benutzer and Abmelden into the
+  avatar menu and dropped Wiederkehrend from the navigation (route unchanged).
+- Added a theme preference persisted in `localStorage`, applied before first
+  paint and switchable from the top strip, the sign-in screen, or Einstellungen.
+- Added a bar chart with a three-month average to Kategorietrends, and surfaced
+  the Jahresbericht from the Übersicht.
+- Amounts now render with a true minus sign (U+2212) instead of a hyphen.
+- Self-hosted Archivo and IBM Plex Mono, so the interface needs no CDN.
+
 ## 1.2.0-rc.1 — 2026-07-31
 
 - Added the concise documentation wiki, repository agent navigation, and a

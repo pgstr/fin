@@ -1,6 +1,6 @@
 [project]
 name = "finanzplaner"
-version = "1.2.0rc1"
+version = "1.2.0rc2"
 description = "Local-first household financial planner for DKB Girokonto exports"
 readme = "README.md"
 requires-python = ">=3.13,<3.15"
