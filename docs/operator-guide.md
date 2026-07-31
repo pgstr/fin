@@ -99,6 +99,40 @@ For a temporary host-only check, change ingress `bindAddress` to `127.0.0.1`.
 For HTTPS ingress, terminate TLS in an approved local proxy, set
 `COOKIE_SECURE=true`, and update `TRUSTED_HOSTS`.
 
+### Updating an already-running stack
+
+`podium apply` refuses to run against a stack that already has a daemon. Use
+`podium reload --stack <name>` instead. Reload takes **no stack-file
+argument**: it re-reads the file the daemon was started from, which on the M1
+Pro is `~/finanzplaner-deploy/finanzplaner.stack.json`, not a path passed on
+the command line and not this repository. Publishing a new image and editing
+the checked-in stack file therefore changes nothing on their own — the file
+under `~/finanzplaner-deploy/` has to be replaced first. A reload that reports
+`unchanged` for every service is the symptom of having skipped that step.
+
+Keep the previous file alongside it as `finanzplaner.stack.pre-<version>.json`,
+matching the snapshots already in that directory, then:
+
+```sh
+cp ~/finanzplaner-deploy/finanzplaner.stack.json \
+   ~/finanzplaner-deploy/finanzplaner.stack.pre-<previous-version>.json
+install -m 644 <new-stack.json> ~/finanzplaner-deploy/finanzplaner.stack.json
+podium reload --stack finanzplaner
+podium describe --stack finanzplaner app | grep image
+```
+
+Two further traps when verifying:
+
+- Ingress routes on `Host`, so `curl http://127.0.0.1:8080/...` without a
+  `Host:` header returns `200` with an empty body. Always pass
+  `-H "Host: finanzen.home.arpa"` (or `--resolve`), or an unchanged deployment
+  will look like a broken one.
+- The demo stack deliberately runs without Podium DNS, so its ingress resolves
+  the application to a fixed address. When the application restarts it can come
+  back on a new IP and the ingress keeps the stale upstream, which surfaces as
+  `502`. Restart the ingress after reloading that stack:
+  `podium restart --stack finanzplaner-demo podium-ingress`.
+
 ### Isolated acceptance stack
 
 Never use the live `finanzplaner` stack for release acceptance. The checked-in
