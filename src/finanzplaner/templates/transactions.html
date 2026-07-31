@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
   <header class="page-heading split">
-    <div><p class="eyebrow">{{ account.display_name }}</p><h1>{{ t("transactions.title") }}</h1></div>
-    <a class="button primary" href="/accounts/{{ account.id }}/import">{{ t("import.title") }}</a>
+    <div><p class="eyebrow">{{ account.display_name }}</p><h1>{{ t("transactions.title") }} — {{ datefmt(month, "MMMM y") }}</h1></div>
+    <a class="button" href="/accounts/{{ account.id }}/import">{{ t("import.title") }} →</a>
   </header>
-  <form class="filter-grid" method="get">
+  <form class="section filter-grid" method="get">
     <label class="wide">{{ t("transactions.search") }}<input type="search" name="q" value="{{ filters.q }}" placeholder="{{ t('transactions.search_placeholder') }}"></label>
     <label>{{ t("month.choose") }}<input type="month" name="month" value="{{ month.strftime('%Y-%m') }}"></label>
     <label>{{ t("transactions.category") }}
@@ -19,7 +19,6 @@
         {% endfor %}
       </select>
     </label>
-    <label class="check"><input type="checkbox" name="uncategorized" value="true" {% if filters.uncategorized %}checked{% endif %}>{{ t("category.uncategorized") }}</label>
     <label>{{ t("transactions.direction") }}
       <select name="direction">
         <option value="">{{ t("common.all") }}</option>
@@ -32,16 +31,22 @@
     </label>
     <label>{{ t("transactions.min_amount") }}<input name="min_amount" inputmode="decimal" value="{{ filters.min_amount }}"></label>
     <label>{{ t("transactions.max_amount") }}<input name="max_amount" inputmode="decimal" value="{{ filters.max_amount }}"></label>
-    <div class="filter-actions"><button class="button primary" type="submit">{{ t("common.filter") }}</button><a class="button quiet" href="/accounts/{{ account.id }}/transactions?month={{ month.strftime('%Y-%m') }}">{{ t("common.clear") }}</a></div>
+    <div class="filter-actions">
+      <label class="check"><input type="checkbox" name="uncategorized" value="true" {% if filters.uncategorized %}checked{% endif %}>{{ t("category.uncategorized") }}</label>
+      <button class="button" type="submit">{{ t("common.filter") }}</button>
+      <a class="button quiet" href="/accounts/{{ account.id }}/transactions?month={{ month.strftime('%Y-%m') }}">{{ t("common.clear") }}</a>
+    </div>
   </form>
+  <section class="section">
   <div class="table-wrap">
     <table class="transactions-table full">
-      <thead><tr><th>{{ t("transactions.date") }}</th><th>{{ t("transactions.booking") }}</th><th>{{ t("transactions.category") }}</th><th class="number">{{ t("transactions.amount") }}</th></tr></thead>
+      <thead><tr><th>{{ t("transactions.date") }}</th><th>{{ t("transactions.booking") }}</th><th>{{ t("transactions.purpose") }}</th><th>{{ t("transactions.category") }}</th><th class="number">{{ t("transactions.amount") }}</th></tr></thead>
       <tbody>
         {% for transaction in page.items %}
           <tr>
             <td><a href="/transactions/{{ transaction.id }}">{{ datefmt(transaction.booking_date, "short") }}</a></td>
-            <td><a class="transaction-name" href="/transactions/{{ transaction.id }}">{{ transaction.display_counterparty or transaction.transaction_type }}<small>{{ transaction.purpose }}</small></a></td>
+            <td class="transaction-name"><a href="/transactions/{{ transaction.id }}">{{ transaction.display_counterparty or transaction.transaction_type }}</a></td>
+            <td class="transaction-purpose">{{ transaction.purpose }}</td>
             <td>
               <details class="category-editor">
                 <summary class="badge {% if not transaction.category %}muted{% endif %}" title="{{ t('transaction.category_update') }}">{{ transaction.category and (transaction.category.label_en if locale == "en" and transaction.category.label_en else transaction.category.label_de) or t("category.uncategorized") }}</summary>
@@ -63,13 +68,17 @@
                 </form>
               </details>
             </td>
-            <td class="number amount">{{ "+" if transaction.amount_cents > 0 else "−" if transaction.amount_cents < 0 else "" }}{{ money(transaction.amount_cents|abs) }}</td>
+            <td class="number amount {{ 'pos' if transaction.amount_cents > 0 else 'neg' if transaction.amount_cents < 0 }}">{{ "+" if transaction.amount_cents > 0 else "−" if transaction.amount_cents < 0 else "" }}{{ money(transaction.amount_cents|abs) }}</td>
           </tr>
-        {% else %}<tr><td colspan="4" class="empty-cell">{{ t("transactions.no_results") }}</td></tr>{% endfor %}
+        {% else %}<tr><td colspan="5" class="empty-cell">{{ t("transactions.no_results") }}</td></tr>{% endfor %}
       </tbody>
     </table>
   </div>
-  {% if page.next_cursor %}
-    <a class="button" href="?month={{ month.strftime('%Y-%m') }}&cursor={{ page.next_cursor }}">{{ t("common.details") }}</a>
-  {% endif %}
+  <div class="table-footer">
+    <span>{{ t("transactions.loaded", count=page.items|length) }}</span>
+    {% if page.next_cursor %}
+      <a class="button quiet" href="?month={{ month.strftime('%Y-%m') }}&cursor={{ page.next_cursor }}">{{ t("transactions.load_more") }} ↓</a>
+    {% endif %}
+  </div>
+  </section>
 {% endblock %}

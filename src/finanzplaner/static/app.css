@@ -566,15 +566,40 @@ thead th[aria-sort] a { color: var(--acc); }
   white-space: nowrap;
 }
 .transaction-name {
-  display: grid;
-  gap: 0.1rem;
+  font-weight: 500;
   overflow-wrap: anywhere;
 }
-.transaction-name small {
-  font-size: 0.68rem;
+.transaction-name small,
+.transaction-purpose {
+  font-size: 0.72rem;
   color: var(--mut);
   overflow-wrap: anywhere;
 }
+.transaction-name small { display: block; }
+
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.7rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--mut);
+}
+
+/* the category chip doubles as the disclosure for the inline editor */
+.category-editor > summary {
+  display: inline-block;
+  cursor: pointer;
+  list-style: none;
+}
+.category-editor > summary::-webkit-details-marker { display: none; }
+.category-editor > summary::marker { content: ""; }
+.category-editor > summary:hover { border-color: var(--acc); color: var(--acc); }
+.category-editor-form { margin-top: 0.35rem; }
 
 .empty-cell {
   padding: 1.4rem 0;
@@ -700,7 +725,18 @@ label { display: block; }
   gap: 0.6rem;
   align-items: end;
 }
-.filter-grid .wide { grid-column: 1 / -1; }
+/* the actions drop to their own full-width row so they never split a field pair */
+.filter-grid .filter-actions {
+  grid-column: 1 / -1;
+  gap: 0.6rem;
+  margin-top: 0.15rem;
+}
+/* the search field gets twice the width of the other filters, per the design.
+   Only once the grid actually has two tracks — `span 2` would otherwise create
+   a phantom second column and push the page wider than the viewport. */
+@media (min-width: 46rem) {
+  .filter-grid .wide { grid-column: span 2; }
+}
 
 .form-grid label,
 .filter-grid label,
@@ -774,7 +810,10 @@ textarea {
   font-size: 0.74rem;
 }
 
-.check {
+/* needs to out-specify `.filter-grid label`, which stacks label above field */
+.check,
+.filter-grid .check,
+.form-grid .check {
   display: flex;
   align-items: center;
   gap: 0.45rem;
@@ -783,9 +822,15 @@ textarea {
   font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: none;
-  color: var(--ink);
+  white-space: nowrap;
+  color: var(--mut);
+  cursor: pointer;
 }
-.check input { width: auto; }
+.check input {
+  width: auto;
+  accent-color: var(--acc);
+  cursor: pointer;
+}
 
 .checks { display: grid; gap: 0.35rem; }
 
