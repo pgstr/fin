@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Zustände (Redesign)" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif">
+  <header style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:1.2rem;padding:.7rem 1.6rem;border-bottom:1px solid var(--line);background:var(--panel)">
+    <span style="width:2.1rem;height:2.1rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.95rem;border-radius:.35rem">F</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.12em;color:var(--mut)">FIN <span style="color:var(--ink)">ZUSTÄNDE</span> · LEER- &amp; FEHLERFÄLLE</span>
+    <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="margin-left:auto;display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+      <span style="width:1.4rem;height:1.4rem;display:grid;place-items:center;border-radius:50%;font-size:.7rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+      <span style="width:1.4rem;height:1.4rem;display:grid;place-items:center;border-radius:50%;font-size:.7rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+    </button>
+  </header>
+  <main style="width:min(1100px,calc(100% - 3rem));margin:0 auto;padding:2rem 0 4rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:.8rem;align-items:start">
+    <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+      <p style="margin:0 0 .6rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">KEIN KONTO SICHTBAR (ERSTNUTZUNG)</p>
+      <div style="display:grid;place-items:center;gap:.5rem;padding:2.2rem 1rem;border:1px dashed var(--line2);border-radius:.4rem;background:var(--field);text-align:center">
+        <span style="width:2.6rem;height:2.6rem;display:grid;place-items:center;border-radius:.45rem;background:var(--accSoft);color:var(--acc);font-size:1.2rem">↓</span>
+        <p style="margin:0;font-size:.9rem;font-weight:600">Noch kein Finanzkonto sichtbar</p>
+        <p style="margin:0;max-width:32ch;font-size:.76rem;color:var(--mut)">Importieren Sie einen DKB-CSV-Export — das Konto wird automatisch über die IBAN angelegt.</p>
+        <button type="button" style="margin-top:.4rem;padding:.55rem .9rem;background:var(--brand);color:var(--brandInk);border:0;border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.05em;cursor:pointer">ERSTEN EXPORT IMPORTIEREN</button>
+      </div>
+    </section>
+    <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+      <p style="margin:0 0 .6rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">KONTOSTAND NICHT ABLEITBAR</p>
+      <div style="padding:.75rem .85rem;background:var(--field);border:1px solid var(--line);border-radius:.4rem;max-width:13rem"><p style="margin:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Kontostand</p><p style="margin:.25rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600;color:var(--mut)">—</p><p style="margin:.1rem 0 0;font-size:.68rem;color:var(--mut)">Nicht zuverlässig ableitbar</p></div>
+      <p style="margin:.6rem 0 0;padding:.45rem .7rem;border-left:3px solid var(--acc);background:var(--field);border-radius:0 .3rem .3rem 0;font-size:.72rem;color:var(--mut)">Möglicherweise unvollständig — es fehlen Monate zwischen den Importen.</p>
+    </section>
+    <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+      <p style="margin:0 0 .6rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">PROGNOSE NICHT MÖGLICH</p>
+      <div style="display:grid;place-items:center;gap:.4rem;padding:1.6rem 1rem;text-align:center">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:1.4rem;color:var(--mut)">⌁</span>
+        <p style="margin:0;font-size:.86rem;font-weight:600">Für eine Prognose fehlen Daten</p>
+        <p style="margin:0;max-width:36ch;font-size:.76rem;color:var(--mut)">Ein verlässlicher Kontostand oder vollständige historische Monate fehlen. Mindestens drei vollständige Monate werden benötigt.</p>
+        <span style="margin-top:.3rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--acc);cursor:pointer">FEHLENDE MONATE IMPORTIEREN →</span>
+      </div>
+    </section>
+    <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+      <p style="margin:0 0 .6rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">IMPORT-FEHLER</p>
+      <div style="display:grid;gap:.4rem;font-size:.76rem;color:var(--mut)">
+        <p style="margin:0;padding:.5rem .7rem;border-left:3px solid var(--neg);background:var(--field);border-radius:0 .3rem .3rem 0"><span style="color:var(--neg);font-family:'IBM Plex Mono',monospace">FEHLER</span> — Der Aufbau der DKB-Datei wird nicht unterstützt.</p>
+        <p style="margin:0;padding:.5rem .7rem;border-left:3px solid var(--neg);background:var(--field);border-radius:0 .3rem .3rem 0"><span style="color:var(--neg);font-family:'IBM Plex Mono',monospace">FEHLER</span> — Die IBAN der Datei stimmt nicht mit dem gewählten Konto überein.</p>
+        <p style="margin:0;padding:.5rem .7rem;border-left:3px solid var(--acc);background:var(--field);border-radius:0 .3rem .3rem 0"><span style="color:var(--acc);font-family:'IBM Plex Mono',monospace">HINWEIS</span> — Die Datei gehört zu einem unbekannten Konto. Name und Sichtbarkeit angeben.</p>
+      </div>
+    </section>
+    <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+      <p style="margin:0 0 .6rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">KEINE TREFFER (BUCHUNGSFILTER)</p>
+      <div style="display:grid;place-items:center;gap:.4rem;padding:1.6rem 1rem;text-align:center">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:1.4rem;color:var(--mut)">↕</span>
+        <p style="margin:0;font-size:.86rem;font-weight:600">Keine Buchungen entsprechen diesen Filtern</p>
+        <div style="display:flex;gap:.4rem;margin-top:.3rem">
+          <button type="button" style="padding:.45rem .7rem;border:1px solid var(--line2);background:transparent;color:var(--ink);border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.66rem;font-weight:600;cursor:pointer" style-hover="border-color:var(--acc);color:var(--acc)">FILTER ZURÜCKSETZEN</button>
+          <button type="button" style="padding:.45rem .7rem;border:1px solid var(--line2);background:transparent;color:var(--ink);border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.66rem;font-weight:600;cursor:pointer" style-hover="border-color:var(--acc);color:var(--acc)">GANZES JAHR ZEIGEN</button>
+        </div>
+      </div>
+    </section>
+    <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+      <p style="margin:0 0 .6rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">AGENT-TOKEN — EINMALIGE ANZEIGE</p>
+      <div style="padding:.8rem .9rem;border:1px solid var(--acc);border-radius:.4rem;background:var(--accSoft)">
+        <p style="margin:0 0 .4rem;font-size:.78rem;font-weight:600">Dieses Token wird nur einmal angezeigt. Jetzt sicher kopieren:</p>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <code style="flex:1;padding:.5rem .6rem;background:var(--field);border:1px solid var(--line2);border-radius:.3rem;font-family:'IBM Plex Mono',monospace;font-size:.74rem;overflow-wrap:anywhere">fin_a1b2c3d4-0000-4xxx-yxxx-beispieltoken</code>
+          <button type="button" style="padding:.5rem .8rem;background:var(--brand);color:var(--brandInk);border:0;border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.66rem;font-weight:600;cursor:pointer">KOPIEREN</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark" };
+  renderVals() {
+    const t = this.state.theme;
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+    };
+  }
+}
+</script>
+</body>
+</html>

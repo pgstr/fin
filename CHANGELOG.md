@@ -8,9 +8,9 @@
   MCP tool, and localized annual HTML reports with saved monthly reviews.
 - Added A4 print styling for annual reports and monthly overviews, suitable for
   browser Print-to-PDF without a PDF runtime dependency.
-- Added a separate budget-adjusted balance trajectory and excluded transactions
-  categorized as internal transfers or `Nicht budgetwirksam` from forecast
-  history while preserving the DKB-reconciling account balance.
+- Excluded transactions categorized as internal transfers or
+  `Nicht budgetwirksam` from forecast history while keeping balance graphs
+  limited to the DKB-reconciling account balance and annual forecast.
 
 ## 1.1.0 — 2026-07-31
 

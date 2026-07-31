@@ -7,15 +7,10 @@
     <line x1="40" x2="680" y1="195" y2="195"></line>
     {% if chart.band %}<polygon class="forecast-band" points="{{ chart.band }}"></polygon>{% endif %}
     {% if chart.actual_points %}<polyline class="actual-line" points="{{ chart.actual_points }}"></polyline>{% endif %}
-    {% if chart.budget_points %}<polyline class="budget-line" points="{{ chart.budget_points }}"></polyline>{% endif %}
     {% if chart.forecast_points %}<polyline class="forecast-line" points="{{ chart.forecast_points }}"></polyline>{% endif %}
     {% for point in chart.actual_dots %}
       {% set point_label = datefmt(point.date, "dd.MM.yyyy") ~ " · " ~ money(point.value) ~ " · " ~ t("common.observed") %}
       <circle class="chart-point actual-point" cx="{{ '%.1f'|format(point.x) }}" cy="{{ '%.1f'|format(point.y) }}" r="5" tabindex="0" data-chart-point data-tooltip="{{ point_label }}" aria-label="{{ point_label }}"><title>{{ point_label }}</title></circle>
-    {% endfor %}
-    {% for point in chart.budget_dots %}
-      {% set point_label = datefmt(point.date, "dd.MM.yyyy") ~ " · " ~ money(point.value) ~ " · " ~ t("dashboard.budget_adjusted") %}
-      <circle class="chart-point budget-point" cx="{{ '%.1f'|format(point.x) }}" cy="{{ '%.1f'|format(point.y) }}" r="5" tabindex="0" data-chart-point data-tooltip="{{ point_label }}" aria-label="{{ point_label }}"><title>{{ point_label }}</title></circle>
     {% endfor %}
     {% for point in chart.forecast_dots %}
       {% set point_label = datefmt(point.date, "dd.MM.yyyy") ~ " · " ~ money(point.value) ~ " · " ~ t("common.estimated") %}

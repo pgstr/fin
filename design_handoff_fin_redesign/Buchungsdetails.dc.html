@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Buchungsdetails (Redesign)" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;display:grid;grid-template-columns:3.5rem minmax(0,1fr)">
+  <aside style="border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.7rem 0">
+    <a href="./Übersicht.dc.html" title="Fin" style="width:2.1rem;height:2.1rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.95rem;border-radius:.35rem;margin-bottom:.8rem;text-decoration:none">F</a>
+    <a href="./Übersicht.dc.html" title="Übersicht" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">◫</a>
+    <a href="./Buchungen.dc.html" title="Buchungen" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;background:var(--accSoft);color:var(--acc);font-size:.95rem;text-decoration:none">↕</a>
+    <a href="./Prognose.dc.html" title="Prognose" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">⌁</a>
+    <a href="./Kategorietrends.dc.html" title="Kategorietrends" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">∿</a>
+    
+    <a href="./Import.dc.html" title="Import" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">↓</a>
+    <a href="./Kategorien.dc.html" title="Kategorien" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">#</a>
+    <details style="margin-top:auto;position:relative">
+      <summary title="alex — Menü" style="width:2.1rem;height:2.1rem;display:grid;place-items:center;border-radius:50%;background:var(--accSoft);color:var(--acc);font-size:.72rem;font-weight:700;cursor:pointer;list-style:none">A</summary>
+      <div style="position:absolute;left:2.6rem;bottom:0;z-index:50;min-width:11.5rem;display:grid;gap:.15rem;padding:.35rem;background:var(--panel);border:1px solid var(--line2);border-radius:.4rem;box-shadow:0 10px 30px rgba(0,0,0,.25)">
+        <a href="./Einstellungen.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">⚙</span>Einstellungen</a>
+        <a href="./Agent-Zugänge.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">◇</span>Agent-Zugänge</a>
+        <a href="./Benutzer.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">○</span>Benutzer</a>
+        <a href="./Anmelden.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">→</span>Abmelden</a>
+      </div>
+    </details>
+  </aside>
+  <div style="min-width:0">
+    <header style="display:flex;align-items:center;gap:1.2rem;padding:.55rem 1.4rem;border-bottom:1px solid var(--line);background:var(--panel);font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--mut)">
+      <span style="color:var(--ink)">FIN</span><span>/</span><span>BUCHUNGEN</span><span>/</span><span style="color:var(--acc)">TX-2026-0512</span>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:.4rem"><span style="width:.4rem;height:.4rem;border-radius:50%;background:var(--pos)"></span>SYNC 31.05. 18:04</span>
+      <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+      </button>
+      <span>ALEX</span>
+    </header>
+    <main style="padding:1.1rem 1.4rem 2rem">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1rem">
+        <div>
+          <a href="./Buchungen.dc.html" style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--mut);text-decoration:none">← ZURÜCK ZU BUCHUNGEN</a>
+          <h1 style="margin:.3rem 0 0;font-size:1.3rem;font-weight:600;letter-spacing:.01em">Vermietung Muster GmbH</h1>
+          <p style="margin:.15rem 0 0;font-size:.8rem;color:var(--mut)">Haushaltskonto · 15.05.2026 · Dauerauftrag</p>
+        </div>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:2rem;font-weight:600;color:var(--neg)">−1.150,00&nbsp;€</p>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:.5rem;align-items:start">
+        <div style="display:grid;gap:.5rem">
+          <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+            <h2 style="margin:0 0 .6rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Kategorie &amp; Tags</h2>
+            <div style="display:flex;gap:.5rem;align-items:end;flex-wrap:wrap">
+              <label style="flex:1 1 12rem;display:grid;gap:.3rem;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Kategorie<select style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.5rem .65rem;color:var(--ink);font:inherit;font-size:.8rem;cursor:pointer"><option>Wohnen · Miete</option><option>Nicht kategorisiert</option><option>Lebensmittel</option></select></label>
+              <label style="flex:1 1 12rem;display:grid;gap:.3rem;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Tags hinzufügen<input placeholder="Kommagetrennt" style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.5rem .65rem;color:var(--ink);font:inherit;font-size:.8rem" /></label>
+              <button type="button" style="padding:.5rem .8rem;background:var(--brand);color:var(--brandInk);border:0;border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.05em;cursor:pointer">SPEICHERN</button>
+            </div>
+            <p style="margin:.7rem 0 0;font-size:.78rem;color:var(--mut)">Aktuelle Tags: <span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;padding:.05rem .4rem;border-radius:.25rem;border:1px solid var(--line2);color:var(--ink)">miete</span></p>
+          </section>
+          <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+            <h2 style="margin:0 0 .6rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Notizen</h2>
+            <article style="padding:.7rem .8rem;border:1px solid var(--line);border-radius:.35rem;background:var(--field)">
+              <p style="margin:0;font-size:.82rem">Miete inkl. Nebenkostenvorauszahlung.</p>
+              <p style="margin:.35rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut)">MENSCH · 15.05.2026 09:12</p>
+            </article>
+            <div style="display:flex;gap:.5rem;align-items:end;margin-top:.6rem">
+              <label style="flex:1;display:grid;gap:.3rem;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Notiz hinzufügen<textarea rows="2" style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.5rem .65rem;color:var(--ink);font:inherit;font-size:.8rem;resize:vertical"></textarea></label>
+              <button type="button" style="padding:.5rem .8rem;border:1px solid var(--line2);background:transparent;color:var(--ink);border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.05em;cursor:pointer" style-hover="border-color:var(--acc);color:var(--acc)">HINZUFÜGEN</button>
+            </div>
+          </section>
+          <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+            <h2 style="margin:0 0 .6rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Interner Transfer &amp; Verlauf</h2>
+            <p style="margin:0 0 .6rem;font-size:.82rem;color:var(--mut)">Keine eindeutige Transferverknüpfung.</p>
+            <div style="display:grid;gap:.3rem;font-size:.78rem">
+              <div style="display:flex;gap:.7rem"><span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut);min-width:8.5rem">15.05. 09:10</span><span>Kategorie geändert — Wohnen · Miete</span></div>
+              <div style="display:flex;gap:.7rem"><span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut);min-width:8.5rem">15.05. 09:12</span><span>Notiz hinzugefügt</span></div>
+            </div>
+          </section>
+        </div>
+        <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <h2 style="margin:0 0 .6rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Importdaten (unveränderlich)</h2>
+          <dl style="display:grid;margin:0;font-size:.78rem">
+            <sc-for list="{{ facts }}" as="f" hint-placeholder-count="8">
+              <div style="display:grid;grid-template-columns:minmax(7rem,.9fr) minmax(0,1.1fr);gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--hair)">
+                <dt style="color:var(--mut);font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;align-self:center">{{ f.label }}</dt>
+                <dd style="margin:0;overflow-wrap:anywhere">{{ f.value }}</dd>
+              </div>
+            </sc-for>
+          </dl>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark" };
+  renderVals() {
+    const t = this.state.theme;
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+      facts: [
+        { label: "Buchungsdatum", value: "15.05.2026" },
+        { label: "Wertstellung", value: "15.05.2026" },
+        { label: "Status", value: "Gebucht" },
+        { label: "Zahlungspfl.", value: "Haushaltskonto" },
+        { label: "Empfänger", value: "Vermietung Muster GmbH" },
+        { label: "Zweck", value: "Miete 05/2026 Objekt 12" },
+        { label: "Umsatztyp", value: "Dauerauftrag" },
+        { label: "IBAN", value: "DE00 0000 0000 0000 0000 00" },
+        { label: "Gläubiger-ID", value: "—" },
+        { label: "Mandatsref.", value: "—" },
+        { label: "Kundenref.", value: "—" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

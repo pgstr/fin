@@ -14,9 +14,9 @@ SQLite.
 - Supports human- or agent-authored categories, notes, tags, and versioned
   monthly reviews without automatic categorization.
 - Detects recurring entries, links unambiguous internal transfers, shows
-  category trends, creates printable annual reports, contrasts the actual
-  balance with a budget-adjusted trajectory, and forecasts account balances
-  for the remaining months through December.
+  category trends, creates printable annual reports, and forecasts account
+  balances for the remaining months through December while keeping
+  budget-neutral transactions out of forecast history.
 - Exposes 16 scoped MCP tools over stateless Streamable HTTP at `/mcp`.
 - Creates verified online SQLite backups with daily and monthly retention.
 

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Mobil Buchungen (Redesign)" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;display:flex;flex-direction:column">
+  <header style="position:sticky;top:0;z-index:5;display:grid;gap:.5rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);background:var(--panel)">
+    <div style="display:flex;align-items:center;gap:.7rem">
+      <span style="width:2rem;height:2rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.9rem;border-radius:.35rem">F</span>
+      <span style="font-size:.9rem;font-weight:600">Buchungen</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--acc)">MAI 2026</span>
+      <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="margin-left:auto;display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+        <span style="width:1.5rem;height:1.5rem;display:grid;place-items:center;border-radius:50%;font-size:.72rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+        <span style="width:1.5rem;height:1.5rem;display:grid;place-items:center;border-radius:50%;font-size:.72rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+      </button>
+    </div>
+    <input type="search" placeholder="Empfänger oder Verwendungszweck" style="width:100%;box-sizing:border-box;border:1px solid var(--line2);border-radius:.4rem;background:var(--field);padding:.6rem .7rem;color:var(--ink);font:inherit;font-size:.82rem" />
+    <div style="display:flex;gap:.4rem;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:.64rem">
+      <span style="padding:.45rem .7rem;border:1px solid var(--acc);border-radius:999px;color:var(--acc);white-space:nowrap">ALLE</span>
+      <span style="padding:.45rem .7rem;border:1px solid var(--line2);border-radius:999px;color:var(--mut);white-space:nowrap">EINGANG</span>
+      <span style="padding:.45rem .7rem;border:1px solid var(--line2);border-radius:999px;color:var(--mut);white-space:nowrap">AUSGANG</span>
+      <span style="padding:.45rem .7rem;border:1px solid var(--line2);border-radius:999px;color:var(--mut);white-space:nowrap">UNKAT (4)</span>
+    </div>
+  </header>
+  <main style="flex:1;padding:.4rem .9rem 5.5rem">
+    <div style="display:grid">
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+        <a href="#" style="display:flex;justify-content:space-between;gap:.7rem;align-items:center;min-height:3rem;padding:.4rem 0;border-bottom:1px solid var(--hair);color:inherit;text-decoration:none">
+          <span style="display:grid;min-width:0;font-size:.84rem;line-height:1.25">{{ r.name }}<small style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.meta }}</small></span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.84rem;white-space:nowrap;color:{{ r.amtColor }}">{{ r.amount }}</span>
+        </a>
+      </sc-for>
+    </div>
+    <div style="display:grid;place-items:center;margin-top:.8rem">
+      <span style="padding:.6rem 1rem;border:1px solid var(--line2);border-radius:.4rem;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut)">MEHR LADEN ↓</span>
+    </div>
+  </main>
+  <nav style="position:fixed;left:0;right:0;bottom:0;z-index:10;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);background:var(--panel)">
+    <a href="./Mobil Übersicht.dc.html" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">◫</span>Übersicht</a>
+    <a href="./Mobil Buchungen.dc.html" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--acc);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">↕</span>Buchungen</a>
+    <a href="#" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">⌁</span>Prognose</a>
+    <a href="#" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">∿</span>Trends</a>
+    <a href="#" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">≡</span>Mehr</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark" };
+  renderVals() {
+    const t = this.state.theme;
+    const neg = { amtColor: "var(--neg)" }, pos = { amtColor: "var(--pos)" };
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+      rows: [
+        { name: "Drogeriemarkt Muster", meta: "30.05. · HAUSHALT · Kartenzahlung", amount: "−23,45", ...neg },
+        { name: "Supermarkt Beispiel", meta: "29.05. · LEBENSMITTEL · Kartenzahlung", amount: "−54,20", ...neg },
+        { name: "Stadtwerke Musterstadt", meta: "28.05. · WOHNEN · Abschlag 05/2026", amount: "−86,00", ...neg },
+        { name: "Online-Apotheke", meta: "27.05. · UNKAT · Bestellung 4711", amount: "−18,90", ...neg },
+        { name: "Überweisung A. Muster", meta: "26.05. · UNKAT · Haushaltsbeitrag", amount: "+1.750,00", ...pos },
+        { name: "Streaming-Dienst", meta: "24.05. · FREIZEIT · Abo 05/2026", amount: "−12,99", ...neg },
+        { name: "Tankstelle Beispielweg", meta: "22.05. · MOBILITÄT · Kartenzahlung", amount: "−58,40", ...neg },
+        { name: "Versicherung AG", meta: "20.05. · VERSICHERUNGEN · Hausrat", amount: "−24,80", ...neg },
+        { name: "Supermarkt Beispiel", meta: "18.05. · LEBENSMITTEL · Kartenzahlung", amount: "−67,35", ...neg },
+        { name: "Vermietung Muster GmbH", meta: "15.05. · WOHNEN · Miete 05/2026", amount: "−1.150,00", ...neg },
+        { name: "Überweisung B. Muster", meta: "05.05. · UNKAT · Haushaltsbeitrag", amount: "+1.750,00", ...pos },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

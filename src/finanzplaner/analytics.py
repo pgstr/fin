@@ -115,33 +115,6 @@ def balance_on(db: Session, account_id: str, target: date) -> tuple[int | None, 
     return snapshot.balance_cents + delta, snapshot.balance_date, reliable
 
 
-def budget_balance_on(
-    db: Session, account_id: str, start: date, target: date
-) -> tuple[int | None, bool]:
-    if target < start:
-        raise ValueError("target must not precede start")
-    opening, _snapshot_date, opening_reliable = balance_on(
-        db, account_id, start - timedelta(days=1)
-    )
-    if opening is None:
-        return None, False
-    transactions = db.scalars(
-        select(Transaction).where(
-            Transaction.account_id == account_id,
-            Transaction.booking_date >= start,
-            Transaction.booking_date <= target,
-        )
-    ).all()
-    categories = {category.id: category for category in db.scalars(select(Category)).all()}
-    budget_delta = sum(
-        transaction.amount_cents
-        for transaction in transactions
-        if not _is_budget_neutral(transaction, categories)
-    )
-    reliable = opening_reliable and complete_coverage(db, account_id, start, target)
-    return opening + budget_delta, reliable
-
-
 def _monthly_total(db: Session, account_id: str, value: date) -> int | None:
     start, end = month_range(value)
     if not complete_coverage(db, account_id, start, end):

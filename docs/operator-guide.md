@@ -120,6 +120,208 @@ After the acceptance and recovery checks, remove only the isolated resources:
 podium down --stack finanzplaner-acceptance --volumes -y
 ```
 
+### Private Tailscale demo
+
+The demo is a separate, synthetic-only Podium stack reached through Tailscale
+Serve. It does not expose the live stack, open a router port, or use Tailscale
+Funnel. Guests still authenticate to Fin with non-administrator accounts.
+
+The checked-in `podium/finanzplaner.demo.stack.json` is a template. Its
+`demo-node.example.ts.net` hostname must be replaced in an untracked copy with
+the M1 Pro's actual Tailscale DNS name. Never commit the tailnet name, guest
+identities, Tailscale policy export, or populated secrets.
+
+#### Host dependency
+
+Use Tailscale's standalone macOS package, which Tailscale recommends over its
+App Store and command-line-only variants. The package installs
+`/Applications/Tailscale.app`; its bundled CLI is invoked below with
+`TAILSCALE_BE_CLI=1`. Installing the system extension, VPN configuration, and
+signing in require interactive approval on the Mac.
+
+The M1 Pro installation performed on 2026-07-31 uses Tailscale `1.98.10` from
+the stable package server. Its package SHA-256 is
+`c2eaf5f660ad45a64d1ba43ee72401029a5cb06e6d148c5e90a987a6f546bc58`.
+The package installation completed non-interactively; macOS system-extension
+approval, VPN configuration approval, and tailnet sign-in remain explicit
+interactive operator actions.
+
+```sh
+curl --fail --show-error --location \
+  --output /private/tmp/Tailscale-1.98.10-macos.pkg \
+  https://pkgs.tailscale.com/stable/Tailscale-1.98.10-macos.pkg
+shasum -a 256 /private/tmp/Tailscale-1.98.10-macos.pkg
+sudo installer -pkg /private/tmp/Tailscale-1.98.10-macos.pkg -target /
+open -a Tailscale
+```
+
+Compare the printed digest exactly before running `installer`. In the Tailscale
+UI, approve the system extension and VPN configuration, sign in, enable HTTPS
+certificates for the tailnet, and leave Funnel disabled. The current official
+[macOS installation](https://tailscale.com/docs/install/mac),
+[system-extension](https://tailscale.com/docs/concepts/macos-sysext), and
+[uninstall](https://tailscale.com/docs/features/client/uninstall) instructions
+remain authoritative.
+
+To remove the dependency later, first disable Serve and revoke every node
+share, sign out, use Tailscale's **Uninstall** action, and follow the official
+standalone macOS cleanup instructions for the VPN configuration and retained
+state. Do not install another macOS Tailscale variant alongside the standalone
+application.
+
+#### Build and load the egress-blocked image
+
+`Dockerfile.demo` derives from the verified Fin image and adds only `iptables`
+plus `docker/demo-entrypoint.sh`. Before Fin starts, that entrypoint permits
+loopback traffic and replies to established ingress connections, then rejects
+every new IPv4 and IPv6 connection initiated by the demo process. Failure to
+install the rules prevents the application from starting.
+
+Load the verified base OCI archive into the builder, then export the derived
+ARM64 image:
+
+```sh
+docker image load --input dist/finanzplaner-1.2.0-rc.1-arm64.oci.tar
+docker buildx build \
+  --platform linux/arm64 \
+  --file Dockerfile.demo \
+  --tag localhost/finanzplaner-demo:1.2.0-rc.1 \
+  --output type=oci,dest=dist/finanzplaner-demo-1.2.0-rc.1-arm64.oci.tar \
+  .
+```
+
+Copy the archive to the M1 Pro through the existing administrative SSH path
+and load it into Podium. Treat every rebuild as a distinct artifact and record
+its archive and manifest digests with the acceptance result.
+
+For the image built and loaded on 2026-07-31, the ARM64 OCI manifest digest is
+`sha256:4c496d3a021e764d73c5c2ad38440d439172a33c41ac90168a0d88dc7a4425c6`.
+The exported archive SHA-256 is
+`99f552e8772af7f3a1c9f57109a2c6db4043c436c75b1120fffe40f8f3cde9e1`.
+The local smoke test proved readiness through mapped loopback ingress, default
+`DROP` policies for IPv4 and IPv6 output, and rejection of a new outbound
+connection. The checked-in stack template also passed `podium validate` on the
+M1 Pro without being applied.
+
+#### Render and validate the private stack
+
+On the M1 Pro, obtain the DNS name without printing the rest of the Tailscale
+status document:
+
+```sh
+TAILSCALE_BE_CLI=1 /Applications/Tailscale.app/Contents/MacOS/Tailscale \
+  status --json | jq -r '.Self.DNSName'
+```
+
+Set `DEMO_TAILSCALE_HOST` to that name without a trailing dot. Render an
+untracked stack file with `jq` rather than editing the committed template:
+
+```sh
+DEMO_TAILSCALE_HOST=demo-node.example-tailnet.ts.net
+demo_stack_path=/private/tmp/finanzplaner.demo.stack.json
+jq --arg host "$DEMO_TAILSCALE_HOST" \
+  '.services[0].env.TRUSTED_HOSTS = ($host + ",localhost,127.0.0.1")
+   | .ingress.routes[0].host = $host' \
+  podium/finanzplaner.demo.stack.json > "$demo_stack_path"
+podium validate "$demo_stack_path"
+```
+
+The rendered stack must retain all of these properties:
+
+- name `finanzplaner-demo`;
+- image `localhost/finanzplaner-demo:1.2.0-rc.1`;
+- only the volume `finanzdaten-demo` mounted at `/data`;
+- no backup service or production/acceptance volume;
+- `COOKIE_SECURE=true`;
+- host port 18082 bound only to `127.0.0.1`;
+- no Podium DNS service.
+
+Create new demo-only secrets. Do not copy the live secret file:
+
+```sh
+mkdir -p ~/.podium/finanzplaner-demo
+install -m 600 /secure/path/finanzplaner-demo-secrets.env \
+  ~/.podium/finanzplaner-demo/secrets.env
+```
+
+Applying the stack is a deployment and requires explicit operator
+confirmation:
+
+```sh
+podium apply "$demo_stack_path"
+podium ps --stack finanzplaner-demo
+curl --resolve "$DEMO_TAILSCALE_HOST:18082:127.0.0.1" \
+  "http://$DEMO_TAILSCALE_HOST:18082/health/ready"
+podium exec --stack finanzplaner-demo app -- iptables -S OUTPUT
+podium exec --stack finanzplaner-demo app -- ip6tables -S OUTPUT
+```
+
+Both firewall listings must show a default `DROP` policy, a loopback allow, and
+an `ESTABLISHED,RELATED` allow. From the demo workload, connections to the live
+Fin address, the Mac, the local gateway, and another RFC1918/ULA address must
+time out or be rejected. If any succeeds, stop the demo and do not configure
+Serve.
+
+#### Provision before sharing
+
+Keep Serve disabled while provisioning. Open the loopback-only URL on the M1
+Pro, complete setup with the private demo setup token, import only
+`tests/fixtures/dkb-browser-demo.csv`, and create one non-admin user per guest.
+Keep the only administrator password and never create an MCP token.
+
+Before continuing, verify `/setup` returns `404`, unauthenticated `/mcp` access
+is denied, the demo survives a restart, and only `finanzdaten-demo` is mounted.
+Guests must be told not to upload real exports or enter personal information.
+
+#### Enable Serve and restrict shared users
+
+First preserve the current tailnet policy and inspect it for broad rules whose
+source is `*`; such rules also apply to shared users. Add an explicit grant for
+each guest identity and the M1 Pro's Tailscale IP, limited to TCP 443. Add policy
+tests proving that TCP 443 is accepted while TCP 22, 8080, and 18082 and other
+nodes are denied. Merge these entries into the existing policy; do not replace
+unrelated grants or tests.
+
+After the policy validates, enable private Serve:
+
+```sh
+TAILSCALE_BE_CLI=1 /Applications/Tailscale.app/Contents/MacOS/Tailscale \
+  serve --bg http://127.0.0.1:18082
+TAILSCALE_BE_CLI=1 /Applications/Tailscale.app/Contents/MacOS/Tailscale \
+  serve status
+TAILSCALE_BE_CLI=1 /Applications/Tailscale.app/Contents/MacOS/Tailscale \
+  funnel status
+```
+
+The Serve status must show private HTTPS forwarding to loopback. Funnel must
+remain disabled. Send individual node-share invitations from the Tailscale
+admin console; do not use a reusable invitation link.
+
+From an invited external device, verify HTTPS and guest login, then verify that
+SSH, ports 8080 and 18082, the live Fin service, and another tailnet node remain
+unreachable.
+
+#### Disable and remove the demo
+
+Disable remote access before stopping or deleting the stack:
+
+```sh
+TAILSCALE_BE_CLI=1 /Applications/Tailscale.app/Contents/MacOS/Tailscale \
+  serve --https=443 off
+```
+
+Revoke every node share and confirm a formerly invited device can no longer
+connect. `podium down --stack finanzplaner-demo` preserves the synthetic volume
+for investigation. Deleting it is destructive and requires separate operator
+confirmation:
+
+```sh
+podium down --stack finanzplaner-demo --volumes -y
+```
+
+Never run an unqualified `podium down --volumes`. Confirm the live
+`finanzplaner` stack remains healthy after teardown.
+
 ## 5. First-run setup and first import
 
 Open `http://finanzen.home.arpa:8080`, enter the setup token, and create the

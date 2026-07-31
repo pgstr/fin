@@ -1,0 +1,12 @@
+ARG FIN_IMAGE=localhost/finanzplaner:1.2.0-rc.1
+FROM ${FIN_IMAGE}
+
+USER root
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y iptables \
+    && rm -rf /var/lib/apt/lists/*
+COPY docker/demo-entrypoint.sh /usr/local/bin/finanzplaner-demo-entrypoint
+RUN chmod 0755 /usr/local/bin/finanzplaner-demo-entrypoint
+
+ENTRYPOINT ["/usr/local/bin/finanzplaner-demo-entrypoint"]
+CMD ["serve"]

@@ -19,6 +19,7 @@ and ordering.
 | Change localization | [Interface map](interfaces.md) | [`i18n.py`](../src/finanzplaner/i18n.py), [`test_web_and_localization.py`](../tests/test_web_and_localization.py) |
 | Migrate the schema | [Development map](development.md) | [Domain model](domain-model.md), [`test_operations.py`](../tests/test_operations.py) |
 | Build, release, deploy, back up, or recover | [Operator guide](operator-guide.md) | [Development map](development.md), [`test_operations.py`](../tests/test_operations.py) |
+| Run the private synthetic demo | [Private Tailscale demo](operator-guide.md#private-tailscale-demo) | [Architecture and security](architecture.md), [`test_operations.py`](../tests/test_operations.py) |
 
 ## Route by domain
 

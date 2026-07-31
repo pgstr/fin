@@ -218,6 +218,48 @@ def test_podium_acceptance_stack_is_host_only_and_isolated() -> None:
     } == {"finanzdaten-acceptance", "finanzbackups-acceptance"}
 
 
+def test_podium_demo_stack_is_private_synthetic_and_egress_blocked() -> None:
+    stack = json.loads(Path("podium/finanzplaner.demo.stack.json").read_text())
+    assert stack["name"] == "finanzplaner-demo"
+    assert stack["dns"] is False
+    assert stack["ingress"] == {
+        "hostPort": 18082,
+        "bindAddress": "127.0.0.1",
+        "routes": [
+            {
+                "host": "demo-node.example.ts.net",
+                "service": "app",
+                "port": 8080,
+            }
+        ],
+    }
+    assert len(stack["services"]) == 1
+    app = stack["services"][0]
+    assert app["id"] == "app"
+    assert app["image"] == "localhost/finanzplaner-demo:1.2.0-rc.1"
+    assert app["entrypoint"] == ["/usr/local/bin/finanzplaner-demo-entrypoint"]
+    assert app["env"]["COOKIE_SECURE"] == "true"
+    assert app["env"]["TRUSTED_HOSTS"] == (
+        "demo-node.example.ts.net,localhost,127.0.0.1"
+    )
+    assert set(app["secrets"]) == {"SESSION_SECRET", "SETUP_TOKEN"}
+    assert app["volumes"] == [
+        {"name": "finanzdaten-demo", "destination": "/data"}
+    ]
+    assert app["restartPolicy"] == "always"
+    assert app["healthCheck"][-1].endswith("/health/ready")
+    assert app["livenessCheck"][-1].endswith("/health/live")
+
+    dockerfile = Path("Dockerfile.demo").read_text()
+    entrypoint = Path("docker/demo-entrypoint.sh").read_text()
+    assert "ARG FIN_IMAGE=localhost/finanzplaner:1.2.0-rc.1" in dockerfile
+    assert "apt-get install --no-install-recommends -y iptables" in dockerfile
+    assert "iptables -P OUTPUT DROP" in entrypoint
+    assert "ip6tables -P OUTPUT DROP" in entrypoint
+    assert "--ctstate ESTABLISHED,RELATED" in entrypoint
+    assert 'exec /usr/local/bin/finanzplaner-entrypoint "$@"' in entrypoint
+
+
 def test_container_is_locked_and_offline_at_runtime() -> None:
     dockerfile = Path("Dockerfile").read_text()
     entrypoint = Path("docker/entrypoint.sh").read_text()

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Prognose (Redesign)" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;display:grid;grid-template-columns:3.5rem minmax(0,1fr)">
+  <aside style="border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.7rem 0">
+    <a href="./Übersicht.dc.html" title="Fin" style="width:2.1rem;height:2.1rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.95rem;border-radius:.35rem;margin-bottom:.8rem;text-decoration:none">F</a>
+    <a href="./Übersicht.dc.html" title="Übersicht" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">◫</a>
+    <a href="./Buchungen.dc.html" title="Buchungen" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">↕</a>
+    <a href="./Prognose.dc.html" title="Prognose" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;background:var(--accSoft);color:var(--acc);font-size:.95rem;text-decoration:none">⌁</a>
+    <a href="./Kategorietrends.dc.html" title="Kategorietrends" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">∿</a>
+    
+    <a href="./Import.dc.html" title="Import" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">↓</a>
+    <a href="./Kategorien.dc.html" title="Kategorien" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">#</a>
+    <details style="margin-top:auto;position:relative">
+      <summary title="alex — Menü" style="width:2.1rem;height:2.1rem;display:grid;place-items:center;border-radius:50%;background:var(--accSoft);color:var(--acc);font-size:.72rem;font-weight:700;cursor:pointer;list-style:none">A</summary>
+      <div style="position:absolute;left:2.6rem;bottom:0;z-index:50;min-width:11.5rem;display:grid;gap:.15rem;padding:.35rem;background:var(--panel);border:1px solid var(--line2);border-radius:.4rem;box-shadow:0 10px 30px rgba(0,0,0,.25)">
+        <a href="./Einstellungen.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">⚙</span>Einstellungen</a>
+        <a href="./Agent-Zugänge.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">◇</span>Agent-Zugänge</a>
+        <a href="./Benutzer.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">○</span>Benutzer</a>
+        <a href="./Anmelden.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">→</span>Abmelden</a>
+      </div>
+    </details>
+  </aside>
+  <div style="min-width:0">
+    <header style="display:flex;align-items:center;gap:1.2rem;padding:.55rem 1.4rem;border-bottom:1px solid var(--line);background:var(--panel);font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--mut)">
+      <span style="color:var(--ink)">FIN</span><span>/</span><span>HAUSHALTSKONTO</span><span>/</span><span style="color:var(--acc)">PROGNOSE</span>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:.4rem"><span style="width:.4rem;height:.4rem;border-radius:50%;background:var(--pos)"></span>SYNC 31.05. 18:04</span>
+      <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+      </button>
+      <span>ALEX</span>
+    </header>
+    <main style="padding:1.1rem 1.4rem 2rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+        <h1 style="margin:0;font-size:1.15rem;font-weight:600;letter-spacing:.01em">Jahresprognose 2026</h1>
+        <a href="./Kategorietrends.dc.html" style="padding:.45rem .8rem;border:1px solid var(--line2);border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--ink);text-decoration:none" style-hover="border-color:var(--acc);color:var(--acc)">KATEGORIETRENDS →</a>
+      </div>
+      <p style="margin:0 0 1rem;padding:.5rem .8rem;border-left:3px solid var(--acc);background:var(--panel);border-radius:0 .35rem .35rem 0;font-size:.76rem;color:var(--mut)">Schätzung auf Basis des gesamten monatlichen Kontoverlaufs und bestätigter Wiederholungen — keine Finanzberatung.</p>
+      <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:.5rem;align-items:start">
+        <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem">
+            <h2 style="margin:0;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Kontoverlauf mit Unsicherheitsband</h2>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--mut)"><span style="color:var(--sky)">━ IST</span>&ensp;<span style="color:var(--acc)">┄ PROGNOSE</span></span>
+          </div>
+          <svg viewBox="0 0 720 220" style="width:100%;display:block" role="img" aria-label="Jahresprognose">
+            <line x1="40" x2="680" y1="30" y2="30" style="stroke:var(--track)" stroke-width="1"></line>
+            <line x1="40" x2="680" y1="80" y2="80" style="stroke:var(--track)" stroke-width="1"></line>
+            <line x1="40" x2="680" y1="130" y2="130" style="stroke:var(--track)" stroke-width="1"></line>
+            <line x1="40" x2="680" y1="180" y2="180" style="stroke:var(--track)" stroke-width="1"></line>
+            <polygon style="fill:var(--accSoft)" points="330.9,64.5 389.1,57.6 447.3,51.5 505.5,46.4 563.6,42.1 621.8,37.8 680,33.5 680,80 621.8,79.1 563.6,78.3 505.5,77.4 447.3,75.7 389.1,74.8 330.9,74.8"></polygon>
+            <polyline fill="none" style="stroke:var(--sky)" stroke-width="2" points="40,150.6 98.2,164.3 156.4,131.6 214.5,123.5 272.7,74.3"></polyline>
+            <polyline fill="none" style="stroke:var(--peach)" stroke-width="2" stroke-dasharray="5 5" points="272.7,74.3 330.9,69.6 389.1,66.2 447.3,63.6 505.5,61.9 563.6,60.2 621.8,58.4 680,56.7"></polyline>
+            <text x="40" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">JAN</text>
+            <text x="156.4" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">MÄR</text>
+            <text x="272.7" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">MAI</text>
+            <text x="389.1" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">JUL</text>
+            <text x="505.5" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">SEP</text>
+            <text x="621.8" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">NOV</text>
+            <text x="4" y="34" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">2.100</text>
+            <text x="4" y="184" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">1.200</text>
+          </svg>
+          <table style="width:100%;border-collapse:collapse;font-size:.78rem;margin-top:.6rem">
+            <thead><tr>
+              <th style="padding:.45rem 0;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut);border-bottom:1px solid var(--line);font-weight:500">MONAT</th>
+              <th style="padding:.45rem 0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut);border-bottom:1px solid var(--line);font-weight:500">SCHÄTZUNG</th>
+              <th style="padding:.45rem 0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut);border-bottom:1px solid var(--line);font-weight:500">MIN</th>
+              <th style="padding:.45rem 0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut);border-bottom:1px solid var(--line);font-weight:500">MAX</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ points }}" as="p" hint-placeholder-count="7">
+                <tr style-hover="background:var(--hair)">
+                  <td style="padding:.45rem 0;border-bottom:1px solid var(--hair)">{{ p.month }}</td>
+                  <td style="padding:.45rem 0;border-bottom:1px solid var(--hair);text-align:right;font-family:'IBM Plex Mono',monospace">{{ p.est }}</td>
+                  <td style="padding:.45rem 0;border-bottom:1px solid var(--hair);text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--mut)">{{ p.min }}</td>
+                  <td style="padding:.45rem 0;border-bottom:1px solid var(--hair);text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--mut)">{{ p.max }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </section>
+        <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.6rem">
+            <h2 style="margin:0;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Berücksichtigte Wiederholungen</h2>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--acc);cursor:pointer">BEARBEITEN →</span>
+          </div>
+          <div style="display:grid">
+            <sc-for list="{{ recurring }}" as="r" hint-placeholder-count="5">
+              <div style="display:flex;justify-content:space-between;gap:.8rem;padding:.5rem 0;border-bottom:1px solid var(--hair)">
+                <span style="display:grid;min-width:0;font-size:.8rem">{{ r.name }}<small style="font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--mut)">{{ r.meta }}</small></span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;white-space:nowrap;color:{{ r.color }}">{{ r.amount }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark" };
+  renderVals() {
+    const t = this.state.theme;
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+      points: [
+        { month: "Juni", est: "1.870,00", min: "1.840,00", max: "1.900,00" },
+        { month: "Juli", est: "1.890,00", min: "1.840,00", max: "1.940,00" },
+        { month: "August", est: "1.905,00", min: "1.835,00", max: "1.975,00" },
+        { month: "September", est: "1.915,00", min: "1.825,00", max: "2.005,00" },
+        { month: "Oktober", est: "1.925,00", min: "1.820,00", max: "2.030,00" },
+        { month: "November", est: "1.935,00", min: "1.815,00", max: "2.055,00" },
+        { month: "Dezember", est: "1.945,00", min: "1.810,00", max: "2.080,00" },
+      ],
+      recurring: [
+        { name: "Vermietung Muster GmbH", meta: "15.06. · MONATLICH", amount: "−1.150,00", color: "var(--neg)" },
+        { name: "Stadtwerke Musterstadt", meta: "28.06. · MONATLICH", amount: "−86,00", color: "var(--neg)" },
+        { name: "Versicherung AG", meta: "20.06. · MONATLICH", amount: "−24,80", color: "var(--neg)" },
+        { name: "Streaming-Dienst", meta: "24.06. · MONATLICH", amount: "−12,99", color: "var(--neg)" },
+        { name: "Überweisung A. Muster", meta: "26.06. · MONATLICH", amount: "+1.750,00", color: "var(--pos)" },
+        { name: "Überweisung B. Muster", meta: "05.06. · MONATLICH", amount: "+1.750,00", color: "var(--pos)" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

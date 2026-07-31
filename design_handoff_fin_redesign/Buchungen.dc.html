@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Buchungen (Redesign)" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;display:grid;grid-template-columns:3.5rem minmax(0,1fr)">
+  <aside style="border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.7rem 0">
+    <a href="./Übersicht.dc.html" title="Fin" style="width:2.1rem;height:2.1rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.95rem;border-radius:.35rem;margin-bottom:.8rem;text-decoration:none">F</a>
+    <a href="./Übersicht.dc.html" title="Übersicht" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">◫</a>
+    <a href="./Buchungen.dc.html" title="Buchungen" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;background:var(--accSoft);color:var(--acc);font-size:.95rem;text-decoration:none">↕</a>
+    <a href="./Prognose.dc.html" title="Prognose" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">⌁</a>
+    <a href="./Kategorietrends.dc.html" title="Kategorietrends" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">∿</a>
+    
+    <a href="./Import.dc.html" title="Import" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">↓</a>
+    <a href="./Kategorien.dc.html" title="Kategorien" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">#</a>
+    <details style="margin-top:auto;position:relative">
+      <summary title="alex — Menü" style="width:2.1rem;height:2.1rem;display:grid;place-items:center;border-radius:50%;background:var(--accSoft);color:var(--acc);font-size:.72rem;font-weight:700;cursor:pointer;list-style:none">A</summary>
+      <div style="position:absolute;left:2.6rem;bottom:0;z-index:50;min-width:11.5rem;display:grid;gap:.15rem;padding:.35rem;background:var(--panel);border:1px solid var(--line2);border-radius:.4rem;box-shadow:0 10px 30px rgba(0,0,0,.25)">
+        <a href="./Einstellungen.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">⚙</span>Einstellungen</a>
+        <a href="./Agent-Zugänge.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">◇</span>Agent-Zugänge</a>
+        <a href="./Benutzer.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">○</span>Benutzer</a>
+        <a href="./Anmelden.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">→</span>Abmelden</a>
+      </div>
+    </details>
+  </aside>
+  <div style="min-width:0">
+    <header style="display:flex;align-items:center;gap:1.2rem;padding:.55rem 1.4rem;border-bottom:1px solid var(--line);background:var(--panel);font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--mut)">
+      <span style="color:var(--ink)">FIN</span><span>/</span><span>HAUSHALTSKONTO</span><span>/</span><span style="color:var(--acc)">BUCHUNGEN</span>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:.4rem"><span style="width:.4rem;height:.4rem;border-radius:50%;background:var(--pos)"></span>SYNC 31.05. 18:04</span>
+      <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+      </button>
+      <span>ALEX</span>
+    </header>
+    <main style="padding:1.1rem 1.4rem 2rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <h1 style="margin:0;font-size:1.15rem;font-weight:600;letter-spacing:.01em">Buchungen — Mai 2026</h1>
+        <a href="./Import.dc.html" style="padding:.45rem .8rem;background:var(--brand);color:var(--brandInk);border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.05em;text-decoration:none">IMPORT →</a>
+      </div>
+      <section style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:.5rem;align-items:end;margin-bottom:.5rem;padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+        <label style="display:grid;gap:.3rem;min-width:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Suche<input type="search" placeholder="Empfänger oder Verwendungszweck" style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.5rem .65rem;color:var(--ink);font:inherit;font-size:.8rem" /></label>
+        <label style="display:grid;gap:.3rem;min-width:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Monat<input type="month" value="2026-05" style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.5rem .65rem;color:var(--ink);font:inherit;font-size:.8rem" /></label>
+        <label style="display:grid;gap:.3rem;min-width:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Kategorie<select style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.5rem .65rem;color:var(--ink);font:inherit;font-size:.8rem;cursor:pointer"><option>Alle</option><option>Lebensmittel</option><option>Wohnen</option><option>Mobilität</option></select></label>
+        <label style="display:grid;gap:.3rem;min-width:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Richtung<select style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.5rem .65rem;color:var(--ink);font:inherit;font-size:.8rem;cursor:pointer"><option>Alle</option><option>Eingang</option><option>Ausgang</option></select></label>
+        <div style="display:flex;gap:.4rem;align-items:center">
+          <label style="display:flex;align-items:center;gap:.4rem;font-size:.74rem;color:var(--mut);white-space:nowrap"><input type="checkbox" style="accent-color:var(--acc);cursor:pointer" />Nur unkategorisiert</label>
+          <button type="button" style="padding:.5rem .8rem;background:var(--brand);color:var(--brandInk);border:0;border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.05em;cursor:pointer">FILTERN</button>
+        </div>
+      </section>
+      <section style="padding:.4rem 1rem .9rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+        <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+          <thead><tr>
+            <th style="padding:.55rem 0;text-align:left;border-bottom:1px solid var(--line)"><button type="button" onClick="{{ sortByDate }}" title="Nach Datum sortieren" style="padding:0;border:0;background:transparent;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:{{ dateHeadColor }};font-weight:500">DATUM {{ dateArrow }}</button></th>
+            <th style="padding:.55rem 0;text-align:left;border-bottom:1px solid var(--line)"><button type="button" onClick="{{ sortByName }}" title="Nach Name sortieren" style="padding:0;border:0;background:transparent;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:{{ nameHeadColor }};font-weight:500">BUCHUNG {{ nameArrow }}</button></th>
+            <th style="padding:.55rem 0;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut);border-bottom:1px solid var(--line);font-weight:500">VERWENDUNGSZWECK</th>
+            <th style="padding:.55rem 0;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut);border-bottom:1px solid var(--line);font-weight:500">KATEGORIE</th>
+            <th style="padding:.55rem 0;text-align:right;border-bottom:1px solid var(--line)"><button type="button" onClick="{{ sortByAmount }}" title="Nach Betrag sortieren" style="padding:0;border:0;background:transparent;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:{{ amountHeadColor }};font-weight:500">BETRAG&nbsp;EUR {{ amountArrow }}</button></th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+              <tr style-hover="background:var(--hair)">
+                <td style="padding:.5rem 0;border-bottom:1px solid var(--hair);font-family:'IBM Plex Mono',monospace;color:var(--mut);width:5rem"><a href="./Buchungsdetails.dc.html" style="color:inherit;text-decoration:none">{{ r.date }}</a></td>
+                <td style="padding:.5rem 1rem .5rem 0;border-bottom:1px solid var(--hair);font-weight:500"><a href="./Buchungsdetails.dc.html" style="color:inherit;text-decoration:none">{{ r.name }}</a></td>
+                <td style="padding:.5rem 1rem .5rem 0;border-bottom:1px solid var(--hair);color:var(--mut)">{{ r.purpose }}</td>
+                <td style="padding:.5rem 0;border-bottom:1px solid var(--hair)"><span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;padding:.05rem .4rem;border-radius:.25rem;border:1px solid {{ r.chipBorder }};color:{{ r.chipInk }}">{{ r.category }}</span></td>
+                <td style="padding:.5rem 0;border-bottom:1px solid var(--hair);text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ r.amtColor }}">{{ r.amount }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.7rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--mut)">
+          <span>12 VON 128 BUCHUNGEN</span>
+          <span style="padding:.4rem .7rem;border:1px solid var(--line2);border-radius:.35rem;color:var(--ink);cursor:pointer" style-hover="border-color:var(--acc);color:var(--acc)">MEHR LADEN ↓</span>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark", sortKey: "date", sortDir: -1 };
+  setSort(key) {
+    this.setState((s) => ({ sortKey: key, sortDir: s.sortKey === key ? -s.sortDir : (key === "name" ? 1 : -1) }));
+  }
+  renderVals() {
+    const t = this.state.theme, sk = this.state.sortKey, sd = this.state.sortDir;
+    const cat = (c) => ({ category: c, chipBorder: "var(--line2)", chipInk: "var(--mut)" });
+    const unkat = { category: "UNKAT", chipBorder: "var(--acc)", chipInk: "var(--acc)" };
+    const neg = { amtColor: "var(--neg)" }, pos = { amtColor: "var(--pos)" };
+    const num = (a) => parseFloat(a.replace("−", "-").replace("+", "").replace(/\./g, "").replace(",", "."));
+    const dkey = (d) => d.split(".").reverse().join("");
+    const arrow = (key) => (sk === key ? (sd === 1 ? "↑" : "↓") : "·");
+    const head = (key) => (sk === key ? "var(--acc)" : "var(--mut)");
+    const base = [
+        { date: "30.05.", name: "Drogeriemarkt Muster", purpose: "Kartenzahlung", amount: "−23,45", ...cat("Haushalt"), ...neg },
+        { date: "29.05.", name: "Supermarkt Beispiel", purpose: "Kartenzahlung 28.05.", amount: "−54,20", ...cat("Lebensmittel"), ...neg },
+        { date: "28.05.", name: "Stadtwerke Musterstadt", purpose: "Abschlag 05/2026", amount: "−86,00", ...cat("Wohnen"), ...neg },
+        { date: "27.05.", name: "Online-Apotheke", purpose: "Bestellung 4711", amount: "−18,90", ...unkat, ...neg },
+        { date: "26.05.", name: "Überweisung A. Muster", purpose: "Haushaltsbeitrag Mai", amount: "+1.750,00", ...unkat, ...pos },
+        { date: "24.05.", name: "Streaming-Dienst", purpose: "Abo 05/2026", amount: "−12,99", ...cat("Freizeit"), ...neg },
+        { date: "22.05.", name: "Tankstelle Beispielweg", purpose: "Kartenzahlung", amount: "−58,40", ...cat("Mobilität"), ...neg },
+        { date: "20.05.", name: "Versicherung AG", purpose: "Beitrag Hausrat", amount: "−24,80", ...cat("Versicherungen"), ...neg },
+        { date: "18.05.", name: "Supermarkt Beispiel", purpose: "Kartenzahlung 17.05.", amount: "−67,35", ...cat("Lebensmittel"), ...neg },
+        { date: "15.05.", name: "Vermietung Muster GmbH", purpose: "Miete 05/2026", amount: "−1.150,00", ...cat("Wohnen"), ...neg },
+        { date: "12.05.", name: "Bäckerei am Markt", purpose: "Kartenzahlung", amount: "−8,60", ...cat("Lebensmittel"), ...neg },
+        { date: "05.05.", name: "Überweisung B. Muster", purpose: "Haushaltsbeitrag Mai", amount: "+1.750,00", ...unkat, ...pos },
+    ];
+    const rows = base.slice().sort((a, b) => {
+      let v = 0;
+      if (sk === "date") v = dkey(a.date) < dkey(b.date) ? -1 : 1;
+      else if (sk === "amount") v = num(a.amount) - num(b.amount);
+      else v = a.name.localeCompare(b.name, "de");
+      return v * sd;
+    });
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+      sortByDate: () => this.setSort("date"),
+      sortByName: () => this.setSort("name"),
+      sortByAmount: () => this.setSort("amount"),
+      dateArrow: arrow("date"), nameArrow: arrow("name"), amountArrow: arrow("amount"),
+      dateHeadColor: head("date"), nameHeadColor: head("name"), amountHeadColor: head("amount"),
+      rows,
+    };
+  }
+}
+</script>
+</body>
+</html>

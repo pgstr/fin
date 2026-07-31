@@ -8,7 +8,6 @@ from sqlalchemy import select
 from finanzplaner.analytics import (
     balance_forecast,
     balance_on,
-    budget_balance_on,
     category_trend,
     complete_coverage,
     month_summary,
@@ -181,7 +180,7 @@ def test_internal_transfers_are_excluded_from_budget_totals(admin, shared_accoun
         assert {item["key"] for item in summary["breakdown"]} == {"groceries"}
 
 
-def test_budget_balance_excludes_non_budget_transactions_without_changing_real_balance(
+def test_non_budget_transactions_do_not_add_an_adjusted_balance_to_the_chart(
     admin, shared_account
 ) -> None:
     rows = [
@@ -236,17 +235,8 @@ def test_budget_balance_excludes_non_budget_transactions_without_changing_real_b
         actual, _snapshot_date, actual_reliable = balance_on(
             db, shared_account.id, date(2026, 1, 31)
         )
-        budget, budget_reliable = budget_balance_on(
-            db,
-            shared_account.id,
-            date(2026, 1, 1),
-            date(2026, 1, 31),
-        )
-
         assert actual_reliable
         assert actual == 100_000
-        assert budget_reliable
-        assert budget == 110_000
 
         chart = build_chart(
             db,
@@ -256,7 +246,8 @@ def test_budget_balance_excludes_non_budget_transactions_without_changing_real_b
             today=date(2026, 1, 31),
         )
         assert [point["value"] for point in chart["actual"]] == [100_000]
-        assert [point["value"] for point in chart["budget"]] == [110_000]
+        assert "budget" not in chart
+        assert "budget_points" not in chart
 
 
 def test_forecast_history_excludes_non_budget_transactions(admin, shared_account) -> None:

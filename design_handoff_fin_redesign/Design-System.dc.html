@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Design-System" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif">
+  <header style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:1.2rem;padding:.7rem 1.6rem;border-bottom:1px solid var(--line);background:var(--panel)">
+    <span style="width:2.1rem;height:2.1rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.95rem;border-radius:.35rem">F</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.12em;color:var(--mut)">FIN <span style="color:var(--ink)">DESIGN-SYSTEM</span> · V1</span>
+    <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="margin-left:auto;display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+      <span style="width:1.4rem;height:1.4rem;display:grid;place-items:center;border-radius:50%;font-size:.7rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+      <span style="width:1.4rem;height:1.4rem;display:grid;place-items:center;border-radius:50%;font-size:.7rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+    </button>
+  </header>
+  <main style="width:min(1100px,calc(100% - 3rem));margin:0 auto;padding:2rem 0 4rem;display:grid;gap:2.2rem">
+    <section>
+      <h1 style="margin:0 0 .3rem;font-size:1.5rem;font-weight:600;letter-spacing:-.01em">Fin Design-System</h1>
+      <p style="margin:0;max-width:60ch;font-size:.88rem;color:var(--mut)">Dichte, terminal-inspirierte Oberfläche für den Haushalts-Finanzplaner. Ein Token-Satz, zwei Themes (☾/☀ oben rechts). Pastell nur für Datenvisualisierung — Beträge immer in klarem Grün/Rot.</p>
+    </section>
+    <section>
+      <h2 style="margin:0 0 .8rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">01 · Farben (Tokens)</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem">
+        <sc-for list="{{ tokens }}" as="tk" hint-placeholder-count="12">
+          <div style="padding:.6rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+            <div style="height:2.6rem;border-radius:.3rem;border:1px solid var(--line);background:{{ tk.swatch }}"></div>
+            <p style="margin:.45rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:.68rem">{{ tk.name }}</p>
+            <p style="margin:.1rem 0 0;font-size:.68rem;color:var(--mut)">{{ tk.role }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:.6rem 0 0;font-size:.74rem;color:var(--mut)">Regel: <span style="font-family:'IBM Plex Mono',monospace">--pos/--neg</span> ausschließlich für Beträge &amp; Deltas. <span style="font-family:'IBM Plex Mono',monospace">--sky/--mint/--peach/--rose/--lav</span> ausschließlich für Diagrammlinien, Bänder und Kategoriebalken. <span style="font-family:'IBM Plex Mono',monospace">--acc</span> für Navigation, Hervorhebung, UNKAT-Warnungen.</p>
+    </section>
+    <section>
+      <h2 style="margin:0 0 .8rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">02 · Typografie</h2>
+      <div style="display:grid;gap:.5rem">
+        <div style="display:grid;grid-template-columns:16rem 1fr;gap:1rem;align-items:baseline;padding:.7rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut)">H1 · ARCHIVO 600 · 1.15REM</span><span style="font-size:1.15rem;font-weight:600">Monatsübersicht — Mai 2026</span></div>
+        <div style="display:grid;grid-template-columns:16rem 1fr;gap:1rem;align-items:baseline;padding:.7rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut)">PANEL-TITEL · MONO · .78REM · CAPS</span><span style="font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Kontoverlauf 2026</span></div>
+        <div style="display:grid;grid-template-columns:16rem 1fr;gap:1rem;align-items:baseline;padding:.7rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut)">ZAHL GROSS · PLEX MONO 600 · 1.25REM</span><span style="font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600">1.842,60</span></div>
+        <div style="display:grid;grid-template-columns:16rem 1fr;gap:1rem;align-items:baseline;padding:.7rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut)">FLIESSTEXT · ARCHIVO 400 · .8REM</span><span style="font-size:.8rem">Die Konto-IBAN in der Datei bestimmt das Zielkonto.</span></div>
+        <div style="display:grid;grid-template-columns:16rem 1fr;gap:1rem;align-items:baseline;padding:.7rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--mut)">META/LABEL · MONO · .64REM · CAPS</span><span style="font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">SYNC 31.05. 18:04 · GEMEINSAM</span></div>
+      </div>
+      <p style="margin:.6rem 0 0;font-size:.74rem;color:var(--mut)">Alle Zahlen in IBM Plex Mono (Tabellenziffern), deutsche Formatierung (1.842,60), Vorzeichen als − / +.</p>
+    </section>
+    <section>
+      <h2 style="margin:0 0 .8rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">03 · Komponenten</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:.5rem;align-items:start">
+        <div style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0 0 .5rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">KPI-KACHEL</p>
+          <div style="padding:.75rem .85rem;background:var(--field);border:1px solid var(--line);border-radius:.4rem;max-width:12rem"><p style="margin:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Kontostand</p><p style="margin:.25rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600">1.842,60</p><p style="margin:.1rem 0 0;font-size:.68rem;color:var(--pos)">▲ +285,55 MTD</p></div>
+        </div>
+        <div style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0 0 .5rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">CHIPS / BADGES</p>
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem;align-items:center">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;padding:.05rem .4rem;border-radius:.25rem;border:1px solid var(--line2);color:var(--mut)">Lebensmittel</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;padding:.05rem .4rem;border-radius:.25rem;border:1px solid var(--acc);color:var(--acc)">UNKAT</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;padding:.05rem .4rem;border-radius:.25rem;border:1px solid var(--pos);color:var(--pos)">AKTIV</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;padding:.05rem .4rem;border-radius:.25rem;border:1px solid var(--line2);color:var(--mut)">WIDERRUFEN</span>
+          </div>
+        </div>
+        <div style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0 0 .5rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">BUTTONS</p>
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+            <button type="button" style="padding:.5rem .8rem;background:var(--brand);color:var(--brandInk);border:0;border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.05em;cursor:pointer">PRIMÄR</button>
+            <button type="button" style="padding:.5rem .8rem;border:1px solid var(--line2);background:transparent;color:var(--ink);border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:.05em;cursor:pointer" style-hover="border-color:var(--acc);color:var(--acc)">SEKUNDÄR</button>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--acc);cursor:pointer;align-self:center">TEXTLINK →</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--neg);cursor:pointer;align-self:center">DESTRUKTIV</span>
+          </div>
+        </div>
+        <div style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0 0 .5rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">EINGABEFELD</p>
+          <label style="display:grid;gap:.3rem;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600;max-width:16rem">Suche<input placeholder="Empfänger oder Zweck" style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.5rem .65rem;color:var(--ink);font:inherit;font-size:.8rem" /></label>
+        </div>
+        <div style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0 0 .5rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">TABELLENZEILE</p>
+          <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+            <tbody>
+              <tr style-hover="background:var(--hair)"><td style="padding:.5rem 0;border-bottom:1px solid var(--hair);font-family:'IBM Plex Mono',monospace;color:var(--mut);width:4.5rem">28.05.</td><td style="padding:.5rem 0;border-bottom:1px solid var(--hair)">Stadtwerke Musterstadt</td><td style="padding:.5rem 0;border-bottom:1px solid var(--hair);text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--neg)">−86,00</td></tr>
+              <tr style-hover="background:var(--hair)"><td style="padding:.5rem 0;font-family:'IBM Plex Mono',monospace;color:var(--mut)">26.05.</td><td style="padding:.5rem 0">Überweisung A. Muster</td><td style="padding:.5rem 0;text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--pos)">+1.750,00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0 0 .5rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">KATEGORIEBALKEN</p>
+          <div style="display:grid;gap:.5rem;font-family:'IBM Plex Mono',monospace;font-size:.74rem">
+            <div style="display:grid;grid-template-columns:6rem 1fr 4rem;gap:.5rem;align-items:center"><span>WOHNEN</span><div style="height:6px;background:var(--track);border-radius:3px"><div style="width:100%;height:100%;background:var(--sky);border-radius:3px"></div></div><span style="text-align:right">1.250,00</span></div>
+            <div style="display:grid;grid-template-columns:6rem 1fr 4rem;gap:.5rem;align-items:center"><span>LEBENSM.</span><div style="height:6px;background:var(--track);border-radius:3px"><div style="width:51%;height:100%;background:var(--mint);border-radius:3px"></div></div><span style="text-align:right">640,80</span></div>
+          </div>
+        </div>
+        <div style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0 0 .5rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">HINWEISLEISTEN</p>
+          <div style="display:grid;gap:.4rem;font-size:.74rem;color:var(--mut)">
+            <p style="margin:0;padding:.45rem .7rem;border-left:3px solid var(--acc);background:var(--field);border-radius:0 .3rem .3rem 0">Schätzung, keine Finanzberatung.</p>
+            <p style="margin:0;padding:.45rem .7rem;border-left:3px solid var(--pos);background:var(--field);border-radius:0 .3rem .3rem 0"><span style="color:var(--pos);font-family:'IBM Plex Mono',monospace">OK</span> — 128 Buchungen verarbeitet.</p>
+            <p style="margin:0;padding:.45rem .7rem;border-left:3px solid var(--neg);background:var(--field);border-radius:0 .3rem .3rem 0"><span style="color:var(--neg);font-family:'IBM Plex Mono',monospace">FEHLER</span> — Der Aufbau der DKB-Datei wird nicht unterstützt.</p>
+          </div>
+        </div>
+        <div style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0 0 .5rem;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mut)">DIAGRAMM-LEGENDE</p>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--mut)"><span style="color:var(--sky)">━ IST</span>&ensp;<span style="color:var(--acc)">┄ PROGNOSE</span>&ensp;<span style="color:var(--mint)">▮ BETRAG</span></span>
+          <p style="margin:.5rem 0 0;font-size:.72rem;color:var(--mut)">Prognose immer gestrichelt + Unsicherheitsband in <span style="font-family:'IBM Plex Mono',monospace">--accSoft</span>.</p>
+        </div>
+      </div>
+    </section>
+    <section>
+      <h2 style="margin:0 0 .8rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">04 · Marke</h2>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <div style="flex:1 1 16rem;display:flex;align-items:center;gap:1rem;padding:1.2rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <span style="width:3rem;height:3rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:1.4rem;border-radius:.5rem">F</span>
+          <div><p style="margin:0;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;font-size:1rem">FIN</p><p style="margin:.15rem 0 0;font-size:.72rem;color:var(--mut)">Blockmarke Pfirsich + Mono-Wortmarke, Versalien, gesperrt</p></div>
+        </div>
+        <div style="flex:1 1 16rem;padding:1.2rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--mut)">FIN / HAUSHALTSKONTO / <span style="color:var(--acc)">2026-05</span></p>
+          <p style="margin:.4rem 0 0;font-size:.72rem;color:var(--mut)">Breadcrumb als Terminal-Pfad — Kontext immer sichtbar, aktueller Abschnitt in Akzentfarbe.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark" };
+  renderVals() {
+    const t = this.state.theme;
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+      tokens: [
+        { name: "--bg", swatch: "var(--bg)", role: "Seitenhintergrund" },
+        { name: "--panel", swatch: "var(--panel)", role: "Panels & Rail" },
+        { name: "--field", swatch: "var(--field)", role: "Eingabefelder" },
+        { name: "--ink", swatch: "var(--ink)", role: "Text" },
+        { name: "--mut", swatch: "var(--mut)", role: "Sekundärtext" },
+        { name: "--acc / --brand", swatch: "var(--acc)", role: "Akzent & Marke (Pfirsich)" },
+        { name: "--pos", swatch: "var(--pos)", role: "Eingänge, positiv" },
+        { name: "--neg", swatch: "var(--neg)", role: "Ausgaben, negativ" },
+        { name: "--sky", swatch: "var(--sky)", role: "Chart: Ist-Linie" },
+        { name: "--mint", swatch: "var(--mint)", role: "Chart: Balken" },
+        { name: "--rose", swatch: "var(--rose)", role: "Chart: Kategorie" },
+        { name: "--lav", swatch: "var(--lav)", role: "Chart: Kategorie" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

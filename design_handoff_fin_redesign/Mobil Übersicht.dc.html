@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Mobil Übersicht (Redesign)" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;display:flex;flex-direction:column">
+  <header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.7rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);background:var(--panel)">
+    <span style="width:2rem;height:2rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.9rem;border-radius:.35rem">F</span>
+    <span style="display:grid;line-height:1.15;min-width:0">
+      <span style="font-size:.86rem;font-weight:600">Haushaltskonto</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--mut)">GEMEINSAM · SYNC 31.05.</span>
+    </span>
+    <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="margin-left:auto;display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+      <span style="width:1.5rem;height:1.5rem;display:grid;place-items:center;border-radius:50%;font-size:.72rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+      <span style="width:1.5rem;height:1.5rem;display:grid;place-items:center;border-radius:50%;font-size:.72rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+    </button>
+  </header>
+  <main style="flex:1;padding:.8rem .9rem 5.5rem;display:grid;gap:.5rem;align-content:start">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="min-width:2.75rem;min-height:2.75rem;display:grid;place-items:center;border:1px solid var(--line2);border-radius:.4rem;color:var(--mut);font-size:1.1rem">‹</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.85rem;color:var(--acc)">MAI 2026</span>
+      <span style="min-width:2.75rem;min-height:2.75rem;display:grid;place-items:center;border:1px solid var(--line2);border-radius:.4rem;color:var(--mut);font-size:1.1rem">›</span>
+    </div>
+    <section style="padding:1rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem;text-align:center">
+      <p style="margin:0;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)">Kontostand · 31.05.</p>
+      <p style="margin:.25rem 0 .1rem;font-family:'IBM Plex Mono',monospace;font-size:2.1rem;font-weight:600">1.842,60&nbsp;€</p>
+      <p style="margin:0;font-size:.74rem;color:var(--pos)">▲ +285,55&nbsp;€ diesen Monat</p>
+    </section>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+      <div style="padding:.7rem .8rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem"><p style="margin:0;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Eingänge</p><p style="margin:.2rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:600;color:var(--pos)">+3.500,00</p></div>
+      <div style="padding:.7rem .8rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem"><p style="margin:0;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Ausgaben</p><p style="margin:.2rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:600;color:var(--neg)">−3.214,45</p></div>
+      <div style="padding:.7rem .8rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem"><p style="margin:0;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Nicht kat.</p><p style="margin:.2rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:600;color:var(--acc)">234,35</p></div>
+      <div style="padding:.7rem .8rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem"><p style="margin:0;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Prognose DEZ</p><p style="margin:.2rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:600">1.945,00</p></div>
+    </div>
+    <section style="padding:.8rem .9rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem">
+        <h2 style="margin:0;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Kontoverlauf</h2>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--mut)"><span style="color:var(--sky)">━ IST</span> <span style="color:var(--acc)">┄ PROG.</span></span>
+      </div>
+      <svg viewBox="0 0 720 240" style="width:100%;display:block" role="img" aria-label="Kontoverlauf">
+        <line x1="20" x2="700" y1="40" y2="40" style="stroke:var(--track)" stroke-width="1.5"></line>
+        <line x1="20" x2="700" y1="110" y2="110" style="stroke:var(--track)" stroke-width="1.5"></line>
+        <line x1="20" x2="700" y1="180" y2="180" style="stroke:var(--track)" stroke-width="1.5"></line>
+        <polygon style="fill:var(--accSoft)" points="330.9,74.5 389.1,67.6 447.3,61.5 505.5,56.4 563.6,52.1 621.8,47.8 680,43.5 680,100 621.8,99.1 563.6,98.3 505.5,97.4 447.3,95.7 389.1,94.8 330.9,94.8"></polygon>
+        <polyline fill="none" style="stroke:var(--sky)" stroke-width="3.5" points="40,170.6 98.2,184.3 156.4,151.6 214.5,143.5 272.7,84.3"></polyline>
+        <polyline fill="none" style="stroke:var(--peach)" stroke-width="3.5" stroke-dasharray="8 8" points="272.7,84.3 330.9,79.6 389.1,76.2 447.3,73.6 505.5,71.9 563.6,70.2 621.8,68.4 680,66.7"></polyline>
+        <text x="40" y="225" text-anchor="middle" style="fill:var(--mut)" font-size="16" font-family="IBM Plex Mono">JAN</text>
+        <text x="272.7" y="225" text-anchor="middle" style="fill:var(--mut)" font-size="16" font-family="IBM Plex Mono">MAI</text>
+        <text x="505.5" y="225" text-anchor="middle" style="fill:var(--mut)" font-size="16" font-family="IBM Plex Mono">SEP</text>
+        <text x="680" y="225" text-anchor="middle" style="fill:var(--mut)" font-size="16" font-family="IBM Plex Mono">DEZ</text>
+      </svg>
+    </section>
+    <section style="padding:.8rem .9rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem">
+      <h2 style="margin:0 0 .5rem;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Größte Ausgaben</h2>
+      <div style="display:grid;gap:.55rem;font-size:.8rem">
+        <sc-for list="{{ expenses }}" as="e" hint-placeholder-count="4">
+          <div>
+            <div style="display:flex;justify-content:space-between"><span>{{ e.label }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ e.amount }}</span></div>
+            <div style="height:5px;background:var(--track);border-radius:3px;margin-top:.3rem"><div style="height:100%;border-radius:3px;width:{{ e.width }};background:{{ e.color }}"></div></div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    <section style="padding:.8rem .9rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.3rem">
+        <h2 style="margin:0;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Letzte Buchungen</h2>
+        <a href="./Mobil Buchungen.dc.html" style="font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--acc);text-decoration:none">ALLE →</a>
+      </div>
+      <div style="display:grid">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+          <a href="#" style="display:flex;justify-content:space-between;gap:.7rem;align-items:center;min-height:2.9rem;padding:.35rem 0;border-bottom:1px solid var(--hair);color:inherit;text-decoration:none">
+            <span style="display:grid;min-width:0;font-size:.82rem;line-height:1.25">{{ r.name }}<small style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--mut)">{{ r.meta }}</small></span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.82rem;white-space:nowrap;color:{{ r.amtColor }}">{{ r.amount }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+  </main>
+  <nav style="position:fixed;left:0;right:0;bottom:0;z-index:10;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);background:var(--panel)">
+    <a href="./Mobil Übersicht.dc.html" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--acc);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">◫</span>Übersicht</a>
+    <a href="./Mobil Buchungen.dc.html" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">↕</span>Buchungen</a>
+    <a href="#" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">⌁</span>Prognose</a>
+    <a href="#" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">∿</span>Trends</a>
+    <a href="#" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">≡</span>Mehr</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark" };
+  renderVals() {
+    const t = this.state.theme;
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+      expenses: [
+        { label: "Wohnen", width: "100%", color: "var(--sky)", amount: "1.250,00" },
+        { label: "Lebensmittel", width: "51%", color: "var(--mint)", amount: "640,80" },
+        { label: "Mobilität", width: "25%", color: "var(--peach)", amount: "310,25" },
+        { label: "Versicherungen", width: "20%", color: "var(--rose)", amount: "245,90" },
+      ],
+      rows: [
+        { name: "Drogeriemarkt Muster", meta: "30.05. · HAUSHALT", amount: "−23,45", amtColor: "var(--neg)" },
+        { name: "Supermarkt Beispiel", meta: "29.05. · LEBENSMITTEL", amount: "−54,20", amtColor: "var(--neg)" },
+        { name: "Stadtwerke Musterstadt", meta: "28.05. · WOHNEN", amount: "−86,00", amtColor: "var(--neg)" },
+        { name: "Überweisung A. Muster", meta: "26.05. · UNKAT", amount: "+1.750,00", amtColor: "var(--pos)" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

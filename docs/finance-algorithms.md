@@ -33,15 +33,10 @@ overlapping import periods covers the complete intervening period. A real
 date gap remains incomplete. Otherwise the UI labels the balance potentially
 incomplete instead of displaying false precision.
 
-The actual balance always includes every transaction so that it continues to
-reconcile to DKB. The overview may also show a separate budget-adjusted
-trajectory. It starts from the actual balance immediately before January 1 and
-then applies only transactions outside the transfer category root through each
-displayed date. This makes internal transfers and entries marked
-`Nicht budgetwirksam` invisible to planning without rewriting bank history.
-The adjusted value is shown only when the opening balance and complete period
-coverage make it reliable, and the extra line is hidden when it equals the
-actual line throughout the displayed year.
+The actual balance and every balance graph include every transaction so that
+they continue to reconcile to DKB. There is no separate adjusted-balance line.
+Budget-neutral treatment is limited to cash-flow summaries and forecast
+history.
 
 ## Internal transfers
 
@@ -107,7 +102,7 @@ Confirmed recurring entries are projected individually on their expected
 dates. Historical transaction IDs supporting those series are removed from
 the variable baseline to prevent double counting. Transactions categorized
 under the transfer root are also removed from that baseline, matching monthly,
-annual, and budget-adjusted-trajectory semantics.
+and annual cash-flow semantics.
 
 Remaining cash flow uses the median of up to the latest six complete monthly
 residual totals. This deliberately favors a stable household-level estimate
@@ -130,9 +125,9 @@ coverage, monthly/year summaries, trends, and forecasts live in
 [`test_import.py`](../tests/test_import.py) proves parser, deduplication,
 mismatch, raw-file, and private-sample behavior.
 [`test_analytics.py`](../tests/test_analytics.py) proves coverage gaps,
-transfers, actual versus budget-adjusted balances, monthly/year summaries,
-archived history, calendar spacing, recurrence, and forecast horizons. Adapter
-presentation is covered in
+transfers, reconciled balance graphs, budget-neutral forecast history,
+monthly/year summaries, archived history, calendar spacing, recurrence, and
+forecast horizons. Adapter presentation is covered in
 [`test_mcp.py`](../tests/test_mcp.py) and
 [`test_web_and_localization.py`](../tests/test_web_and_localization.py).
 

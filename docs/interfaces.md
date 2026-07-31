@@ -23,9 +23,9 @@ Routes cover setup and login, overview, transactions and detail, import,
 categories, annual report, trends, forecast, recurring review, monthly review,
 agent tokens, users, locale settings, and health. The annual report renders all
 12 month summaries, category totals, coverage warnings, balances, and saved
-reviews. The overview keeps the bank-reconciling balance visually distinct
-from a budget-adjusted trajectory that omits transfer-root transactions; the
-extra trajectory appears only when it differs and has complete coverage.
+reviews. Overview balance graphs contain only the bank-reconciling actual
+balance and the annual forecast; budget-neutral transactions affect summary
+and forecast calculations without creating another plotted balance series.
 Shared print CSS produces A4 monthly or annual output through the browser
 without a PDF dependency. Financial calculations and scoped reads remain
 service calls rather than route-local queries.

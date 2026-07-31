@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Mobil Prognose (Redesign)" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;display:flex;flex-direction:column">
+  <header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.7rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);background:var(--panel)">
+    <span style="width:2rem;height:2rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.9rem;border-radius:.35rem">F</span>
+    <span style="display:grid;line-height:1.15;min-width:0">
+      <span style="font-size:.86rem;font-weight:600">Jahresprognose</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--mut)">2026 · BIS DEZEMBER</span>
+    </span>
+    <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="margin-left:auto;display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+      <span style="width:1.5rem;height:1.5rem;display:grid;place-items:center;border-radius:50%;font-size:.72rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+      <span style="width:1.5rem;height:1.5rem;display:grid;place-items:center;border-radius:50%;font-size:.72rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+    </button>
+  </header>
+  <main style="flex:1;padding:.8rem .9rem 5.5rem;display:grid;gap:.5rem;align-content:start">
+    <section style="padding:1rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem;text-align:center">
+      <p style="margin:0;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)">Prognose Dezember 2026</p>
+      <p style="margin:.25rem 0 .1rem;font-family:'IBM Plex Mono',monospace;font-size:2.1rem;font-weight:600">≈ 1.945,00&nbsp;€</p>
+      <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--mut)">SPANNE 1.810,00 – 2.080,00</p>
+    </section>
+    <section style="padding:.8rem .9rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem">
+        <h2 style="margin:0;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Verlauf &amp; Band</h2>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--mut)"><span style="color:var(--sky)">━ IST</span> <span style="color:var(--acc)">┄ PROG.</span></span>
+      </div>
+      <svg viewBox="0 0 720 240" style="width:100%;display:block" role="img" aria-label="Jahresprognose">
+        <line x1="20" x2="700" y1="40" y2="40" style="stroke:var(--track)" stroke-width="1.5"></line>
+        <line x1="20" x2="700" y1="110" y2="110" style="stroke:var(--track)" stroke-width="1.5"></line>
+        <line x1="20" x2="700" y1="180" y2="180" style="stroke:var(--track)" stroke-width="1.5"></line>
+        <polygon style="fill:var(--accSoft)" points="330.9,74.5 389.1,67.6 447.3,61.5 505.5,56.4 563.6,52.1 621.8,47.8 680,43.5 680,100 621.8,99.1 563.6,98.3 505.5,97.4 447.3,95.7 389.1,94.8 330.9,94.8"></polygon>
+        <polyline fill="none" style="stroke:var(--sky)" stroke-width="3.5" points="40,170.6 98.2,184.3 156.4,151.6 214.5,143.5 272.7,84.3"></polyline>
+        <polyline fill="none" style="stroke:var(--peach)" stroke-width="3.5" stroke-dasharray="8 8" points="272.7,84.3 330.9,79.6 389.1,76.2 447.3,73.6 505.5,71.9 563.6,70.2 621.8,68.4 680,66.7"></polyline>
+        <text x="40" y="225" text-anchor="middle" style="fill:var(--mut)" font-size="16" font-family="IBM Plex Mono">JAN</text>
+        <text x="272.7" y="225" text-anchor="middle" style="fill:var(--mut)" font-size="16" font-family="IBM Plex Mono">MAI</text>
+        <text x="505.5" y="225" text-anchor="middle" style="fill:var(--mut)" font-size="16" font-family="IBM Plex Mono">SEP</text>
+        <text x="680" y="225" text-anchor="middle" style="fill:var(--mut)" font-size="16" font-family="IBM Plex Mono">DEZ</text>
+      </svg>
+      <p style="margin:.5rem 0 0;padding:.45rem .6rem;border-left:3px solid var(--acc);background:var(--field);border-radius:0 .3rem .3rem 0;font-size:.68rem;color:var(--mut)">Schätzung, keine Finanzberatung.</p>
+    </section>
+    <section style="padding:.8rem .9rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem">
+      <h2 style="margin:0 0 .4rem;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Monatswerte</h2>
+      <div style="display:grid">
+        <sc-for list="{{ points }}" as="p" hint-placeholder-count="7">
+          <div style="display:flex;justify-content:space-between;gap:.7rem;align-items:center;min-height:2.6rem;padding:.3rem 0;border-bottom:1px solid var(--hair)">
+            <span style="font-size:.82rem">{{ p.month }}</span>
+            <span style="display:grid;text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:.82rem">{{ p.est }}</span><small style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--mut)">{{ p.range }}</small></span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    <section style="padding:.8rem .9rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem">
+      <h2 style="margin:0 0 .4rem;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Berücksichtigte Wiederholungen</h2>
+      <div style="display:grid">
+        <sc-for list="{{ recurring }}" as="r" hint-placeholder-count="4">
+          <div style="display:flex;justify-content:space-between;gap:.7rem;align-items:center;min-height:2.6rem;padding:.3rem 0;border-bottom:1px solid var(--hair)">
+            <span style="display:grid;min-width:0;font-size:.82rem">{{ r.name }}<small style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--mut)">{{ r.meta }}</small></span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.82rem;white-space:nowrap;color:{{ r.color }}">{{ r.amount }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </main>
+  <nav style="position:fixed;left:0;right:0;bottom:0;z-index:10;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);background:var(--panel)">
+    <a href="./Mobil Übersicht.dc.html" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">◫</span>Übersicht</a>
+    <a href="./Mobil Buchungen.dc.html" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">↕</span>Buchungen</a>
+    <a href="./Mobil Prognose.dc.html" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--acc);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">⌁</span>Prognose</a>
+    <a href="#" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">∿</span>Trends</a>
+    <a href="#" style="min-height:3.4rem;display:grid;place-items:center;gap:.05rem;padding:.4rem 0;color:var(--mut);text-decoration:none;font-size:.6rem;font-weight:600"><span style="font-size:1.05rem">≡</span>Mehr</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark" };
+  renderVals() {
+    const t = this.state.theme;
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+      points: [
+        { month: "Juni", est: "1.870,00", range: "1.840–1.900" },
+        { month: "Juli", est: "1.890,00", range: "1.840–1.940" },
+        { month: "August", est: "1.905,00", range: "1.835–1.975" },
+        { month: "September", est: "1.915,00", range: "1.825–2.005" },
+        { month: "Oktober", est: "1.925,00", range: "1.820–2.030" },
+        { month: "November", est: "1.935,00", range: "1.815–2.055" },
+        { month: "Dezember", est: "1.945,00", range: "1.810–2.080" },
+      ],
+      recurring: [
+        { name: "Vermietung Muster GmbH", meta: "MONATLICH", amount: "−1.150,00", color: "var(--neg)" },
+        { name: "Stadtwerke Musterstadt", meta: "MONATLICH", amount: "−86,00", color: "var(--neg)" },
+        { name: "Überweisung A. Muster", meta: "MONATLICH", amount: "+1.750,00", color: "var(--pos)" },
+        { name: "Überweisung B. Muster", meta: "MONATLICH", amount: "+1.750,00", color: "var(--pos)" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

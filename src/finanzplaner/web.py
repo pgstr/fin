@@ -22,7 +22,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from .analytics import add_months, balance_on, budget_balance_on, month_end, month_start
+from .analytics import add_months, balance_on, month_end, month_start
 from .categories import seed_categories
 from .config import get_settings
 from .csv_import import parse_euro_cents
@@ -523,30 +523,6 @@ def build_chart(
                 }
             )
 
-    actual_by_month = {point["month"]: point for point in actual}
-    budget = []
-    for month in year_months:
-        actual_point = actual_by_month.get(month)
-        if actual_point is None:
-            continue
-        balance, reliable = budget_balance_on(
-            db, account_id, date(chart_year, 1, 1), actual_point["date"]
-        )
-        if balance is not None and reliable:
-            budget.append(
-                {
-                    "month": month,
-                    "date": actual_point["date"],
-                    "value": balance,
-                    "reliable": reliable,
-                }
-            )
-    if all(
-        point["value"] == actual_by_month[point["month"]]["value"]
-        for point in budget
-    ):
-        budget = []
-
     raw_forecast = [
         {
             "month": point["month"],
@@ -577,19 +553,16 @@ def build_chart(
                 *projected,
             ]
 
-    values = [point["value"] for point in actual + budget + forecast_line]
+    values = [point["value"] for point in actual + forecast_line]
     for point in forecast_line:
         values.extend([point["low"], point["high"]])
     empty = {
         "actual": actual,
-        "budget": budget,
         "projected": projected,
         "actual_points": "",
-        "budget_points": "",
         "forecast_points": "",
         "band": "",
         "actual_dots": [],
-        "budget_dots": [],
         "forecast_dots": [],
         "axis_points": [
             {"month": month, "x": 40 + index * (640 / 11)}
@@ -621,13 +594,9 @@ def build_chart(
         return {**point, "x": x(point["month"]), "y": y(point["value"])}
 
     actual_dots = [dot(point) for point in actual]
-    budget_dots = [dot(point) for point in budget]
     forecast_dots = [dot(point) for point in projected]
     actual_coords = [
         f"{point['x']:.1f},{point['y']:.1f}" for point in actual_dots
-    ]
-    budget_coords = [
-        f"{point['x']:.1f},{point['y']:.1f}" for point in budget_dots
     ]
     forecast_coords = [
         f"{x(point['month']):.1f},{y(point['value']):.1f}"
@@ -644,11 +613,9 @@ def build_chart(
     return {
         **empty,
         "actual_points": " ".join(actual_coords),
-        "budget_points": " ".join(budget_coords),
         "forecast_points": " ".join(forecast_coords),
         "band": " ".join(upper + lower_coords),
         "actual_dots": actual_dots,
-        "budget_dots": budget_dots,
         "forecast_dots": forecast_dots,
         "min_cents": low,
         "max_cents": high,

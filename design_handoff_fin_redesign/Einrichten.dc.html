@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--brand:#f5c79a;--brandInk:#101418;--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--brand:#e8a86a;--brandInk:#fff;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Einrichten (Redesign)" style="min-height:100vh;display:grid;place-items:center;padding:1.5rem;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif">
+  <div style="width:min(24rem,100%)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <span style="display:inline-flex;align-items:center;gap:.6rem">
+        <span style="width:2.3rem;height:2.3rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:1.05rem;border-radius:.4rem">F</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.9rem;letter-spacing:.14em">FIN</span>
+      </span>
+      <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+      </button>
+    </div>
+    <section style="padding:1.5rem;background:var(--panel);border:1px solid var(--line);border-radius:.5rem">
+      <h1 style="margin:0 0 .2rem;font-size:1.15rem;font-weight:600">Fin einrichten</h1>
+      <p style="margin:0 0 1.2rem;font-size:.8rem;color:var(--mut)">Erstellen Sie das erste Administratorkonto. Dafür wird das einmalige Einrichtungstoken benötigt.</p>
+      <div style="display:grid;gap:.8rem">
+        <label style="display:grid;gap:.3rem;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Einrichtungstoken<input type="password" autocomplete="off" style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.6rem .7rem;color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:.85rem" /></label>
+        <label style="display:grid;gap:.3rem;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Benutzername<input autocomplete="username" style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.6rem .7rem;color:var(--ink);font:inherit;font-size:.85rem" /></label>
+        <label style="display:grid;gap:.3rem;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600">Passwort<input type="password" autocomplete="new-password" style="width:100%;border:1px solid var(--line2);border-radius:.35rem;background:var(--field);padding:.6rem .7rem;color:var(--ink);font:inherit;font-size:.85rem" /><small style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--mut);text-transform:none;letter-spacing:.04em">MIN. 12 ZEICHEN</small></label>
+        <a href="./Übersicht.dc.html" style="display:grid;place-items:center;padding:.65rem;background:var(--brand);color:var(--brandInk);border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.74rem;font-weight:600;letter-spacing:.08em;text-decoration:none">INSTALLATION EINRICHTEN →</a>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1024,&quot;height&quot;:700}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark" };
+  renderVals() {
+    const t = this.state.theme;
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+    };
+  }
+}
+</script>
+</body>
+</html>

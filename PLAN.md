@@ -36,10 +36,10 @@ they should change.
   from the population standard deviation of those residuals. It is a
   deterministic estimate, not financial advice.
 - Actual balances always reconcile to the imported bank balance and therefore
-  include every transaction. A separate budget-adjusted trajectory excludes
-  transactions categorized under the transfer root, including
-  `Nicht budgetwirksam`; the forecast variable baseline uses the same
-  budget-neutral rule.
+  include every transaction. Balance graphs show only that actual balance and
+  the annual forecast. Transactions categorized under the transfer root,
+  including `Nicht budgetwirksam`, remain excluded from budget totals and the
+  forecast variable baseline without adding a separate balance series.
 - Import coverage may be assembled from multiple adjacent or overlapping import
   batches. A real date gap must still make derived balances unreliable.
 - Historical analytics remain readable after categories are archived.
@@ -313,7 +313,7 @@ or a net-worth product.
 | Concise documentation wiki and agent navigation | 5 | P0 | M | Build before and alongside new features |
 | Annual and multi-year reporting | 5 | P0 | M | Build |
 | Printable monthly/year HTML including saved reviews | 5 | P0 | M | Build with reporting |
-| Budget-adjusted balance trajectory and forecast history | 5 | P0 | S | Build without changing the reconciled bank balance |
+| Budget-neutral forecast history | 5 | P0 | S | Build without adding a second balance series |
 | Scheduled month-end review draft | 5 | P0 | S | Configure outside Fin through MCP |
 | `My visible accounts` aggregate dashboard | 4 | P1 | L | Build with strict privacy semantics |
 | Target balance and date | 4 | P1 | M | Build as the first narrow savings goal |
@@ -434,9 +434,9 @@ the wiki to find the code and tests for every current Fin capability.
    relevant tests in the wiki.
 6. Configure the end-of-month review outside Fin. It may read analytics and
    save a review through MCP; Fin must not embed or schedule the agent.
-7. Keep the reconciled balance unchanged, but add a visibly separate
-   budget-adjusted yearly trajectory and exclude transfer-root transactions
-   from the forecast's historical variable baseline.
+7. Keep the reconciled balance and its graphs unchanged, but exclude
+   transfer-root transactions from the forecast's historical variable
+   baseline.
 
 Done when annual totals reconcile exactly with their included month summaries,
 private-account authorization is unchanged, incomplete periods remain visible,

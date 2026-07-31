@@ -1,0 +1,49 @@
+{
+  "name": "finanzplaner-demo",
+  "dns": false,
+  "services": [
+    {
+      "id": "app",
+      "image": "localhost/finanzplaner-demo:1.2.0-rc.1",
+      "entrypoint": ["/usr/local/bin/finanzplaner-demo-entrypoint"],
+      "command": ["serve"],
+      "args": [],
+      "env": {
+        "ENVIRONMENT": "production",
+        "DATABASE_PATH": "/data/finanzplaner.db",
+        "BACKUP_DIR": "/backups",
+        "COOKIE_SECURE": "true",
+        "TRUSTED_HOSTS": "demo-node.example.ts.net,localhost,127.0.0.1",
+        "TZ": "Europe/Berlin",
+        "LOG_LEVEL": "INFO"
+      },
+      "secrets": {
+        "SESSION_SECRET": "SESSION_SECRET",
+        "SETUP_TOKEN": "SETUP_TOKEN"
+      },
+      "cpus": 1,
+      "memoryMB": 512,
+      "rootfsGB": 1,
+      "volumes": [
+        {"name": "finanzdaten-demo", "destination": "/data"}
+      ],
+      "healthCheck": ["curl", "--fail", "--silent", "http://127.0.0.1:8080/health/ready"],
+      "healthTimeoutSeconds": 90,
+      "livenessCheck": ["curl", "--fail", "--silent", "http://127.0.0.1:8080/health/live"],
+      "livenessIntervalSeconds": 15,
+      "livenessFailThreshold": 3,
+      "restartPolicy": "always"
+    }
+  ],
+  "ingress": {
+    "hostPort": 18082,
+    "bindAddress": "127.0.0.1",
+    "routes": [
+      {
+        "host": "demo-node.example.ts.net",
+        "service": "app",
+        "port": 8080
+      }
+    ]
+  }
+}

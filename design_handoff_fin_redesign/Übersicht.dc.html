@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;min-height:100vh}
+body{background:#101418;font-family:Archivo,sans-serif}
+a{color:#7fb2e0}a:hover{color:#a9cdf2}
+.fr{--bg:#101418;--panel:#171c23;--line:rgba(150,165,180,.14);--line2:rgba(150,165,180,.28);--ink:#e6ebf1;--mut:#8a97a5;--acc:#f5c79a;--accSoft:rgba(245,199,154,.14);--pos:#35cd7c;--neg:#f2505f;--sky:#a9cdf2;--mint:#9fe0bf;--peach:#f5c79a;--rose:#f0aab8;--lav:#cbbcf0;--brand:#f5c79a;--brandInk:#101418;--track:rgba(150,165,180,.12);--hair:rgba(150,165,180,.08);--field:#10151b}
+.fr[data-theme="light"]{--bg:#f5f6f8;--panel:#fff;--line:#e4e8ee;--line2:#d6dbe3;--ink:#1a212b;--mut:#6b7684;--acc:#c07a33;--accSoft:rgba(232,168,106,.16);--pos:#149447;--neg:#d93848;--sky:#88b6e0;--mint:#8fd4b1;--peach:#e8a86a;--rose:#e79cac;--lav:#b7a6e3;--brand:#e8a86a;--brandInk:#fff;--track:#eef1f5;--hair:#eef1f5;--field:#f8f9fb}
+</style>
+</helmet>
+<div class="fr" data-theme="{{ theme }}" data-screen-label="Übersicht (Redesign)" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:Archivo,sans-serif;display:grid;grid-template-columns:3.5rem minmax(0,1fr)">
+  <aside style="border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.7rem 0">
+    <a href="./Übersicht.dc.html" title="Fin" style="width:2.1rem;height:2.1rem;display:grid;place-items:center;background:var(--brand);color:var(--brandInk);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.95rem;border-radius:.35rem;margin-bottom:.8rem;text-decoration:none">F</a>
+    <a href="./Übersicht.dc.html" title="Übersicht" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;background:var(--accSoft);color:var(--acc);font-size:.95rem;text-decoration:none">◫</a>
+    <a href="./Buchungen.dc.html" title="Buchungen" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">↕</a>
+    <a href="./Prognose.dc.html" title="Prognose" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">⌁</a>
+    <a href="./Kategorietrends.dc.html" title="Kategorietrends" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">∿</a>
+    <a href="./Import.dc.html" title="Import" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">↓</a>
+    <a href="./Kategorien.dc.html" title="Kategorien" style="width:2.3rem;height:2.3rem;display:grid;place-items:center;border-radius:.4rem;color:var(--mut);font-size:.95rem;text-decoration:none" style-hover="background:var(--track);color:var(--ink)">#</a>
+    <details style="margin-top:auto;position:relative">
+      <summary title="alex — Menü" style="width:2.1rem;height:2.1rem;display:grid;place-items:center;border-radius:50%;background:var(--accSoft);color:var(--acc);font-size:.72rem;font-weight:700;cursor:pointer;list-style:none">A</summary>
+      <div style="position:absolute;left:2.6rem;bottom:0;z-index:50;min-width:11.5rem;display:grid;gap:.15rem;padding:.35rem;background:var(--panel);border:1px solid var(--line2);border-radius:.4rem;box-shadow:0 10px 30px rgba(0,0,0,.25)">
+        <a href="./Einstellungen.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">⚙</span>Einstellungen</a>
+        <a href="./Agent-Zugänge.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">◇</span>Agent-Zugänge</a>
+        <a href="./Benutzer.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">○</span>Benutzer</a>
+        <a href="./Anmelden.dc.html" style="display:flex;align-items:center;gap:.55rem;padding:.5rem .6rem;border-radius:.3rem;color:var(--ink);text-decoration:none;font-size:.78rem;white-space:nowrap" style-hover="background:var(--track)"><span style="color:var(--mut);width:1rem;display:inline-grid;place-items:center">→</span>Abmelden</a>
+      </div>
+    </details>
+  </aside>
+  <div style="min-width:0">
+    <header style="display:flex;align-items:center;gap:1.2rem;padding:.55rem 1.4rem;border-bottom:1px solid var(--line);background:var(--panel);font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--mut)">
+      <span style="color:var(--ink)">FIN</span><span>/</span><span>HAUSHALTSKONTO</span><span>/</span><span style="color:var(--acc)">{{ monthCode }}</span>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:.4rem"><span style="width:.4rem;height:.4rem;border-radius:50%;background:var(--pos)"></span>SYNC 31.05. 18:04</span>
+      <button type="button" onClick="{{ toggleTheme }}" title="Dark/Light umschalten" style="display:inline-flex;align-items:center;gap:.15rem;padding:.15rem;border:1px solid var(--line2);border-radius:999px;background:transparent;cursor:pointer;font:inherit;color:inherit">
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ moonBg }};color:{{ moonInk }}">☾</span>
+        <span style="width:1.3rem;height:1.3rem;display:grid;place-items:center;border-radius:50%;font-size:.68rem;background:{{ sunBg }};color:{{ sunInk }}">☀</span>
+      </button>
+      <span>ALEX</span>
+    </header>
+    <main style="padding:1.1rem 1.4rem 2rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <h1 style="margin:0;font-size:1.15rem;font-weight:600;letter-spacing:.01em">Monatsübersicht — {{ monthTitle }}</h1>
+        <div style="display:flex;gap:.4rem;font-family:'IBM Plex Mono',monospace;font-size:.74rem">
+          <button type="button" onClick="{{ setApr }}" style="padding:.3rem .6rem;border:1px solid {{ aprBorder }};border-radius:.3rem;background:transparent;color:{{ aprInk }};font:inherit;font-size:.74rem;cursor:pointer">APR</button>
+          <button type="button" onClick="{{ setMai }}" style="padding:.3rem .6rem;border:1px solid {{ maiBorder }};border-radius:.3rem;background:transparent;color:{{ maiInk }};font:inherit;font-size:.74rem;cursor:pointer">MAI 2026</button>
+          <button type="button" title="Noch keine Daten für Juni" style="padding:.3rem .6rem;border:1px solid var(--line);border-radius:.3rem;background:transparent;color:var(--mut);font:inherit;font-size:.74rem;cursor:not-allowed;opacity:.45">JUN</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.5rem;margin-bottom:.5rem">
+        <div style="padding:.75rem .85rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><p style="margin:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Kontostand</p><p style="margin:.25rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600">{{ kBalance }}</p><p style="margin:.1rem 0 0;font-size:.68rem;color:var(--pos)">{{ kBalanceSub }}</p></div>
+        <div style="padding:.75rem .85rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><p style="margin:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Eingänge</p><p style="margin:.25rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600;color:var(--pos)">{{ kIn }}</p><p style="margin:.1rem 0 0;font-size:.68rem;color:var(--mut)">100% Beitrag</p></div>
+        <div style="padding:.75rem .85rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><p style="margin:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Ausgaben</p><p style="margin:.25rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600;color:var(--neg)">{{ kOut }}</p><p style="margin:.1rem 0 0;font-size:.68rem;color:var(--mut)">{{ kOutSub }}</p></div>
+        <div style="padding:.75rem .85rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><p style="margin:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Netto</p><p style="margin:.25rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600">{{ kNet }}</p><p style="margin:.1rem 0 0;font-size:.68rem;color:var(--pos)">{{ kNetSub }}</p></div>
+        <div style="padding:.75rem .85rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><p style="margin:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Nicht kat.</p><p style="margin:.25rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600;color:var(--acc)">{{ kUnkat }}</p><p style="margin:.1rem 0 0;font-size:.68rem;color:var(--acc)">{{ kUnkatSub }}</p></div>
+        <div style="padding:.75rem .85rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem"><p style="margin:0;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Prognose DEZ</p><p style="margin:.25rem 0 0;font-family:'IBM Plex Mono',monospace;font-size:1.25rem;font-weight:600">1.945,00</p><p style="margin:.1rem 0 0;font-size:.68rem;color:var(--mut)">1.810–2.080</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:.5rem">
+        <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem">
+            <h2 style="margin:0;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Kontoverlauf 2026</h2>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--mut)"><span style="color:var(--sky)">━ IST</span>&ensp;<span style="color:var(--acc)">┄ PROGNOSE</span></span>
+          </div>
+          <div style="position:relative">
+            <svg viewBox="0 0 720 220" style="width:100%;display:block" role="img" aria-label="Kontoverlauf">
+              <line x1="40" x2="680" y1="30" y2="30" style="stroke:var(--track)" stroke-width="1"></line>
+              <line x1="40" x2="680" y1="80" y2="80" style="stroke:var(--track)" stroke-width="1"></line>
+              <line x1="40" x2="680" y1="130" y2="130" style="stroke:var(--track)" stroke-width="1"></line>
+              <line x1="40" x2="680" y1="180" y2="180" style="stroke:var(--track)" stroke-width="1"></line>
+              <polygon style="fill:var(--accSoft)" points="{{ band }}"></polygon>
+              <polyline fill="none" style="stroke:var(--sky)" stroke-width="2" points="{{ actual }}"></polyline>
+              <polyline fill="none" style="stroke:var(--peach)" stroke-width="2" stroke-dasharray="5 5" points="{{ forecast }}"></polyline>
+              <sc-for list="{{ dots }}" as="d" hint-placeholder-count="0">
+                <circle cx="{{ d.x }}" cy="{{ d.y }}" r="8" fill="transparent" style="cursor:pointer" onMouseEnter="{{ d.enter }}" onMouseLeave="{{ hideTip }}"></circle>
+              </sc-for>
+              <sc-for list="{{ dots }}" as="d" hint-placeholder-count="0">
+                <circle cx="{{ d.x }}" cy="{{ d.y }}" r="3.5" style="fill:var(--panel);stroke:{{ d.stroke }};stroke-width:2;pointer-events:none"></circle>
+              </sc-for>
+              <text x="40" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">JAN</text>
+              <text x="156.4" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">MÄR</text>
+              <text x="272.7" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">MAI</text>
+              <text x="389.1" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">JUL</text>
+              <text x="505.5" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">SEP</text>
+              <text x="621.8" y="205" text-anchor="middle" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">NOV</text>
+              <text x="4" y="34" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">2.100</text>
+              <text x="4" y="184" style="fill:var(--mut)" font-size="9" font-family="IBM Plex Mono">1.200</text>
+            </svg>
+            <div style="position:absolute;pointer-events:none;transform:translate(-50%,-130%);padding:.3rem .5rem;background:var(--panel);border:1px solid var(--line2);border-radius:.3rem;box-shadow:0 6px 18px rgba(0,0,0,.25);font-family:'IBM Plex Mono',monospace;font-size:.66rem;white-space:nowrap;display:{{ tipDisplay }};left:{{ tipLeft }};top:{{ tipTop }}">{{ tipLabel }}</div>
+          </div>
+        </section>
+        <section style="padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+          <h2 style="margin:0 0 .6rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Größte Ausgaben — {{ monthShort }}</h2>
+          <table style="width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:.76rem">
+            <tbody>
+              <sc-for list="{{ expenses }}" as="e" hint-placeholder-count="6">
+                <tr>
+                  <td style="padding:.45rem 0;color:var(--ink)">{{ e.label }}</td>
+                  <td style="padding:.45rem .5rem;width:38%"><div style="height:6px;background:var(--track);border-radius:3px"><div style="height:100%;border-radius:3px;width:{{ e.width }};background:{{ e.color }}"></div></div></td>
+                  <td style="padding:.45rem 0;text-align:right">{{ e.amount }}</td>
+                  <td style="padding:.45rem 0 .45rem .6rem;text-align:right;color:var(--mut)">{{ e.pct }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </section>
+      </div>
+      <section style="margin-top:.5rem;padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:.4rem">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem">
+          <h2 style="margin:0;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Letzte Buchungen</h2>
+          <a href="./Buchungen.dc.html" style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--acc);text-decoration:none">ALLE ANZEIGEN →</a>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+          <tbody>
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5">
+              <tr style-hover="background:var(--hair)">
+                <td style="padding:.5rem 0;border-bottom:1px solid var(--hair);font-family:'IBM Plex Mono',monospace;color:var(--mut);width:5rem"><a href="./Buchungsdetails.dc.html" style="color:inherit;text-decoration:none">{{ r.date }}</a></td>
+                <td style="padding:.5rem 0;border-bottom:1px solid var(--hair)"><a href="./Buchungsdetails.dc.html" style="color:inherit;text-decoration:none">{{ r.name }}</a></td>
+                <td style="padding:.5rem 0;border-bottom:1px solid var(--hair);color:var(--mut)">{{ r.category }}</td>
+                <td style="padding:.5rem 0;border-bottom:1px solid var(--hair);text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ r.amtColor }}">{{ r.amount }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </section>
+      <section style="margin-top:.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 1rem;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:.4rem">
+        <div>
+          <h2 style="margin:0 0 .2rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">Monatsrückblick — {{ monthTitle }}</h2>
+          <p style="margin:0;font-size:.82rem;color:var(--mut)">Für diesen Monat wurde noch kein Rückblick gespeichert.</p>
+        </div>
+        <span style="padding:.45rem .8rem;border:1px solid var(--line2);border-radius:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--ink);cursor:pointer" style-hover="border-color:var(--acc);color:var(--acc)">SCHREIBEN →</span>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { theme: (typeof localStorage !== "undefined" && localStorage.getItem("fin-theme")) || "dark", month: "MAI", tip: null };
+  renderVals() {
+    const t = this.state.theme, m = this.state.month, tip = this.state.tip;
+    const X = [40, 98.2, 156.4, 214.5, 272.7, 330.9, 389.1, 447.3, 505.5, 563.6, 621.8, 680];
+    const M = ["JAN","FEB","MÄR","APR","MAI","JUN","JUL","AUG","SEP","OKT","NOV","DEZ"];
+    const data = {
+      MAI: {
+        code: "2026-05", title: "Mai 2026", short: "Mai",
+        kBalance: "1.842,60", kBalanceSub: "▲ +285,55 MTD", kIn: "+3.500,00", kOut: "−3.214,45", kOutSub: "▼ 3,6% vs. APR", kNet: "+285,55", kNetSub: "▲ +120,40 MoM", kUnkat: "234,35", kUnkatSub: "4 Buchungen",
+        actualY: [150.6, 164.3, 131.6, 123.5, 74.3], actualV: ["1.400,00","1.320,00","1.510,00","1.557,05","1.842,60"],
+        forecastY: [69.6, 66.2, 63.6, 61.9, 60.2, 58.4, 56.7], forecastV: ["1.870,00","1.890,00","1.905,00","1.915,00","1.925,00","1.935,00","1.945,00"],
+        band: "330.9,64.5 389.1,57.6 447.3,51.5 505.5,46.4 563.6,42.1 621.8,37.8 680,33.5 680,80 621.8,79.1 563.6,78.3 505.5,77.4 447.3,75.7 389.1,74.8 330.9,74.8",
+        expenses: [
+          { label: "WOHNEN", width: "100%", color: "var(--sky)", amount: "1.250,00", pct: "39%" },
+          { label: "LEBENSM.", width: "51%", color: "var(--mint)", amount: "640,80", pct: "20%" },
+          { label: "MOBILITÄT", width: "25%", color: "var(--peach)", amount: "310,25", pct: "10%" },
+          { label: "VERSICH.", width: "20%", color: "var(--rose)", amount: "245,90", pct: "8%" },
+          { label: "FREIZEIT", width: "16%", color: "var(--lav)", amount: "198,60", pct: "6%" },
+          { label: "GESUNDH.", width: "12%", color: "var(--sky)", amount: "152,40", pct: "5%" },
+        ],
+        rows: [
+          { date: "30.05.", name: "Drogeriemarkt Muster", category: "Haushalt", amount: "−23,45", amtColor: "var(--neg)" },
+          { date: "29.05.", name: "Supermarkt Beispiel", category: "Lebensmittel", amount: "−54,20", amtColor: "var(--neg)" },
+          { date: "28.05.", name: "Stadtwerke Musterstadt", category: "Wohnen", amount: "−86,00", amtColor: "var(--neg)" },
+          { date: "27.05.", name: "Online-Apotheke", category: "Nicht kategorisiert", amount: "−18,90", amtColor: "var(--neg)" },
+          { date: "26.05.", name: "Überweisung A. Muster", category: "Nicht kategorisiert", amount: "+1.750,00", amtColor: "var(--pos)" },
+        ],
+      },
+      APR: {
+        code: "2026-04", title: "April 2026", short: "April",
+        kBalance: "1.557,05", kBalanceSub: "▲ +165,15 MTD", kIn: "+3.480,00", kOut: "−3.314,85", kOutSub: "▲ 1,9% vs. MÄR", kNet: "+165,15", kNetSub: "▼ −24,90 MoM", kUnkat: "112,70", kUnkatSub: "2 Buchungen",
+        actualY: [150.6, 164.3, 131.6, 123.5], actualV: ["1.400,00","1.320,00","1.510,00","1.557,05"],
+        forecastY: [117, 111, 106, 102, 98, 95, 92, 89], forecastV: ["1.595,00","1.630,00","1.660,00","1.685,00","1.705,00","1.725,00","1.745,00","1.760,00"],
+        band: "272.7,112 330.9,104 389.1,97 447.3,91 505.5,86 563.6,81 621.8,76 680,71 680,107 621.8,104 563.6,101.5 505.5,99.5 447.3,98 389.1,97 330.9,96.5 272.7,96",
+        expenses: [
+          { label: "WOHNEN", width: "100%", color: "var(--sky)", amount: "1.250,00", pct: "38%" },
+          { label: "LEBENSM.", width: "49%", color: "var(--mint)", amount: "618,30", pct: "19%" },
+          { label: "MOBILITÄT", width: "31%", color: "var(--peach)", amount: "384,70", pct: "12%" },
+          { label: "VERSICH.", width: "20%", color: "var(--rose)", amount: "245,90", pct: "7%" },
+          { label: "FREIZEIT", width: "22%", color: "var(--lav)", amount: "270,15", pct: "8%" },
+          { label: "GESUNDH.", width: "7%", color: "var(--sky)", amount: "89,60", pct: "3%" },
+        ],
+        rows: [
+          { date: "29.04.", name: "Supermarkt Beispiel", category: "Lebensmittel", amount: "−61,80", amtColor: "var(--neg)" },
+          { date: "28.04.", name: "Stadtwerke Musterstadt", category: "Wohnen", amount: "−86,00", amtColor: "var(--neg)" },
+          { date: "26.04.", name: "Überweisung A. Muster", category: "Nicht kategorisiert", amount: "+1.740,00", amtColor: "var(--pos)" },
+          { date: "22.04.", name: "Möbelhaus Muster", category: "Haushalt", amount: "−149,00", amtColor: "var(--neg)" },
+          { date: "15.04.", name: "Vermietung Muster GmbH", category: "Wohnen", amount: "−1.150,00", amtColor: "var(--neg)" },
+        ],
+      },
+    };
+    const d = data[m];
+    const nAct = d.actualY.length;
+    const dots = [];
+    d.actualY.forEach((y, i) => dots.push({ x: X[i], y, stroke: "var(--sky)", label: `${M[i]} · ${d.actualV[i]} · IST` }));
+    d.forecastY.forEach((y, i) => dots.push({ x: X[nAct + i], y, stroke: "var(--peach)", label: `${M[nAct + i]} · ${d.forecastV[i]} · PROGNOSE` }));
+    const actual = d.actualY.map((y, i) => `${X[i]},${y}`).join(" ");
+    const fStart = `${X[nAct - 1]},${d.actualY[nAct - 1]}`;
+    const forecast = fStart + " " + d.forecastY.map((y, i) => `${X[nAct + i]},${y}`).join(" ");
+    return {
+      theme: t,
+      toggleTheme: () => { const n = t === "dark" ? "light" : "dark"; try { localStorage.setItem("fin-theme", n); } catch (e) {} this.setState({ theme: n }); },
+      moonBg: t === "dark" ? "var(--brand)" : "transparent", moonInk: t === "dark" ? "var(--brandInk)" : "var(--mut)",
+      sunBg: t === "light" ? "var(--brand)" : "transparent", sunInk: t === "light" ? "var(--brandInk)" : "var(--mut)",
+      setApr: () => this.setState({ month: "APR", tip: null }),
+      setMai: () => this.setState({ month: "MAI", tip: null }),
+      aprBorder: m === "APR" ? "var(--acc)" : "var(--line2)", aprInk: m === "APR" ? "var(--acc)" : "var(--mut)",
+      maiBorder: m === "MAI" ? "var(--acc)" : "var(--line2)", maiInk: m === "MAI" ? "var(--acc)" : "var(--mut)",
+      monthCode: d.code, monthTitle: d.title, monthShort: d.short,
+      kBalance: d.kBalance, kBalanceSub: d.kBalanceSub, kIn: d.kIn, kOut: d.kOut, kOutSub: d.kOutSub, kNet: d.kNet, kNetSub: d.kNetSub, kUnkat: d.kUnkat, kUnkatSub: d.kUnkatSub,
+      actual, forecast, band: d.band,
+      dots: dots.map((p) => ({ ...p, enter: () => this.setState({ tip: p }) })),
+      hideTip: () => this.setState({ tip: null }),
+      tipDisplay: tip ? "block" : "none",
+      tipLeft: tip ? `${(tip.x / 720) * 100}%` : "0%",
+      tipTop: tip ? `${(tip.y / 220) * 100}%` : "0%",
+      tipLabel: tip ? tip.label : "",
+      expenses: d.expenses, rows: d.rows,
+    };
+  }
+}
+</script>
+</body>
+</html>
