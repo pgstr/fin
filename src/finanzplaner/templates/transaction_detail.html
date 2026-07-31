@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-  <header class="page-heading">
-    <p class="eyebrow">{{ account.display_name }} · {{ datefmt(transaction.booking_date) }}</p>
-    <h1 class="wrap-anywhere">{{ transaction.display_counterparty or transaction.transaction_type }}</h1>
-    <p class="hero-amount">{{ "+" if transaction.amount_cents > 0 else "−" if transaction.amount_cents < 0 else "" }}{{ money(transaction.amount_cents|abs) }}</p>
+  <header class="page-heading split">
+    <div>
+      <a class="back-link" href="/accounts/{{ account.id }}/transactions?month={{ transaction.booking_date.strftime('%Y-%m') }}"><span aria-hidden="true">←</span> {{ t("transactions.title") }}</a>
+      <h1 class="wrap-anywhere">{{ transaction.display_counterparty or transaction.transaction_type }}</h1>
+      <p class="lede">{{ account.display_name }} · {{ datefmt(transaction.booking_date) }}{% if transaction.transaction_type %} · {{ transaction.transaction_type }}{% endif %}</p>
+    </div>
+    <p class="hero-amount {{ 'pos' if transaction.amount_cents > 0 else 'neg' if transaction.amount_cents < 0 }}">{{ "+" if transaction.amount_cents > 0 else "−" if transaction.amount_cents < 0 else "" }}{{ money(transaction.amount_cents|abs) }}</p>
   </header>
   <div class="detail-grid">
     <section class="section" aria-labelledby="annotation-title">

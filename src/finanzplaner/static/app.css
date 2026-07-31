@@ -425,9 +425,19 @@ img, svg { max-width: 100%; }
 }
 .section h3,
 .report-review h3 {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mut);
 }
+/* the detail panel stacks several sub-sections under one panel title */
+.section > h3 { margin-top: 1.1rem; }
+.section > form + h3,
+.section > p + h3 { margin-top: 1.1rem; }
+.section > h3 + p,
+.section > h3 + .notes { margin-top: 0.4rem; }
+.section > * + form { margin-top: 0.6rem; }
 .section-heading p { font-size: 0.72rem; color: var(--mut); }
 
 /* --------------------------------------------------------------- panel -- */
@@ -741,6 +751,7 @@ label { display: block; }
 .form-grid label,
 .filter-grid label,
 .stack > label,
+.inline-form > label,
 .field-label {
   display: grid;
   gap: 0.3rem;
@@ -798,11 +809,11 @@ textarea {
 .inline-form,
 .category-editor-form {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  align-items: end;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
-.inline-form label { flex: 1 1 10rem; }
+.inline-form > label { flex: 1 1 12rem; }
 
 .category-editor { min-width: 9rem; }
 .category-editor select {
@@ -868,10 +879,25 @@ legend {
 .alert.error strong,
 .alert.error .code-label { color: var(--neg); }
 
-.note,
-.note-edit,
-.notes { font-size: 0.72rem; color: var(--mut); }
-.notes { display: grid; gap: 0.3rem; }
+.notes { display: grid; gap: 0.4rem; }
+.note {
+  padding: 0.55rem 0.7rem;
+  border-left: 2px solid var(--line2);
+  border-radius: 0 0.3rem 0.3rem 0;
+  background: var(--field);
+}
+.note > small {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mut);
+}
+.note-edit { display: grid; gap: 0.4rem; margin-top: 0.5rem; }
+.note-edit textarea { min-height: 4.5rem; }
+.note-edit button { justify-self: start; }
 
 /* -------------------------------------------------------- empty states -- */
 
@@ -1093,10 +1119,23 @@ progress::-moz-progress-bar { background: var(--bar, var(--sky)); border-radius:
 
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
   gap: var(--gap);
   align-items: start;
 }
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mut);
+}
+.back-link:hover { color: var(--acc); text-decoration: none; }
+
+.hero-amount { align-self: flex-end; }
 
 .facts dl { display: grid; gap: 0.5rem; }
 .facts dt,
@@ -1116,11 +1155,14 @@ progress::-moz-progress-bar { background: var(--bar, var(--sky)); border-radius:
 
 .hero-amount {
   font-family: var(--mono);
-  font-size: 1.6rem;
+  font-size: clamp(1.3rem, 5vw, 2rem);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .stack { display: grid; gap: 0.6rem; }
+.stack > button,
+.stack > .button { justify-self: start; }
 
 .category-list { display: grid; }
 .category-row {
