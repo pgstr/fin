@@ -60,7 +60,10 @@
   {% endif %}
 
   <section class="month-details" aria-labelledby="month-details-title">
-    <h2 id="month-details-title">{{ t("dashboard.month_details") }}</h2>
+    <div class="section-heading split">
+      <h2 id="month-details-title">{{ t("dashboard.month_details") }}</h2>
+      <a class="button quiet" href="/accounts/{{ account.id }}/report?year={{ month.year }}">{{ t("nav.report") }} →</a>
+    </div>
     <dl>
       <div><dt>{{ t("dashboard.opening_balance") }}</dt><dd>{{ money(summary.opening_balance_cents) if summary.opening_balance_reliable else "—" }}</dd></div>
       <div><dt>{{ t("dashboard.closing_balance") }}</dt><dd>{{ money(summary.closing_balance_cents) if summary.closing_balance_reliable else "—" }}</dd></div>
