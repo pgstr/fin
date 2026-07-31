@@ -2,13 +2,14 @@
 {% block content %}
   <header class="page-heading">{% if account %}<p class="eyebrow">{{ account.display_name }}</p>{% endif %}<h1>{{ t("import.title") }}</h1><p class="lede">{{ t("import.intro") }}</p></header>
   {% if result.rows %}
-    <div class="alert success" role="status">{{ t("import.result", rows=result.rows, inserted=result.inserted, duplicates=result.duplicates) }}</div>
+    <div class="alert success" role="status"><span class="code-label">OK</span> — {{ t("import.result", rows=result.rows, inserted=result.inserted, duplicates=result.duplicates) }}</div>
   {% endif %}
-  <div class="detail-grid">
+  <div class="import-grid">
     <section class="section">
+      <div class="section-heading"><h2>{{ t("import.file") }}</h2></div>
       <form method="post" action="{{ form_action }}" enctype="multipart/form-data" class="stack">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        <label>{{ t("import.file") }}<input type="file" name="file" accept=".csv,text/csv" required></label>
+        <label class="dropzone"><span class="sr-only">{{ t("import.file") }}</span><input type="file" name="file" accept=".csv,text/csv" required></label>
         <label>{{ t("import.target") }}
           <select name="expected_account_id">
             <option value="">{{ t("import.target_optional") }}</option>
@@ -20,14 +21,14 @@
           <label>{{ t("import.account_name") }}<input name="new_account_name" maxlength="160"></label>
           <label>{{ t("import.visibility") }}<select name="new_account_visibility"><option value="">{{ t("common.none") }}</option><option value="shared">{{ t("account.shared") }}</option><option value="private">{{ t("account.private") }}</option></select></label>
         </fieldset>
-        <button class="button primary" type="submit">{{ t("import.submit") }}</button>
+        <button class="button" type="submit">{{ t("import.submit") }}</button>
       </form>
     </section>
     <section class="section">
-      <h2>{{ t("import.history") }}</h2>
+      <div class="section-heading"><h2>{{ t("import.history") }}</h2></div>
       <div class="table-wrap">
         <table><thead><tr><th>{{ t("import.time") }}</th><th>{{ t("import.period") }}</th><th class="number">{{ t("import.rows") }}</th><th class="number">{{ t("import.inserted") }}</th><th class="number">{{ t("import.duplicates") }}</th></tr></thead>
-        <tbody>{% for item in imports %}<tr><td>{{ datetimefmt(item.imported_at) }}</td><td>{{ datefmt(item.export_from, "short") }}–{{ datefmt(item.export_to, "short") }}</td><td class="number">{{ item.row_count }}</td><td class="number">{{ item.inserted_count }}</td><td class="number">{{ item.duplicate_count }}</td></tr>{% else %}<tr><td colspan="5">{{ t("import.no_history") }}</td></tr>{% endfor %}</tbody></table>
+        <tbody>{% for item in imports %}<tr><td>{{ datetimefmt(item.imported_at) }}</td><td class="code-label">{{ datefmt(item.export_from, "short") }}–{{ datefmt(item.export_to, "short") }}</td><td class="number">{{ item.row_count }}</td><td class="number">{{ item.inserted_count }}</td><td class="number">{{ item.duplicate_count }}</td></tr>{% else %}<tr><td colspan="5" class="empty-cell">{{ t("import.no_history") }}</td></tr>{% endfor %}</tbody></table>
       </div>
     </section>
   </div>
