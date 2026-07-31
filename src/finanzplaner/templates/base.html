@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="{{ locale }}">
+<html lang="{{ locale }}" data-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="dark">
+    <meta name="color-scheme" content="dark light">
     <title>{{ page_title }} · {{ t("app.name") }}</title>
+    <script src="{{ url_for('static', path='theme.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
     <script src="{{ url_for('static', path='app.js') }}" defer></script>
   </head>
@@ -14,57 +15,30 @@
       {% set month_query = '?month=' ~ month.strftime('%Y-%m') if month else '' %}
       <div class="app-shell">
         <aside class="sidebar">
-          <a class="brand" href="/" aria-label="{{ t('app.name') }}">
-            <span class="brand-mark" aria-hidden="true">F</span>
-            <span class="brand-copy">
-              <strong>{{ t("app.name") }}</strong>
-              <small>{{ t("dashboard.title") }}</small>
-            </span>
-          </a>
-          {% if accounts %}
-            <label class="account-select">
-              <span>{{ t("account.select") }}</span>
-              <select data-account-selector aria-label="{{ t('account.select') }}">
-                {% for visible_account in accounts %}
-                  <option
-                    value="/accounts/{{ visible_account.id }}/overview{% if month %}?month={{ month.strftime('%Y-%m') }}{% endif %}"
-                    {% if account and account.id == visible_account.id %}selected{% endif %}
-                  >{{ visible_account.display_name }} · {{ t("account." ~ visible_account.visibility) }}</option>
-                {% endfor %}
-              </select>
-            </label>
-          {% endif %}
+          <a class="brand" href="/" aria-label="{{ t('app.name') }}"><span aria-hidden="true">F</span></a>
+          <a class="mobile-brand" href="/">{{ account.display_name if account else page_title }}</a>
+
           {% if account %}
             <nav class="primary-nav" aria-label="{{ t('nav.main') }}">
-              <a href="/accounts/{{ account.id }}/overview{{ month_query }}" {% if '/overview' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">◫</span>{{ t("nav.overview") }}</a>
-              <a href="/accounts/{{ account.id }}/transactions{{ month_query }}" {% if '/transactions' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↕</span>{{ t("nav.transactions") }}</a>
-              <a href="/accounts/{{ account.id }}/report{% if month %}?year={{ month.year }}{% endif %}" {% if '/report' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">▤</span>{{ t("nav.report") }}</a>
-              <a href="/accounts/{{ account.id }}/forecast{{ month_query }}" {% if '/forecast' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">⌁</span>{{ t("nav.forecast") }}</a>
-              <a href="/accounts/{{ account.id }}/trends" {% if '/trends' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">⌁</span>{{ t("trend.title") }}</a>
-              <a href="/accounts/{{ account.id }}/recurring" {% if '/recurring' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↻</span>{{ t("nav.recurring") }}</a>
-              <a href="/accounts/{{ account.id }}/import" {% if '/import' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↓</span>{{ t("nav.import") }}</a>
-              {% if is_admin %}<a href="/categories" {% if request.url.path == '/categories' %}aria-current="page"{% endif %}><span aria-hidden="true">#</span>{{ t("nav.categories") }}</a>{% endif %}
+              <a href="/accounts/{{ account.id }}/overview{{ month_query }}" title="{{ t('nav.overview') }}" {% if '/overview' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">◫</span><span class="sr-only">{{ t("nav.overview") }}</span></a>
+              <a href="/accounts/{{ account.id }}/transactions{{ month_query }}" title="{{ t('nav.transactions') }}" {% if '/transactions' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↕</span><span class="sr-only">{{ t("nav.transactions") }}</span></a>
+              <a href="/accounts/{{ account.id }}/forecast{{ month_query }}" title="{{ t('nav.forecast') }}" {% if '/forecast' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">⌁</span><span class="sr-only">{{ t("nav.forecast") }}</span></a>
+              <a href="/accounts/{{ account.id }}/trends" title="{{ t('trend.title') }}" {% if '/trends' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">∿</span><span class="sr-only">{{ t("trend.title") }}</span></a>
+              <a href="/accounts/{{ account.id }}/report{% if month %}?year={{ month.year }}{% endif %}" title="{{ t('nav.report') }}" {% if '/report' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">▤</span><span class="sr-only">{{ t("nav.report") }}</span></a>
+              <a href="/accounts/{{ account.id }}/import" title="{{ t('nav.import') }}" {% if '/import' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↓</span><span class="sr-only">{{ t("nav.import") }}</span></a>
+              {% if is_admin %}<a href="/categories" title="{{ t('nav.categories') }}" {% if request.url.path == '/categories' %}aria-current="page"{% endif %}><span aria-hidden="true">#</span><span class="sr-only">{{ t("nav.categories") }}</span></a>{% endif %}
             </nav>
           {% endif %}
 
-          <nav class="utility-nav" aria-label="{{ t('nav.secondary') }}">
-            <a href="/settings" {% if request.url.path == '/settings' %}aria-current="page"{% endif %}><span aria-hidden="true">⚙</span>{{ t("nav.settings") }}</a>
-            <a href="/tokens" {% if request.url.path == '/tokens' %}aria-current="page"{% endif %}><span aria-hidden="true">◇</span>{{ t("nav.tokens") }}</a>
-            {% if is_admin %}<a href="/users" {% if request.url.path == '/users' %}aria-current="page"{% endif %}><span aria-hidden="true">○</span>{{ t("nav.users") }}</a>{% endif %}
-          </nav>
-
           <details class="user-menu">
-            <summary>
-              <span class="user-avatar" aria-hidden="true">{{ user.username[0]|upper }}</span>
-              <span>{{ user.username }}</span>
-            </summary>
+            <summary title="{{ user.username }}" aria-label="{{ t('nav.secondary') }}">{{ user.username[0]|upper }}</summary>
             <div class="menu-panel">
-              <a href="/settings">{{ t("nav.settings") }}</a>
-              <a href="/tokens">{{ t("nav.tokens") }}</a>
-              {% if is_admin %}<a href="/users">{{ t("nav.users") }}</a>{% endif %}
+              <a href="/settings" {% if request.url.path == '/settings' %}aria-current="page"{% endif %}><span class="menu-icon" aria-hidden="true">⚙</span>{{ t("nav.settings") }}</a>
+              <a href="/tokens" {% if request.url.path == '/tokens' %}aria-current="page"{% endif %}><span class="menu-icon" aria-hidden="true">◇</span>{{ t("nav.tokens") }}</a>
+              {% if is_admin %}<a href="/users" {% if request.url.path == '/users' %}aria-current="page"{% endif %}><span class="menu-icon" aria-hidden="true">○</span>{{ t("nav.users") }}</a>{% endif %}
               <form action="/logout" method="post">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                <button class="link-button" type="submit">{{ t("nav.logout") }}</button>
+                <button class="link-button" type="submit"><span class="menu-icon" aria-hidden="true">→</span>{{ t("nav.logout") }}</button>
               </form>
             </div>
           </details>
@@ -72,8 +46,37 @@
 
         <div class="workspace">
           <header class="topbar">
-            <a class="mobile-brand" href="/" aria-label="{{ t('app.name') }}"><span aria-hidden="true">F</span>{{ t("app.name") }}</a>
-            <span class="topbar-context">{{ account.display_name if account else page_title }}</span>
+            <span class="crumb-root">{{ t("app.name")|upper }}</span>
+            <span aria-hidden="true">/</span>
+            {% if account %}
+              {% if accounts|length > 1 %}
+                <label class="account-select">
+                  <span class="sr-only">{{ t("account.select") }}</span>
+                  <select data-account-selector>
+                    {% for visible_account in accounts %}
+                      <option
+                        value="/accounts/{{ visible_account.id }}/overview{% if month %}?month={{ month.strftime('%Y-%m') }}{% endif %}"
+                        {% if account.id == visible_account.id %}selected{% endif %}
+                      >{{ visible_account.display_name }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+              {% else %}
+                <span class="topbar-context">{{ account.display_name }}</span>
+              {% endif %}
+              <span aria-hidden="true">/</span>
+              <span class="crumb-current">{% if month %}{{ month.strftime('%Y-%m') }}{% else %}{{ page_title }}{% endif %}</span>
+            {% else %}
+              <span class="crumb-current">{{ page_title }}</span>
+            {% endif %}
+
+            {% if account %}
+              <span class="topbar-sync">{{ t("account." ~ account.visibility)|upper }}</span>
+            {% endif %}
+            <button class="theme-toggle" type="button" data-theme-toggle title="{{ t('theme.toggle') }}" aria-label="{{ t('theme.toggle') }}">
+              <span class="toggle-moon" aria-hidden="true">☾</span>
+              <span class="toggle-sun" aria-hidden="true">☀</span>
+            </button>
             <span class="topbar-user">{{ user.username }}</span>
           </header>
           <main id="main" class="page-shell">
@@ -86,18 +89,19 @@
         </div>
         {% if account %}
           <nav class="mobile-nav" aria-label="{{ t('nav.mobile') }}">
-            <a href="/accounts/{{ account.id }}/overview{{ month_query }}" {% if '/overview' in request.url.path %}aria-current="page"{% endif %}>{{ t("nav.overview") }}</a>
-            <a href="/accounts/{{ account.id }}/transactions{{ month_query }}" {% if '/transactions' in request.url.path %}aria-current="page"{% endif %}>{{ t("nav.transactions") }}</a>
-            <a href="/accounts/{{ account.id }}/forecast{{ month_query }}" {% if '/forecast' in request.url.path %}aria-current="page"{% endif %}>{{ t("nav.forecast") }}</a>
+            <a href="/accounts/{{ account.id }}/overview{{ month_query }}" {% if '/overview' in request.url.path %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">◫</span>{{ t("nav.overview") }}</a>
+            <a href="/accounts/{{ account.id }}/transactions{{ month_query }}" {% if '/transactions' in request.url.path %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">↕</span>{{ t("nav.transactions") }}</a>
+            <a href="/accounts/{{ account.id }}/forecast{{ month_query }}" {% if '/forecast' in request.url.path %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">⌁</span>{{ t("nav.forecast") }}</a>
+            <a href="/accounts/{{ account.id }}/trends" {% if '/trends' in request.url.path %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">∿</span>{{ t("trend.title") }}</a>
             <details>
-              <summary>{{ t("nav.secondary") }}</summary>
+              <summary><span class="nav-icon" aria-hidden="true">⋯</span>{{ t("nav.secondary") }}</summary>
               <div class="mobile-menu-panel">
-                <a href="/accounts/{{ account.id }}/trends">{{ t("trend.title") }}</a>
                 <a href="/accounts/{{ account.id }}/report{% if month %}?year={{ month.year }}{% endif %}">{{ t("nav.report") }}</a>
-                {% if is_admin %}<a href="/categories">{{ t("nav.categories") }}</a>{% endif %}
                 <a href="/accounts/{{ account.id }}/import">{{ t("nav.import") }}</a>
-                <a href="/accounts/{{ account.id }}/recurring">{{ t("nav.recurring") }}</a>
+                {% if is_admin %}<a href="/categories">{{ t("nav.categories") }}</a>{% endif %}
                 <a href="/settings">{{ t("nav.settings") }}</a>
+                <a href="/tokens">{{ t("nav.tokens") }}</a>
+                {% if is_admin %}<a href="/users">{{ t("nav.users") }}</a>{% endif %}
               </div>
             </details>
           </nav>

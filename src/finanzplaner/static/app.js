@@ -1,6 +1,35 @@
 (() => {
   "use strict";
 
+  // Theme. The initial value is applied by theme.js before first paint; this
+  // only handles switching it afterwards and keeping the controls in sync.
+  const applyTheme = (theme) => {
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("fin-theme", theme);
+    } catch (error) {
+      /* storage unavailable — the theme still applies for this page view */
+    }
+    document.querySelectorAll("[data-theme-option]").forEach((option) => {
+      option.checked = option.value === theme;
+    });
+  };
+
+  document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      applyTheme(current === "light" ? "dark" : "light");
+    });
+  });
+
+  document.querySelectorAll("[data-theme-option]").forEach((option) => {
+    option.checked =
+      option.value === document.documentElement.getAttribute("data-theme");
+    option.addEventListener("change", () => {
+      if (option.checked) applyTheme(option.value);
+    });
+  });
+
   document.querySelectorAll("[data-account-selector]").forEach((select) => {
     select.addEventListener("change", () => {
       if (select.value.startsWith("/")) window.location.assign(select.value);
