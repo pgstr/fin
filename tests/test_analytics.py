@@ -1,0 +1,276 @@
+from __future__ import annotations
+
+from datetime import date
+
+from sqlalchemy import select
+
+from finanzplaner.analytics import balance_forecast, month_summary
+from finanzplaner.categories import stable_category_id
+from finanzplaner.db import SessionLocal
+from finanzplaner.models import Transaction, TransferLink, User
+from finanzplaner.security import Actor, hash_password
+from finanzplaner.services import FinanceService
+from finanzplaner.web import build_chart
+
+from .conftest import dkb_csv
+
+
+def test_unique_transfer_matching_never_assigns_category(admin) -> None:
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        actor = Actor.human(admin)
+        account_a = service.create_account(
+            actor,
+            display_name="Gemeinsam",
+            iban="DE02120300000000202051",
+            visibility="shared",
+        )
+        account_b = service.create_account(
+            actor,
+            display_name="Privat",
+            iban="DE12500105170648489890",
+            visibility="private",
+        )
+        db.commit()
+        outgoing = [["03.01.26", "03.01.26", "Gebucht", "", "Eigenkonto", "Transfer", "Überweisung", account_b.iban, "-100,00", "", "", ""]]
+        incoming = [["04.01.26", "04.01.26", "Gebucht", "Eigenkonto", "", "Transfer", "Überweisung", account_a.iban, "100,00", "", "", ""]]
+        service.import_dkb(actor, dkb_csv(outgoing, iban=account_a.iban), max_bytes=10_000_000, expected_account_id=account_a.id)
+        service.import_dkb(actor, dkb_csv(incoming, iban=account_b.iban), max_bytes=10_000_000, expected_account_id=account_b.id)
+        assert db.scalar(select(TransferLink)) is not None
+        assert service.match_transfers() == 0
+        transactions = db.scalars(select(Transaction)).all()
+        assert all(tx.category_id is None for tx in transactions)
+        shared_transaction = next(tx for tx in transactions if tx.account_id == account_a.id)
+        presentation = service.get_transfer_presentation(actor, shared_transaction.id)
+        assert presentation and not presentation["private_counterpart"]
+        shared_only_user = User(
+            username="shared-only",
+            password_hash=hash_password("shared user password"),
+            locale="de",
+        )
+        db.add(shared_only_user)
+        db.commit()
+        redacted = service.get_transfer_presentation(
+            Actor.human(shared_only_user), shared_transaction.id
+        )
+        assert redacted == {"linked": True, "private_counterpart": True}
+
+
+def test_ambiguous_transfer_remains_unlinked(admin) -> None:
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        actor = Actor.human(admin)
+        account_a = service.create_account(actor, display_name="A", iban="DE02120300000000202051", visibility="shared")
+        account_b = service.create_account(actor, display_name="B", iban="DE12500105170648489890", visibility="private")
+        db.commit()
+        outgoing = [["03.01.26", "03.01.26", "Gebucht", "", "B", "Transfer", "Überweisung", account_b.iban, "-100,00", "", "", ""]]
+        incoming = [
+            ["03.01.26", "03.01.26", "Gebucht", "A", "", "Transfer", "Überweisung", account_a.iban, "100,00", "", "", ""],
+            ["04.01.26", "04.01.26", "Gebucht", "A", "", "Transfer", "Überweisung", account_a.iban, "100,00", "", "", ""],
+        ]
+        service.import_dkb(actor, dkb_csv(outgoing, iban=account_a.iban), max_bytes=10_000_000, expected_account_id=account_a.id)
+        service.import_dkb(actor, dkb_csv(incoming, iban=account_b.iban), max_bytes=10_000_000, expected_account_id=account_b.id)
+        assert service.match_transfers() == 0
+
+
+def test_internal_transfers_are_excluded_from_budget_totals(admin, shared_account) -> None:
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        actor = Actor.human(admin)
+        service.import_dkb(
+            actor,
+            dkb_csv(),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+        transactions = db.scalars(select(Transaction)).all()
+        incoming = next(tx for tx in transactions if tx.amount_cents > 0)
+        outgoing = next(tx for tx in transactions if tx.amount_cents < 0)
+        service.categorize(
+            actor,
+            incoming.id,
+            stable_category_id("transfers.internal-transfer"),
+            incoming.revision,
+        )
+        service.categorize(
+            actor,
+            outgoing.id,
+            stable_category_id("groceries.general"),
+            outgoing.revision,
+        )
+        db.commit()
+
+        summary = service.summary(actor, shared_account.id, date(2026, 1, 1))
+
+        assert summary["incoming_cents"] == 0
+        assert summary["outgoing_cents"] == 4_567
+        assert summary["net_cents"] == -4_567
+        assert {item["key"] for item in summary["breakdown"]} == {"groceries"}
+
+
+def test_current_month_uses_today_balance_without_future_coverage(
+    admin, shared_account
+) -> None:
+    rows = [
+        [
+            "10.07.26",
+            "10.07.26",
+            "Gebucht",
+            "",
+            "Supermarkt",
+            "Einkauf",
+            "Karte",
+            "",
+            "-10,00",
+            "",
+            "",
+            "",
+        ]
+    ]
+    with SessionLocal() as db:
+        FinanceService(db).import_dkb(
+            Actor.human(admin),
+            dkb_csv(
+                rows,
+                start="01.07.20",
+                end="26.07.20",
+                balance="483,53",
+                balance_date="26.07.26",
+            ),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+
+        summary = month_summary(
+            db,
+            shared_account.id,
+            date(2026, 7, 1),
+            "de",
+            today=date(2026, 7, 26),
+        )
+        chart = build_chart(
+            db,
+            shared_account.id,
+            {"points": []},
+            date(2026, 7, 1),
+            today=date(2026, 7, 26),
+        )
+
+        assert summary["closing_balance_cents"] == 48_353
+        assert summary["balance_effective_date"] == date(2026, 7, 26)
+        assert summary["balance_reliable"]
+        assert summary["closing_balance_reliable"]
+        assert summary["coverage_complete"]
+        assert chart["actual"][-1]["month"] == date(2026, 7, 1)
+        assert chart["actual"][-1]["date"] == date(2026, 7, 26)
+        assert chart["actual"][-1]["value"] == 48_353
+        assert chart["min_cents"] == 0
+        assert chart["max_cents"] == 50_000
+        assert [point["month"].month for point in chart["axis_points"]] == list(
+            range(1, 13)
+        )
+        assert chart["forecast_dots"] == []
+
+
+def test_recurring_detection_and_forecast_are_deterministic(admin, shared_account) -> None:
+    rows = []
+    for month in range(1, 7):
+        rows.extend(
+            [
+                [f"01.{month:02d}.26", f"01.{month:02d}.26", "Gebucht", "Arbeitgeber", "", "Gehalt", "Überweisung", "", "2.000,00", "", "", ""],
+                [f"03.{month:02d}.26", f"03.{month:02d}.26", "Gebucht", "", "Vermieter", "Miete", "Lastschrift", "", "-900,00", "", "", ""],
+                [f"15.{month:02d}.26", f"15.{month:02d}.26", "Gebucht", "", "Variable Kosten", "Monat", "Karte", "", f"-{100 + month},00", "", "", ""],
+            ]
+        )
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        actor = Actor.human(admin)
+        service.import_dkb(
+            actor,
+            dkb_csv(rows, start="01.01.26", end="30.06.26", balance="5.000,00", balance_date="30.06.26"),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+        series = service.detect_recurring(actor, shared_account.id)
+        rent = next(item for item in series if "vermieter" in item.normalized_counterparty)
+        service.update_recurring(actor, rent.id, status="confirmed", enabled=True)
+        rerun = service.detect_recurring(actor, shared_account.id)
+        preserved = next(item for item in rerun if item.id == rent.id)
+        assert preserved.status == "confirmed"
+        assert preserved.manually_overridden
+        first = balance_forecast(db, shared_account.id, today=date(2026, 7, 15))
+        second = balance_forecast(db, shared_account.id, today=date(2026, 7, 15))
+        assert first == second
+        assert first["available"]
+        assert len(first["points"]) == 7
+        assert first["recurring"]
+        assert first["points"][1]["recurring_cashflow_cents"] == -90_000
+        assert first["points"][1]["variable_cashflow_cents"] > 0
+        assert all(point["low_cents"] <= point["balance_cents"] <= point["high_cents"] for point in first["points"])
+
+
+def test_forecast_uses_stable_total_cashflow_and_stops_in_december(
+    admin, shared_account
+) -> None:
+    monthly_amounts = [27_559, -41_851, -1_015, -9_488, 9_985, 8_543]
+    rows = []
+    for month, amount in enumerate(monthly_amounts, start=1):
+        amount_text = f"{abs(amount) // 100},{abs(amount) % 100:02d}"
+        if amount < 0:
+            amount_text = f"-{amount_text}"
+        rows.append(
+            [
+                f"15.{month:02d}.26",
+                f"15.{month:02d}.26",
+                "Gebucht",
+                "Test",
+                "",
+                "Monatlicher Saldo",
+                "Überweisung",
+                "",
+                amount_text,
+                "",
+                "",
+                "",
+            ]
+        )
+
+    with SessionLocal() as db:
+        FinanceService(db).import_dkb(
+            Actor.human(admin),
+            dkb_csv(
+                rows,
+                start="01.01.26",
+                end="30.06.26",
+                balance="483,53",
+                balance_date="30.06.26",
+            ),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+
+        forecast = balance_forecast(
+            db, shared_account.id, today=date(2026, 7, 15)
+        )
+
+        assert forecast["available"]
+        assert forecast["method"] == (
+            "median-monthly-net-with-confirmed-recurring-separation"
+        )
+        assert forecast["points"][-1]["month"] == date(2026, 12, 1)
+        assert [
+            point["variable_cashflow_cents"] for point in forecast["points"][1:]
+        ] == [3_764] * 6
+        chart = build_chart(
+            db,
+            shared_account.id,
+            forecast,
+            date(2026, 7, 1),
+            today=date(2026, 7, 15),
+        )
+        assert [point["month"].month for point in chart["actual"]] == list(
+            range(1, 7)
+        )
+        assert [point["month"].month for point in chart["forecast_dots"]] == list(
+            range(7, 13)
+        )

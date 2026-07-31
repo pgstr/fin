@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <header class="page-heading"><p class="eyebrow">{{ account.display_name }} · {{ datefmt(month, "MMMM y") }}</p><h1>{{ t("review.title") }}</h1></header>
+  <div class="detail-grid">
+    <section class="section">
+      <form method="post" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="month" value="{{ month.strftime('%Y-%m') }}"><input type="hidden" name="expected_revision" value="{{ review.revision if review else 0 }}">
+        <label>{{ t("review.content") }}<textarea name="content" rows="18" maxlength="50000" required>{{ review.content if review else "" }}</textarea></label>
+        <button class="button primary" type="submit">{{ t("review.save") }}</button>
+      </form>
+    </section>
+    <section class="section"><h2>{{ t("review.history") }}</h2>{% for item in history %}<details {% if loop.first %}open{% endif %}><summary>{{ t("review.revision", revision=item.revision) }} · {{ datetimefmt(item.created_at) }}</summary><div class="prose">{{ markdown(item.content)|safe }}</div></details>{% else %}<p>{{ t("review.no_content") }}</p>{% endfor %}</section>
+  </div>
+{% endblock %}

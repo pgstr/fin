@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="{{ locale }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>{{ page_title }} · {{ t("app.name") }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
+    <script src="{{ url_for('static', path='app.js') }}" defer></script>
+  </head>
+  <body class="{% if user %}app-body{% else %}auth-body{% endif %}">
+    <a class="skip-link" href="#main">{{ t("common.skip") }}</a>
+    {% if user %}
+      {% set month_query = '?month=' ~ month.strftime('%Y-%m') if month else '' %}
+      <div class="app-shell">
+        <aside class="sidebar">
+          <a class="brand" href="/" aria-label="{{ t('app.name') }}">
+            <span class="brand-mark" aria-hidden="true">F</span>
+            <span class="brand-copy">
+              <strong>{{ t("app.name") }}</strong>
+              <small>{{ t("dashboard.title") }}</small>
+            </span>
+          </a>
+          {% if accounts %}
+            <label class="account-select">
+              <span>{{ t("account.select") }}</span>
+              <select data-account-selector aria-label="{{ t('account.select') }}">
+                {% for visible_account in accounts %}
+                  <option
+                    value="/accounts/{{ visible_account.id }}/overview{% if month %}?month={{ month.strftime('%Y-%m') }}{% endif %}"
+                    {% if account and account.id == visible_account.id %}selected{% endif %}
+                  >{{ visible_account.display_name }} · {{ t("account." ~ visible_account.visibility) }}</option>
+                {% endfor %}
+              </select>
+            </label>
+          {% endif %}
+          {% if account %}
+            <nav class="primary-nav" aria-label="{{ t('nav.main') }}">
+              <a href="/accounts/{{ account.id }}/overview{{ month_query }}" {% if '/overview' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">◫</span>{{ t("nav.overview") }}</a>
+              <a href="/accounts/{{ account.id }}/transactions{{ month_query }}" {% if '/transactions' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↕</span>{{ t("nav.transactions") }}</a>
+              <a href="/accounts/{{ account.id }}/forecast{{ month_query }}" {% if '/forecast' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">⌁</span>{{ t("nav.forecast") }}</a>
+              <a href="/accounts/{{ account.id }}/trends" {% if '/trends' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">⌁</span>{{ t("trend.title") }}</a>
+              <a href="/accounts/{{ account.id }}/recurring" {% if '/recurring' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↻</span>{{ t("nav.recurring") }}</a>
+              <a href="/accounts/{{ account.id }}/import" {% if '/import' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↓</span>{{ t("nav.import") }}</a>
+              {% if is_admin %}<a href="/categories" {% if request.url.path == '/categories' %}aria-current="page"{% endif %}><span aria-hidden="true">#</span>{{ t("nav.categories") }}</a>{% endif %}
+            </nav>
+          {% endif %}
+
+          <nav class="utility-nav" aria-label="{{ t('nav.secondary') }}">
+            <a href="/settings" {% if request.url.path == '/settings' %}aria-current="page"{% endif %}><span aria-hidden="true">⚙</span>{{ t("nav.settings") }}</a>
+            <a href="/tokens" {% if request.url.path == '/tokens' %}aria-current="page"{% endif %}><span aria-hidden="true">◇</span>{{ t("nav.tokens") }}</a>
+            {% if is_admin %}<a href="/users" {% if request.url.path == '/users' %}aria-current="page"{% endif %}><span aria-hidden="true">○</span>{{ t("nav.users") }}</a>{% endif %}
+          </nav>
+
+          <details class="user-menu">
+            <summary>
+              <span class="user-avatar" aria-hidden="true">{{ user.username[0]|upper }}</span>
+              <span>{{ user.username }}</span>
+            </summary>
+            <div class="menu-panel">
+              <a href="/settings">{{ t("nav.settings") }}</a>
+              <a href="/tokens">{{ t("nav.tokens") }}</a>
+              {% if is_admin %}<a href="/users">{{ t("nav.users") }}</a>{% endif %}
+              <form action="/logout" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <button class="link-button" type="submit">{{ t("nav.logout") }}</button>
+              </form>
+            </div>
+          </details>
+        </aside>
+
+        <div class="workspace">
+          <header class="topbar">
+            <a class="mobile-brand" href="/" aria-label="{{ t('app.name') }}"><span aria-hidden="true">F</span>{{ t("app.name") }}</a>
+            <span class="topbar-context">{{ account.display_name if account else page_title }}</span>
+            <span class="topbar-user">{{ user.username }}</span>
+          </header>
+          <main id="main" class="page-shell">
+    {% else %}
+      <main id="main" class="auth-main">
+    {% endif %}
+      {% block content %}{% endblock %}
+    {% if user %}
+          </main>
+        </div>
+        {% if account %}
+          <nav class="mobile-nav" aria-label="{{ t('nav.mobile') }}">
+            <a href="/accounts/{{ account.id }}/overview{{ month_query }}" {% if '/overview' in request.url.path %}aria-current="page"{% endif %}>{{ t("nav.overview") }}</a>
+            <a href="/accounts/{{ account.id }}/transactions{{ month_query }}" {% if '/transactions' in request.url.path %}aria-current="page"{% endif %}>{{ t("nav.transactions") }}</a>
+            <a href="/accounts/{{ account.id }}/forecast{{ month_query }}" {% if '/forecast' in request.url.path %}aria-current="page"{% endif %}>{{ t("nav.forecast") }}</a>
+            <details>
+              <summary>{{ t("nav.secondary") }}</summary>
+              <div class="mobile-menu-panel">
+                <a href="/accounts/{{ account.id }}/trends">{{ t("trend.title") }}</a>
+                {% if is_admin %}<a href="/categories">{{ t("nav.categories") }}</a>{% endif %}
+                <a href="/accounts/{{ account.id }}/import">{{ t("nav.import") }}</a>
+                <a href="/accounts/{{ account.id }}/recurring">{{ t("nav.recurring") }}</a>
+                <a href="/settings">{{ t("nav.settings") }}</a>
+              </div>
+            </details>
+          </nav>
+        {% endif %}
+      </div>
+    {% else %}
+      </main>
+    {% endif %}
+  </body>
+</html>

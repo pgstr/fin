@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+  <header class="page-heading"><h1>{{ t("settings.title") }}</h1></header>
+  <section class="section narrow"><form method="post" class="stack"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label>{{ t("settings.language") }}<select name="locale"><option value="de" {% if user.locale == "de" %}selected{% endif %}>{{ t("settings.german") }}</option><option value="en" {% if user.locale == "en" %}selected{% endif %}>{{ t("settings.english") }}</option></select></label><button class="button primary" type="submit">{{ t("common.save") }}</button></form></section>
+{% endblock %}

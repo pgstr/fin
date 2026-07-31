@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+  <header class="page-heading">
+    <p class="eyebrow">{{ account.display_name }}</p>
+    <h1>{{ t("trend.title") }}</h1>
+  </header>
+  <form class="section narrow" method="get">
+    <label>{{ t("trend.category") }}
+      <select name="category_id" data-auto-submit>
+        {% for root in categories if not root.parent_id %}
+          <optgroup label="{{ root.label_en if locale == 'en' and root.label_en else root.label_de }}">
+            {% for category in categories if category.parent_id == root.id and category.assignable %}
+              <option value="{{ category.id }}" {% if category.id == selected_id %}selected{% endif %}>{{ category.label_en if locale == "en" and category.label_en else category.label_de }}</option>
+            {% endfor %}
+          </optgroup>
+        {% endfor %}
+      </select>
+    </label>
+  </form>
+  {% if trend %}
+    {% if trend.sparse %}<div class="alert warning">{{ t("trend.sparse") }}</div>{% endif %}
+    <section class="section">
+      <div class="section-heading split">
+        <h2>{{ trend.category_label }}</h2>
+        <p>{{ t("trend.monthly_change") }}: {{ money(trend.linear_monthly_change_cents) if trend.linear_monthly_change_cents is not none else "—" }}</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>{{ t("month.choose") }}</th><th>{{ t("common.incomplete") }}</th><th class="number">{{ t("transactions.amount") }}</th><th class="number">{{ t("trend.moving_average") }}</th></tr></thead>
+          <tbody>
+            {% for point in trend.points %}
+              <tr>
+                <td>{{ datefmt(point.month, "MMM y") }}</td>
+                <td>{{ t("common.no") if point.complete else t("common.yes") }}</td>
+                <td class="number">{{ money(point.amount_cents) }}</td>
+                <td class="number">{{ money(moving_by_month.get(point.month)) if moving_by_month.get(point.month) is not none else "—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

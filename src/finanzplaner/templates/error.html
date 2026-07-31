@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+  <section class="error-page">
+    <h1>{{ t("error.title") }}</h1>
+    <p>{{ t(error.message_key) }}</p>
+    <a class="button" href="/">{{ t("common.back") }}</a>
+  </section>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+  <section class="empty-state">
+    <h1>{{ t("dashboard.title") }}</h1>
+    <p>{{ t("account.no_visible") }}</p>
+    <a class="button primary" href="/import">{{ t("import.title") }}</a>
+  </section>
+{% endblock %}

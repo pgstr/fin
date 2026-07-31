@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <section class="auth-card" aria-labelledby="login-title">
+    <div class="auth-brand"><span class="brand-mark" aria-hidden="true">F</span>{{ t("app.name") }}</div>
+    <h1 id="login-title">{{ t("login.title") }}</h1>
+    {% if login_error %}<div class="alert error" role="alert">{{ t(login_error) }}</div>{% endif %}
+    <form method="post" class="stack">
+      <input type="hidden" name="form_token" value="{{ form_token }}">
+      <input type="hidden" name="next_url" value="{{ next_url }}">
+      <label>{{ t("login.username") }}<input name="username" autocomplete="username" required autofocus></label>
+      <label>{{ t("login.password") }}<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="button primary" type="submit">{{ t("login.submit") }}</button>
+    </form>
+    <p class="locale-links"><a href="/login?lang=de" lang="de">Deutsch</a> · <a href="/login?lang=en" lang="en">English</a></p>
+  </section>
+{% endblock %}

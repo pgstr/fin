@@ -1,0 +1,26 @@
+<div class="chart-shell" data-balance-chart>
+  <svg class="balance-chart {{ chart_class|default('') }}" viewBox="0 0 720 240" role="img" aria-labelledby="{{ chart_id }}-title {{ chart_id }}-desc">
+    <title id="{{ chart_id }}-title">{{ t(chart_title_key) }}</title>
+    <desc id="{{ chart_id }}-desc">{{ t("dashboard.balance_chart_desc") }}. {{ t("forecast.notice") }}</desc>
+    <line x1="40" x2="680" y1="40" y2="40"></line>
+    <line x1="40" x2="680" y1="118" y2="118"></line>
+    <line x1="40" x2="680" y1="195" y2="195"></line>
+    {% if chart.band %}<polygon class="forecast-band" points="{{ chart.band }}"></polygon>{% endif %}
+    {% if chart.actual_points %}<polyline class="actual-line" points="{{ chart.actual_points }}"></polyline>{% endif %}
+    {% if chart.forecast_points %}<polyline class="forecast-line" points="{{ chart.forecast_points }}"></polyline>{% endif %}
+    {% for point in chart.actual_dots %}
+      {% set point_label = datefmt(point.date, "dd.MM.yyyy") ~ " · " ~ money(point.value) ~ " · " ~ t("common.observed") %}
+      <circle class="chart-point actual-point" cx="{{ '%.1f'|format(point.x) }}" cy="{{ '%.1f'|format(point.y) }}" r="5" tabindex="0" data-chart-point data-tooltip="{{ point_label }}" aria-label="{{ point_label }}"><title>{{ point_label }}</title></circle>
+    {% endfor %}
+    {% for point in chart.forecast_dots %}
+      {% set point_label = datefmt(point.date, "dd.MM.yyyy") ~ " · " ~ money(point.value) ~ " · " ~ t("common.estimated") %}
+      <circle class="chart-point forecast-point" cx="{{ '%.1f'|format(point.x) }}" cy="{{ '%.1f'|format(point.y) }}" r="5" tabindex="0" data-chart-point data-tooltip="{{ point_label }}" aria-label="{{ point_label }}"><title>{{ point_label }}</title></circle>
+    {% endfor %}
+    {% for point in chart.axis_points %}
+      <text class="chart-x-label" x="{{ '%.1f'|format(point.x) }}" y="224" text-anchor="middle">{{ datefmt(point.month, "MMM") }}</text>
+    {% endfor %}
+    <text x="4" y="44">{{ money(chart.max_cents) }}</text>
+    <text x="4" y="199">{{ money(chart.min_cents) }}</text>
+  </svg>
+  <div class="chart-tooltip" data-chart-tooltip role="status" hidden></div>
+</div>

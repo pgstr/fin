@@ -1,0 +1,30 @@
+Kontotyp;Girokonto
+IBAN;DE02120300000000202051
+Zeitraum;01.01.26 - 30.06.26
+Kontostand vom 30.06.26;3.482,17 €
+
+Buchungsdatum;Wertstellung;Status;Zahlungspflichtige*r;Zahlungsempfänger*in;Verwendungszweck;Umsatztyp;IBAN;Betrag (€);Gläubiger-ID;Mandatsreferenz;Kundenreferenz
+02.01.26;02.01.26;Gebucht;Beispiel Arbeitgeber GmbH;;Gehalt Januar;Überweisung;DE44500105175407324931;2.600,00;;;
+03.01.26;03.01.26;Gebucht;;Beispiel Wohnen GmbH;Miete Januar;Lastschrift;DE12500105170648489890;-1.000,00;DE98ZZZ09999999999;MIETE-DEMO;
+10.01.26;10.01.26;Gebucht;;Beispiel Supermarkt;Wocheneinkauf;Kartenzahlung;DE75512108001245126199;-412,35;;;
+15.01.26;15.01.26;Gebucht;;Beispiel Energie AG;Abschlag Januar;Lastschrift;DE83500105179999999999;-180,00;DE42ZZZ00000000001;ENERGIE-DEMO;
+02.02.26;02.02.26;Gebucht;Beispiel Arbeitgeber GmbH;;Gehalt Februar;Überweisung;DE44500105175407324931;2.600,00;;;
+03.02.26;03.02.26;Gebucht;;Beispiel Wohnen GmbH;Miete Februar;Lastschrift;DE12500105170648489890;-1.000,00;DE98ZZZ09999999999;MIETE-DEMO;
+10.02.26;10.02.26;Gebucht;;Beispiel Supermarkt;Wocheneinkauf;Kartenzahlung;DE75512108001245126199;-387,42;;;
+15.02.26;15.02.26;Gebucht;;Beispiel Energie AG;Abschlag Februar;Lastschrift;DE83500105179999999999;-180,00;DE42ZZZ00000000001;ENERGIE-DEMO;
+02.03.26;02.03.26;Gebucht;Beispiel Arbeitgeber GmbH;;Gehalt März;Überweisung;DE44500105175407324931;2.600,00;;;
+03.03.26;03.03.26;Gebucht;;Beispiel Wohnen GmbH;Miete März;Lastschrift;DE12500105170648489890;-1.000,00;DE98ZZZ09999999999;MIETE-DEMO;
+10.03.26;10.03.26;Gebucht;;Beispiel Supermarkt;Wocheneinkauf;Kartenzahlung;DE75512108001245126199;-425,18;;;
+15.03.26;15.03.26;Gebucht;;Beispiel Energie AG;Abschlag März;Lastschrift;DE83500105179999999999;-180,00;DE42ZZZ00000000001;ENERGIE-DEMO;
+02.04.26;02.04.26;Gebucht;Beispiel Arbeitgeber GmbH;;Gehalt April;Überweisung;DE44500105175407324931;2.600,00;;;
+03.04.26;03.04.26;Gebucht;;Beispiel Wohnen GmbH;Miete April;Lastschrift;DE12500105170648489890;-1.000,00;DE98ZZZ09999999999;MIETE-DEMO;
+10.04.26;10.04.26;Gebucht;;Beispiel Supermarkt;Wocheneinkauf;Kartenzahlung;DE75512108001245126199;-398,76;;;
+15.04.26;15.04.26;Gebucht;;Beispiel Energie AG;Abschlag April;Lastschrift;DE83500105179999999999;-180,00;DE42ZZZ00000000001;ENERGIE-DEMO;
+02.05.26;02.05.26;Gebucht;Beispiel Arbeitgeber GmbH;;Gehalt Mai;Überweisung;DE44500105175407324931;2.600,00;;;
+03.05.26;03.05.26;Gebucht;;Beispiel Wohnen GmbH;Miete Mai;Lastschrift;DE12500105170648489890;-1.000,00;DE98ZZZ09999999999;MIETE-DEMO;
+10.05.26;10.05.26;Gebucht;;Beispiel Supermarkt;Wocheneinkauf;Kartenzahlung;DE75512108001245126199;-441,09;;;
+15.05.26;15.05.26;Gebucht;;Beispiel Energie AG;Abschlag Mai;Lastschrift;DE83500105179999999999;-180,00;DE42ZZZ00000000001;ENERGIE-DEMO;
+02.06.26;02.06.26;Gebucht;Beispiel Arbeitgeber GmbH;;Gehalt Juni;Überweisung;DE44500105175407324931;2.600,00;;;
+03.06.26;03.06.26;Gebucht;;Beispiel Wohnen GmbH;Miete Juni;Lastschrift;DE12500105170648489890;-1.000,00;DE98ZZZ09999999999;MIETE-DEMO;
+10.06.26;10.06.26;Gebucht;;Beispiel Supermarkt;Wocheneinkauf;Kartenzahlung;DE75512108001245126199;-404,63;;;
+15.06.26;15.06.26;Gebucht;;Beispiel Energie AG;Abschlag Juni;Lastschrift;DE83500105179999999999;-180,00;DE42ZZZ00000000001;ENERGIE-DEMO;

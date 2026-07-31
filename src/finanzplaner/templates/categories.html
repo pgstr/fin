@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+  <header class="page-heading"><h1>{{ t("category.title") }}</h1><p class="lede">{{ t("category.intro") }}</p></header>
+  <section class="section">
+    <h2>{{ t("category.create") }}</h2>
+    <form method="post" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>{{ t("category.root") }}<select name="parent_id"><option value="">{{ t("common.none") }}</option>{% for root in roots %}<option value="{{ root.id }}">{{ root.label_de }}</option>{% endfor %}</select></label>
+      <label>{{ t("category.key") }}<input name="key" pattern="[a-z0-9-]+" required></label>
+      <label>{{ t("category.label_de") }}<input name="label_de" required></label>
+      <label>{{ t("category.label_en") }}<input name="label_en"></label>
+      <label>{{ t("category.order") }}<input name="sort_order" type="number" value="0"></label>
+      <button class="button primary" type="submit">{{ t("common.create") }}</button>
+    </form>
+  </section>
+  <div class="category-list">
+    {% for root in roots %}
+      <section class="section">
+        <h2>{{ root.label_en if locale == "en" and root.label_en else root.label_de }}</h2>
+        <p class="code-label">{{ root.key }}</p>
+        {% for category in children[root.id] %}
+          <form method="post" action="/categories/{{ category.id }}" class="category-row">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <span class="code-label">{{ category.key }}</span>
+            <label>{{ t("category.label_de") }}<input name="label_de" value="{{ category.label_de }}" required></label>
+            <label>{{ t("category.label_en") }}<input name="label_en" value="{{ category.label_en or '' }}"></label>
+            <label>{{ t("category.order") }}<input name="sort_order" type="number" value="{{ category.sort_order }}"></label>
+            <label class="check"><input name="active" type="checkbox" value="true" {% if category.active %}checked{% endif %}>{{ t("category.active") }}</label>
+            <button class="button quiet" type="submit">{{ t("common.save") }}</button>
+          </form>
+        {% endfor %}
+      </section>
+    {% endfor %}
+  </div>
+{% endblock %}

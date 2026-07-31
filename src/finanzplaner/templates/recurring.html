@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+  <header class="page-heading split"><div><p class="eyebrow">{{ account.display_name }}</p><h1>{{ t("recurring.title") }}</h1></div><form method="post" action="/accounts/{{ account.id }}/recurring/detect"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="button primary" type="submit">{{ t("recurring.detect") }}</button></form></header>
+  <div class="recurring-cards">
+    {% for item in recurring %}
+      <form method="post" action="/recurring/{{ item.id }}" class="section recurring-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="section-heading split"><div><h2>{{ item.normalized_counterparty }}</h2><span class="badge">{{ t("recurring." ~ item.status) }}</span></div><label class="check"><input type="checkbox" name="enabled" value="true" {% if item.enabled %}checked{% endif %}>{{ t("category.active") }}</label></div>
+        <div class="form-grid">
+          <label>{{ t("recurring.cadence") }}<select name="cadence">{% for cadence in ["weekly", "monthly", "quarterly", "yearly"] %}<option value="{{ cadence }}" {% if item.cadence == cadence %}selected{% endif %}>{{ t("recurring." ~ cadence) }}</option>{% endfor %}</select></label>
+          <label>{{ t("recurring.amount") }}<input name="typical_amount" value="{{ '%.2f'|format(item.typical_amount_cents / 100)|replace('.', ',') }}" inputmode="decimal"></label>
+          <label>{{ t("recurring.next") }}<input type="date" name="expected_next_date" value="{{ item.expected_next_date.isoformat() }}"></label>
+          <label>{{ t("users.status") }}<select name="status">{% for status in ["detected", "confirmed", "rejected"] %}<option value="{{ status }}" {% if item.status == status %}selected{% endif %}>{{ t("recurring." ~ status) }}</option>{% endfor %}</select></label>
+        </div>
+        <details><summary>{{ t("recurring.evidence") }}</summary><p>{{ item.evidence.transaction_ids|length }} {{ t("transactions.title") }} · {{ item.evidence.interval_days|join(", ") }} {{ t("common.days") }}</p></details>
+        <button class="button" type="submit">{{ t("common.save") }}</button>
+      </form>
+    {% else %}<section class="empty-state"><p>{{ t("recurring.no_results") }}</p></section>{% endfor %}
+  </div>
+{% endblock %}

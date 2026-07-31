@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block content %}
+  <header class="page-heading dashboard-heading split">
+    <div>
+      <p class="eyebrow">{{ account.display_name }} · {{ t("account." ~ account.visibility) }}</p>
+      <h1>{{ datefmt(month, "MMMM y") }}</h1>
+      <p class="lede">{{ t("dashboard.title") }}</p>
+    </div>
+    {% set base_url = '/accounts/' ~ account.id ~ '/overview' %}
+    {% include "_month_nav.html" %}
+  </header>
+
+  <section class="summary-grid" aria-label="{{ t('dashboard.title') }}">
+    <article class="summary-item balance">
+      <span class="summary-icon" aria-hidden="true">€</span>
+      <div>
+        <p>{{ t("dashboard.balance") }}</p>
+        <strong>{{ money(summary.closing_balance_cents) if summary.balance_reliable else "—" }}</strong>
+        <small>
+          {% if summary.balance_reliable %}{{ t("dashboard.balance_as_of", date=datefmt(summary.balance_effective_date)) }}
+          {% else %}{{ t("dashboard.balance_unavailable") }}{% endif %}
+        </small>
+      </div>
+    </article>
+    <article class="summary-item incoming">
+      <span class="summary-icon" aria-hidden="true">↙</span>
+      <div>
+        <p>{{ t("dashboard.incoming") }}</p>
+        <strong>+{{ money(summary.incoming_cents) }}</strong>
+        <small>{{ t("dashboard.household_contribution", amount=money(summary.household_contribution_cents)) }}</small>
+      </div>
+    </article>
+    <article class="summary-item outgoing">
+      <span class="summary-icon" aria-hidden="true">↗</span>
+      <div>
+        <p>{{ t("dashboard.outgoing") }}</p>
+        <strong>−{{ money(summary.outgoing_cents) }}</strong>
+        <small>{{ t("dashboard.uncategorized_count", count=summary.uncategorized_count) }}</small>
+      </div>
+    </article>
+  </section>
+
+  {% if not summary.coverage_complete %}
+    <div class="alert warning" role="status"><strong>{{ t("common.incomplete") }}.</strong> {{ t("forecast.insufficient") }}</div>
+  {% endif %}
+
+  <section class="month-details" aria-labelledby="month-details-title">
+    <h2 id="month-details-title">{{ t("dashboard.month_details") }}</h2>
+    <dl>
+      <div><dt>{{ t("dashboard.opening_balance") }}</dt><dd>{{ money(summary.opening_balance_cents) if summary.opening_balance_reliable else "—" }}</dd></div>
+      <div><dt>{{ t("dashboard.closing_balance") }}</dt><dd>{{ money(summary.closing_balance_cents) if summary.closing_balance_reliable else "—" }}</dd></div>
+      <div><dt>{{ t("dashboard.net") }}</dt><dd>{{ money(summary.net_cents) }}</dd></div>
+      <div><dt>{{ t("dashboard.categorized") }}</dt><dd>{{ money(summary.categorized_cents) }}</dd></div>
+      <div><dt>{{ t("dashboard.uncategorized") }}</dt><dd>{{ money(summary.uncategorized_cents) }}</dd></div>
+      <div><dt>{{ t("dashboard.previous_month") }}</dt><dd>{% if summary.previous_month_net_cents is not none %}{{ money(summary.net_cents - summary.previous_month_net_cents) }}{% else %}{{ t("dashboard.no_comparison") }}{% endif %}</dd></div>
+      <div><dt>{{ t("dashboard.previous_year") }}</dt><dd>{% if summary.previous_year_net_cents is not none %}{{ money(summary.net_cents - summary.previous_year_net_cents) }}{% else %}{{ t("dashboard.no_comparison") }}{% endif %}</dd></div>
+    </dl>
+  </section>
+
+  <div class="dashboard-grid">
+    <section class="section" aria-labelledby="balance-title">
+      <div class="section-heading split">
+        <div>
+          <h2 id="balance-title">{{ t("dashboard.balance_chart") }}</h2>
+          <p>{{ t("dashboard.balance_chart_desc") }}</p>
+        </div>
+        <div class="legend" aria-label="{{ t('common.details') }}">
+          <span><i class="legend-line actual"></i>{{ t("common.observed") }}</span>
+          <span><i class="legend-line forecast"></i>{{ t("common.estimated") }}</span>
+        </div>
+      </div>
+      {% if chart.actual_points or chart.forecast_points %}
+        {% set chart_id = "overview-chart" %}
+        {% set chart_title_key = "dashboard.balance_chart" %}
+        {% include "_balance_chart.html" %}
+        <details class="chart-fallback">
+          <summary>{{ t("dashboard.chart_fallback") }}</summary>
+          <table>
+            <thead><tr><th>{{ t("month.choose") }}</th><th class="number">{{ t("dashboard.balance") }}</th></tr></thead>
+            <tbody>
+              {% for point in chart.actual %}<tr><td>{{ datefmt(point.date) }}</td><td class="number">{{ money(point.value) }}</td></tr>{% endfor %}
+              {% for point in chart.projected %}<tr><td>{{ datefmt(point.month, "MMM y") }} · {{ t("common.estimated") }}</td><td class="number">{{ money(point.value) }}</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </details>
+      {% else %}
+        <p class="empty-inline">{{ t("forecast.insufficient") }}</p>
+      {% endif %}
+    </section>
+
+    <section class="section breakdown" aria-labelledby="breakdown-title">
+      <div class="section-heading">
+        <h2 id="breakdown-title">{{ t("dashboard.largest_expenses") }}</h2>
+        <p>{{ datefmt(month, "MMMM y") }}</p>
+      </div>
+      {% set max_expense = summary.breakdown[0].amount_cents if summary.breakdown else 1 %}
+      {% for item in summary.breakdown[:6] %}
+        <div class="bar-row">
+          <div><span>{{ item.label or t("category.uncategorized") }}</span><strong>{{ money(item.amount_cents) }}</strong></div>
+          <progress max="{{ max_expense }}" value="{{ item.amount_cents }}">{{ item.amount_cents }}</progress>
+        </div>
+      {% else %}
+        <p class="empty-inline">{{ t("transactions.no_results") }}</p>
+      {% endfor %}
+    </section>
+  </div>
+
+  <section class="section" aria-labelledby="recent-title">
+    <div class="section-heading split">
+      <h2 id="recent-title">{{ t("dashboard.recent") }}</h2>
+      <a class="button quiet" href="/accounts/{{ account.id }}/transactions?month={{ month.strftime('%Y-%m') }}">{{ t("dashboard.all_transactions") }}</a>
+    </div>
+    <div class="table-wrap">
+      <table class="transactions-table">
+        <thead><tr><th>{{ t("transactions.date") }}</th><th>{{ t("transactions.booking") }}</th><th>{{ t("transactions.category") }}</th><th class="number">{{ t("transactions.amount") }}</th></tr></thead>
+        <tbody>
+          {% for transaction in summary.recent_transactions %}
+            <tr>
+              <td><a href="/transactions/{{ transaction.id }}">{{ datefmt(transaction.booking_date, "dd.MM.") }}</a></td>
+              <td><a class="transaction-name" href="/transactions/{{ transaction.id }}">{{ transaction.display_counterparty or transaction.transaction_type }}<small>{{ transaction.purpose }}</small></a></td>
+              <td><span class="badge {% if not transaction.category %}muted{% endif %}">{{ transaction.category and (transaction.category.label_en if locale == "en" and transaction.category.label_en else transaction.category.label_de) or t("category.uncategorized") }}</span></td>
+              <td class="number amount">{{ "+" if transaction.amount_cents > 0 else "−" if transaction.amount_cents < 0 else "" }}{{ money(transaction.amount_cents|abs) }}</td>
+            </tr>
+          {% else %}<tr><td colspan="4" class="empty-cell">{{ t("transactions.no_results") }}</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <article class="editorial" aria-labelledby="review-title">
+    <div class="section-heading split">
+      <div><p class="eyebrow">{{ t("dashboard.review") }}</p><h2 id="review-title">{{ datefmt(month, "MMMM y") }}</h2></div>
+      <a class="button quiet" href="/accounts/{{ account.id }}/review?month={{ month.strftime('%Y-%m') }}">{{ t("common.edit") }}</a>
+    </div>
+    {% if summary.review %}
+      <div class="prose">{{ markdown(summary.review.content)|safe }}</div>
+      <small>{{ t("review.revision", revision=summary.review.revision) }} · {{ datetimefmt(summary.review.created_at) }}</small>
+    {% else %}<p>{{ t("dashboard.no_review") }}</p>{% endif %}
+  </article>
+{% endblock %}

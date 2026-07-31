@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+  <header class="page-heading">
+    <p class="eyebrow">{{ account.display_name }} · {{ datefmt(transaction.booking_date) }}</p>
+    <h1 class="wrap-anywhere">{{ transaction.display_counterparty or transaction.transaction_type }}</h1>
+    <p class="hero-amount">{{ "+" if transaction.amount_cents > 0 else "−" if transaction.amount_cents < 0 else "" }}{{ money(transaction.amount_cents|abs) }}</p>
+  </header>
+  <div class="detail-grid">
+    <section class="section" aria-labelledby="annotation-title">
+      <h2 id="annotation-title">{{ t("transaction.annotations") }}</h2>
+      <form method="post" action="/transactions/{{ transaction.id }}/category" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="revision" value="{{ transaction.revision }}">
+        <label>{{ t("transaction.category_update") }}
+          <select name="category_id">
+            <option value="">{{ t("category.uncategorized") }}</option>
+            {% for root in categories if not root.parent_id %}
+              <optgroup label="{{ root.label_en if locale == 'en' and root.label_en else root.label_de }}">
+                {% for category in categories if category.parent_id == root.id and category.assignable %}
+                  <option value="{{ category.id }}" {% if transaction.category_id == category.id %}selected{% endif %}>{{ category.label_en if locale == "en" and category.label_en else category.label_de }}</option>
+                {% endfor %}
+              </optgroup>
+            {% endfor %}
+          </select>
+        </label>
+        <button class="button primary" type="submit">{{ t("common.save") }}</button>
+      </form>
+      <h3>{{ t("transaction.note") }}</h3>
+      <div class="notes">
+        {% for note in transaction.notes %}
+          <article class="note">
+            <div class="prose">{{ markdown(note.content)|safe }}</div>
+            <small>{{ t("actor." ~ note.author_type) }} · {{ datetimefmt(note.created_at) }}</small>
+            {% if note.author_type == "human" and note.author_id == user.id %}
+              <form method="post" action="/notes/{{ note.id }}" class="note-edit">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <textarea name="content" rows="3">{{ note.content }}</textarea>
+                <button class="button quiet" type="submit">{{ t("common.save") }}</button>
+                <button class="link-button danger-text" type="submit" name="delete" value="true">{{ t("common.archive") }}</button>
+              </form>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+      <form method="post" action="/transactions/{{ transaction.id }}/notes" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>{{ t("transaction.note_add") }}<textarea name="content" rows="4" maxlength="10000" required></textarea></label>
+        <button class="button" type="submit">{{ t("transaction.note_add") }}</button>
+      </form>
+      <h3>{{ t("transaction.tags") }}</h3>
+      <p>{% for link in transaction.tag_links %}<span class="badge">{{ link.tag.name }}</span> {% else %}—{% endfor %}</p>
+      <form method="post" action="/transactions/{{ transaction.id }}/tags" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>{{ t("transaction.tags_add") }}<input name="tags" placeholder="{{ t('transaction.tags_hint') }}" required></label>
+        <button class="button" type="submit">{{ t("common.save") }}</button>
+      </form>
+      <h3>{{ t("transaction.transfer") }}</h3>
+      {% if transfer and transfer.private_counterpart %}<p>{{ t("transaction.transfer_redacted") }}</p>
+      {% elif transfer %}<p>{{ t("transaction.transfer_visible") }} <a href="/transactions/{{ transfer.transaction_id }}">{{ datefmt(transfer.booking_date) }} · {{ money(transfer.amount_cents) }}</a></p>
+      {% else %}<p>{{ t("transaction.no_transfer") }}</p>{% endif %}
+    </section>
+    <section class="section facts" aria-labelledby="facts-title">
+      <h2 id="facts-title">{{ t("transaction.imported_facts") }}</h2>
+      <dl>
+        <div><dt>{{ t("transaction.booking_date") }}</dt><dd>{{ datefmt(transaction.booking_date) }}</dd></div>
+        <div><dt>{{ t("transaction.value_date") }}</dt><dd>{{ datefmt(transaction.value_date) }}</dd></div>
+        <div><dt>{{ t("transaction.status") }}</dt><dd>{{ t("status.booked") if transaction.status == "Gebucht" else transaction.status }}</dd></div>
+        <div><dt>{{ t("transaction.payer") }}</dt><dd>{{ transaction.payer or "—" }}</dd></div>
+        <div><dt>{{ t("transaction.payee") }}</dt><dd>{{ transaction.payee or "—" }}</dd></div>
+        <div><dt>{{ t("transaction.purpose") }}</dt><dd>{{ transaction.purpose or "—" }}</dd></div>
+        <div><dt>{{ t("transaction.type") }}</dt><dd>{{ transaction.transaction_type or "—" }}</dd></div>
+        <div><dt>{{ t("transaction.iban") }}</dt><dd>{{ transaction.counterparty_iban or "—" }}</dd></div>
+        <div><dt>{{ t("transaction.creditor_id") }}</dt><dd>{{ transaction.creditor_id or "—" }}</dd></div>
+        <div><dt>{{ t("transaction.mandate") }}</dt><dd>{{ transaction.mandate_reference or "—" }}</dd></div>
+        <div><dt>{{ t("transaction.customer_ref") }}</dt><dd>{{ transaction.customer_reference or "—" }}</dd></div>
+      </dl>
+    </section>
+  </div>
+  <section class="section"><h2>{{ t("transaction.audit") }}</h2><ol class="timeline">{% for event in events %}<li><strong>{{ t("audit." ~ event.action) }}</strong><small>{{ datetimefmt(event.created_at) }}</small></li>{% else %}<li>—</li>{% endfor %}</ol></section>
+{% endblock %}
