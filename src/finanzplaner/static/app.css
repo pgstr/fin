@@ -1547,6 +1547,12 @@ td small.code-label { display: block; margin-top: 0.15rem; }
   .mobile-menu-panel a:hover { background: var(--track); text-decoration: none; }
 }
 
+@media (max-width: 620px) {
+  /* let the densest tables scroll inside .table-wrap rather than squeeze every
+     payee down to one word per line */
+  .transactions-table { min-width: 24rem; }
+}
+
 @media (max-width: 520px) {
   .split { align-items: flex-start; }
   /* two wider tiles rather than three narrow ones, so amounts stay on one line */
