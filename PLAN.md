@@ -1,16 +1,17 @@
 # Fin development plan
 
-Status: completed for `1.1.0`
+Status: `1.1.0` complete; post-`1.1.0` roadmap active
 Last updated: 2026-07-31
 
 This is the single source of truth for future Fin development. Product and
 operator documentation describe released behavior; issues and pull requests
 may break down individual tasks, but they do not replace this plan.
 
-This plan contains no net-new product features. Its behavior changes are
+The `1.1.0` work recorded below contained no net-new product features. It was
 limited to correcting existing financial, privacy, security, and data-integrity
-contracts; the remaining work is test, deployment, recovery, and release
-verification.
+contracts and proving test, deployment, recovery, and release behavior. The
+post-`1.1.0` section at the end of this file is the prioritized roadmap for new
+product work.
 
 ## Product decisions
 
@@ -34,6 +35,11 @@ they should change.
   the latest six complete monthly residual totals. The uncertainty band widens
   from the population standard deviation of those residuals. It is a
   deterministic estimate, not financial advice.
+- Actual balances always reconcile to the imported bank balance and therefore
+  include every transaction. A separate budget-adjusted trajectory excludes
+  transactions categorized under the transfer root, including
+  `Nicht budgetwirksam`; the forecast variable baseline uses the same
+  budget-neutral rule.
 - Import coverage may be assembled from multiple adjacent or overlapping import
   batches. A real date gap must still make derived balances unreliable.
 - Historical analytics remain readable after categories are archived.
@@ -41,9 +47,9 @@ they should change.
   GitHub repository used only as a version-control remote. Release verification
   runs locally and on the approved Podium host, not in GitHub Actions.
 
-## Scope boundaries
+## `1.1.0` scope boundaries
 
-The following are not planned:
+The following were not planned for `1.1.0`:
 
 - bank APIs, scraping, or live DKB connectivity;
 - automatic or rules-based categorization;
@@ -52,8 +58,9 @@ The following are not planned:
 - combined net-worth, investment, loan, tax, or multi-currency features;
 - a public-internet deployment profile or native mobile application.
 
-New product features stay deferred until the current application has passed the
-release gates below and has been used with real household workflows.
+The post-`1.1.0` roadmap keeps most of these boundaries. It permits only the
+narrow, evidence-gated exceptions stated there; an exception does not reopen
+the whole surrounding product area.
 
 ## Current baseline
 
@@ -270,6 +277,214 @@ All tasks F-01 through F-14 and all release gates were completed on 2026-07-31.
   Actions and other paid GitHub features are intentionally not part of the
   development or release process.
 
-There is no additional open product work in this plan. New product scope should
-be chosen from evidence gathered during real household use and added here before
-implementation.
+## Post-`1.1.0` product roadmap
+
+This roadmap consolidates the current scope boundaries, the original Fin
+specification, the earlier finance-spoke plans, and the current implementation.
+There is no separate GitHub issue backlog. New scope must be promoted here
+before implementation.
+
+### Rating model
+
+- **Importance** is specific to Fin: `5` is central to its household-finance
+  purpose and `1` provides little value for this application.
+- **Priority** is `P0` next validated slice, `P1` next product release, `P2`
+  evidence-gated, `P3` distant, or `X` do not build.
+- **Effort** is relative: `S`, `M`, or `L`. Every schema change still requires
+  an Alembic migration and upgrade coverage.
+
+### Previously deferred ideas that are already implemented
+
+- local, responsive web dashboard;
+- shared and private multi-account storage and navigation;
+- recurring-series detection and review;
+- running-balance history, trends, and annual forecast;
+- agent-authored monthly reviews rendered in the web interface;
+- human and external-agent categorization through one service layer.
+
+The remaining multi-account proposal is specifically an aggregate view across
+accounts already visible to one user. It is not a household-wide privacy bypass
+or a net-worth product.
+
+### Prioritized candidates
+
+| Feature | Importance | Priority | Effort | Decision |
+|---|---:|---:|---:|---|
+| Concise documentation wiki and agent navigation | 5 | P0 | M | Build before and alongside new features |
+| Annual and multi-year reporting | 5 | P0 | M | Build |
+| Printable monthly/year HTML including saved reviews | 5 | P0 | M | Build with reporting |
+| Budget-adjusted balance trajectory and forecast history | 5 | P0 | S | Build without changing the reconciled bank balance |
+| Scheduled month-end review draft | 5 | P0 | S | Configure outside Fin through MCP |
+| `My visible accounts` aggregate dashboard | 4 | P1 | L | Build with strict privacy semantics |
+| Target balance and date | 4 | P1 | M | Build as the first narrow savings goal |
+| DKB Visa or another genuinely used CSV format | 4 if used | P2 | M each | Require a real sample and workflow |
+| Category budgets or targets | 3 | P2 | L | Trial only after target-balance use |
+| Transaction splitting | 3 | P2 | L | Require evidence of distorted reports |
+| Direct PDF generation | 2 | P3 | M | Defer while browser print is sufficient |
+| Alerts or hard spending limits | 2 | P3 | L | Defer until targets and a channel exist |
+| Bulk manual categorization workflow | 2 | P3 | M | Add only if agent-assisted flow is insufficient |
+| Additional banks generally | 2 | P3 | M each | Add one proven format at a time |
+
+### Settled non-goals
+
+| Feature | Importance | Priority | Reason |
+|---|---:|---:|---|
+| Live bank API connectivity | 2 | X | Large credential, security, and reliability burden |
+| Screen scraping | 1 | X | Fragile and unsafe to operate with bank credentials |
+| Rules or catch-all automatic categorization | 2 | X | Conflicts with explicit human/agent category authority |
+| Built-in ML categorization, confidence scores, or review queue | 1 | X | Duplicates the external agent and complicates provenance |
+| Embedded LLM or outbound AI calls | 1 | X | MCP is the intentional agent boundary |
+| Household-member purchase attribution | 1 | X | No demonstrated need for the administrative complexity |
+| Full net-worth dashboard | 2 | X | Different product and data model from bank cash flow |
+| Investment or securities tracking | 1 | X | Separate valuation domain and data source |
+| Loan amortization | 2 | X | Recurrence already captures payment cash flow |
+| Tax functionality | 1 | X | Specialized, high-stakes domain outside Fin |
+| Multiple currencies | 1 | X | Current DKB/EUR workflow does not justify pervasive change |
+| Native mobile application | 1 | X | Responsive local web UI covers mobile use |
+| Public-internet deployment profile | 1 | X | Expands the threat model without a proven need |
+| Email integration or reset email | 1 | X | Local administrator resets are sufficient |
+| User-facing import rollback | 1 | X | Atomic idempotent imports make it rare and references make it risky |
+| One-click restore | 1 | X | Restore is destructive and remains an operator procedure |
+| Public REST API or duplicate export CLI | 1 | X | MCP already provides the structured integration surface |
+
+### Cross-cutting track — concise documentation wiki
+
+Fin will gain a small, hand-maintained Markdown wiki that covers the complete
+system without becoming a generated code dump. Its two audiences are operators
+and coding agents. The documentation is part of the product: a behavior change
+is incomplete until its corresponding page is current.
+
+The navigation contract is:
+
+1. `README.md` gives the product overview and points to `docs/index.md`.
+2. `docs/index.md` is the wiki home and routes by task and domain.
+3. A short repository-local `AGENTS.md` tells agents to read this plan, the wiki
+   index, and the relevant focused page before changing code.
+4. Focused pages link to related pages, implementation entry points, and tests.
+
+Initial coverage should include:
+
+- product purpose, settled decisions, non-goals, and terminology;
+- architecture and the browser/service/MCP boundaries;
+- domain model and database invariants;
+- account visibility, authorization, secrets, and audit rules;
+- DKB import, deduplication, balances, and coverage;
+- categories, annotations, transfers, recurring series, summaries, trends,
+  forecast, and monthly reviews;
+- web routes, MCP tools/capabilities, and localization conventions;
+- development setup, migrations, testing, release checks, deployment, backup,
+  and recovery;
+- a concise decision log for choices that future agents must not silently
+  reverse.
+
+Every focused page should answer only:
+
+- what the area does and why it exists;
+- its invariants and privacy/security boundaries;
+- the main code entry points and data flow;
+- the tests that prove the contract;
+- related pages and deliberately unsupported behavior.
+
+Documentation acceptance criteria:
+
+- every area above is reachable from `docs/index.md` in at most two links;
+- the index includes task-oriented routes such as importing, changing
+  analytics, adding an MCP tool, changing authorization, migrating the schema,
+  and releasing;
+- internal Markdown links are checked deterministically by a small local lint
+  command included in release verification;
+- feature changes update the relevant page and navigation in the same change;
+- pages remain concise and do not duplicate source code, API schemas, or the
+  operator guide verbatim;
+- an unfamiliar agent can locate the governing invariant, implementation entry
+  point, and relevant tests without a repository-wide search.
+
+### Phase 0 — activate `1.1.0`, gather evidence, and build the wiki foundation
+
+Use the released application for one complete household cycle before changing
+the financial schema. If `1.1.0` is not yet live, deployment still requires
+explicit operator confirmation.
+
+Record:
+
+- which accounts or file formats remain uncovered;
+- how many transactions need manual category corrections;
+- how often a transaction genuinely needs splitting;
+- whether annual printable reports are used;
+- whether users ask for a target balance or category budgets.
+
+In parallel, create `docs/index.md`, the repository-local `AGENTS.md`, the
+focused system-map pages, and the internal-link lint. Reconcile the existing
+README, architecture, finance-algorithm, MCP, and operator documents into the
+wiki navigation without duplicating their contents.
+
+Done when one real import-to-review cycle has completed and a new agent can use
+the wiki to find the code and tests for every current Fin capability.
+
+### Phase 1 — provisional `1.2`: year reporting and review cadence
+
+1. Add a deterministic `year_summary(account, year)` that uses the same
+   financial semantics as `month_summary`.
+2. Add an authorized service method and `get_year_summary` MCP tool.
+3. Add a server-rendered annual report containing monthly cash flow, category
+   totals, balance development, incomplete-coverage warnings, and saved reviews.
+4. Add print CSS for clean A4 and browser Print-to-PDF output in German and
+   English. Do not add a PDF runtime dependency yet.
+5. Document the year-summary contract, report data flow, MCP addition, and
+   relevant tests in the wiki.
+6. Configure the end-of-month review outside Fin. It may read analytics and
+   save a review through MCP; Fin must not embed or schedule the agent.
+7. Keep the reconciled balance unchanged, but add a visibly separate
+   budget-adjusted yearly trajectory and exclude transfer-root transactions
+   from the forecast's historical variable baseline.
+
+Done when annual totals reconcile exactly with their included month summaries,
+private-account authorization is unchanged, incomplete periods remain visible,
+the report prints cleanly, and the external review run remains auditable.
+
+### Phase 2 — provisional `1.3`: `My visible accounts`
+
+Define aggregate semantics before implementation:
+
+- include only accounts visible to the current user;
+- neutralize matched internal transfers without hiding unmatched cash flow;
+- never reveal another user's private-account existence, name, balance,
+  transaction, review, or contribution;
+- describe the result as aggregate cash flow and cash balances, not net worth;
+- preserve per-account drill-down and source reliability indicators.
+
+Add the service aggregation before the web page or any MCP exposure. Verify
+shared/private combinations, missing transfer matches, incomplete import
+coverage, and direct-object access at service and adapter boundaries. Add the
+aggregate semantics and privacy examples to the wiki before the UI ships.
+
+### Phase 3 — provisional `1.4`: target balance
+
+Add one deliberately small goal type:
+
+- account, target date, and target balance;
+- projected balance at the target date;
+- projected surplus or shortfall;
+- a target line on the existing forecast;
+- MCP read access, but no autonomous agent mutation;
+- complete model, migration, algorithm, and UI documentation in the wiki.
+
+Do not add notifications, hard spending limits, multiple goal types, or
+automated recommendations in this phase.
+
+### Phase 4 — evidence-gated extensions
+
+Promote at most one candidate at a time:
+
+- a DKB Visa or other CSV importer when a real, private sample and ongoing use
+  exist;
+- transaction splitting when mixed purchases materially distort category
+  totals;
+- category targets when the target-balance feature does not answer household
+  planning questions;
+- direct PDF generation when browser printing is demonstrably inconvenient;
+- alerts only after targets exist and a delivery channel is explicitly chosen.
+
+Each promoted feature needs its own acceptance checks, documentation pages or
+page updates, migration coverage where applicable, browser/MCP coverage where
+exposed, and a separate reviewable release slice.

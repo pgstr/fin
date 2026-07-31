@@ -147,6 +147,7 @@ def test_real_browser_workflow_is_responsive_and_accessible(
                 routes = [
                     f"/accounts/{account_id}/overview?month=2026-06",
                     f"/accounts/{account_id}/transactions?month=2026-01",
+                    f"/accounts/{account_id}/report?year=2026",
                     f"/accounts/{account_id}/forecast",
                     f"/accounts/{account_id}/import",
                 ]
@@ -155,6 +156,15 @@ def test_real_browser_workflow_is_responsive_and_accessible(
                     assert response and response.ok, route
                     expect(page.locator("main")).to_be_visible()
                     assert_no_document_overflow(page)
+
+                if width == 1280:
+                    page.goto(
+                        f"{browser_server}/accounts/{account_id}/report?year=2026"
+                    )
+                    page.emulate_media(media="print")
+                    expect(page.locator(".sidebar")).to_be_hidden()
+                    assert len(page.pdf(format="A4", print_background=True)) > 1_000
+                    page.emulate_media(media="screen")
 
                 page.goto(
                     f"{browser_server}/accounts/{account_id}/transactions?month=2026-01"

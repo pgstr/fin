@@ -42,6 +42,25 @@ def test_parser_aligns_stale_period_year_with_balance_and_transactions() -> None
     assert parsed.export_to.isoformat() == "2026-07-26"
 
 
+def test_parser_preserves_four_digit_years_in_multi_year_period() -> None:
+    rows = [
+        ["02.01.2025", "02.01.2025", "Gebucht", "Quelle", "", "", "Überweisung", "", "12,34", "", "", ""],
+        ["31.07.2026", "31.07.2026", "Gebucht", "", "Ziel", "", "Überweisung", "", "-12,34", "", "", ""],
+    ]
+
+    parsed = parse_dkb_csv(
+        dkb_csv(
+            rows,
+            start="01.01.2025",
+            end="31.07.2026",
+            balance_date="31.07.2026",
+        )
+    )
+
+    assert parsed.export_from.isoformat() == "2025-01-01"
+    assert parsed.export_to.isoformat() == "2026-07-31"
+
+
 def test_committed_browser_demo_fixture_is_valid_and_synthetic() -> None:
     payload = Path("tests/fixtures/dkb-browser-demo.csv").read_bytes()
     parsed = parse_dkb_csv(payload)

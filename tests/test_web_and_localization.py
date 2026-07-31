@@ -528,10 +528,63 @@ def test_annual_forecast_table_separates_minimum_and_maximum(
     assert "Variabler Cashflow" not in forecast.text
 
 
+def test_annual_report_is_localized_printable_and_includes_saved_reviews(
+    authenticated_client, admin, shared_account
+) -> None:
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        service.import_dkb(
+            Actor.human(admin),
+            dkb_csv(),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+        service.save_review(
+            Actor.human(admin),
+            shared_account.id,
+            date(2026, 1, 1),
+            "## Januar\n\nRuhiger synthetischer Monat.",
+            expected_revision=0,
+        )
+
+    report = authenticated_client.get(
+        f"/accounts/{shared_account.id}/report?year=2026"
+    )
+
+    assert report.status_code == 200
+    assert "Jahresbericht 2026" in report.text
+    assert "Monatlicher Cashflow und Kontostand" in report.text
+    assert "Januar" in report.text and "Dezember" in report.text
+    assert "Ruhiger synthetischer Monat." in report.text
+    assert "Unvollständig" in report.text
+    assert "data-print" in report.text
+
+    stylesheet = authenticated_client.get("/static/app.css")
+    assert "@page { size: A4" in stylesheet.text
+    assert "@media print" in stylesheet.text
+
+    with SessionLocal() as db:
+        user = db.get(User, admin.id)
+        user.locale = "en"
+        db.commit()
+    english = authenticated_client.get(
+        f"/accounts/{shared_account.id}/report?year=2026"
+    )
+    assert "Annual report 2026" in english.text
+    assert "Monthly cash flow and balance" in english.text
+    assert "January" in english.text and "December" in english.text
+
+    invalid = authenticated_client.get(
+        f"/accounts/{shared_account.id}/report?year=10000"
+    )
+    assert invalid.status_code == 422
+
+
 def test_required_pages_and_csrf(authenticated_client, shared_account) -> None:
     paths = [
         f"/accounts/{shared_account.id}/overview",
         f"/accounts/{shared_account.id}/transactions",
+        f"/accounts/{shared_account.id}/report?year=2026",
         f"/accounts/{shared_account.id}/forecast",
         f"/accounts/{shared_account.id}/trends",
         f"/accounts/{shared_account.id}/import",
@@ -659,6 +712,14 @@ def test_private_account_ids_do_not_leak_over_http(authenticated_client) -> None
     )
     assert hidden.status_code == unknown.status_code == 404
     assert "Vertrauliches Konto" not in hidden.text
+    hidden_report = authenticated_client.get(
+        f"/accounts/{private_id}/report?year=2026"
+    )
+    unknown_report = authenticated_client.get(
+        "/accounts/00000000-0000-0000-0000-000000000000/report?year=2026"
+    )
+    assert hidden_report.status_code == unknown_report.status_code == 404
+    assert "Vertrauliches Konto" not in hidden_report.text
 
 
 def test_localized_request_validation(authenticated_client) -> None:

@@ -23,6 +23,7 @@ from .analytics import (
     month_start,
     month_summary,
 )
+from .analytics import year_summary as calculate_year_summary
 from .categories import normalize_category_key
 from .csv_import import (
     audit_payload,
@@ -886,6 +887,16 @@ class FinanceService:
     def summary(self, actor: Actor, account_id: str, value_month: date) -> dict:
         self.get_account(actor, account_id, "analytics:read" if actor.actor_type == "agent" else "transactions:read")
         return month_summary(self.db, account_id, value_month, actor.locale)
+
+    def year_summary(self, actor: Actor, account_id: str, year: int) -> dict:
+        if year < 1900 or year > 9999:
+            raise ValidationError("year", "error.validation")
+        self.get_account(
+            actor,
+            account_id,
+            "analytics:read" if actor.actor_type == "agent" else "transactions:read",
+        )
+        return calculate_year_summary(self.db, account_id, year, actor.locale)
 
     def trend(self, actor: Actor, account_id: str, category_id: str) -> dict:
         self.get_account(actor, account_id, "analytics:read")

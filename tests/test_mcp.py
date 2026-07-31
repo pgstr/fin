@@ -33,6 +33,7 @@ REQUIRED_TOOLS = {
     "add_transaction_note",
     "add_transaction_tags",
     "get_month_summary",
+    "get_year_summary",
     "get_category_trend",
     "get_balance_forecast",
     "list_recurring_series",
@@ -364,11 +365,28 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                     {"account_id": shared_account.id, "month": "2026-01"},
                 )
                 assert summary.structuredContent["data"]["transaction_count"] == 2
+                annual = await session.call_tool(
+                    "get_year_summary",
+                    {"account_id": shared_account.id, "year": 2026},
+                )
+                annual_data = annual.structuredContent["data"]
+                assert annual_data["year"] == 2026
+                assert len(annual_data["months"]) == 12
+                assert annual_data["transaction_count"] == sum(
+                    month["transaction_count"] for month in annual_data["months"]
+                )
+                assert "review_count" not in annual_data
+                assert all("review" not in month for month in annual_data["months"])
                 hidden = await session.call_tool(
                     "get_month_summary",
                     {"account_id": private_account_id, "month": "2026-01"},
                 )
                 assert hidden.structuredContent["error"]["code"] == "not_found"
+                hidden_annual = await session.call_tool(
+                    "get_year_summary",
+                    {"account_id": private_account_id, "year": 2026},
+                )
+                assert hidden_annual.structuredContent["error"]["code"] == "not_found"
                 hidden_transaction = await session.call_tool(
                     "get_transaction", {"transaction_id": private_transaction_id}
                 )
@@ -378,6 +396,11 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                     {"account_id": shared_account.id, "month": "not-a-month"},
                 )
                 assert invalid_month.structuredContent["error"]["code"] == "month"
+                invalid_year = await session.call_tool(
+                    "get_year_summary",
+                    {"account_id": shared_account.id, "year": 10_000},
+                )
+                assert invalid_year.structuredContent["error"]["code"] == "year"
 
     async with httpx.AsyncClient(
         headers={"Authorization": f"Bearer {limited_token}"}, follow_redirects=True
@@ -394,6 +417,11 @@ async def test_official_client_enumerates_and_exercises_mcp_tools(
                     {"account_id": shared_account.id, "month": "2026-01"},
                 )
                 assert denied.structuredContent["error"]["code"] == "permission_denied"
+                denied_annual = await session.call_tool(
+                    "get_year_summary",
+                    {"account_id": shared_account.id, "year": 2026},
+                )
+                assert denied_annual.structuredContent["error"]["code"] == "permission_denied"
 
     async with httpx.AsyncClient(
         headers={"Authorization": f"Bearer {review_token}"}, follow_redirects=True

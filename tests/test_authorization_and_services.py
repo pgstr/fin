@@ -60,6 +60,8 @@ def test_shared_and_private_horizontal_authorization(admin, shared_account) -> N
             service.get_account(Actor.human(user_a), private_b.id)
         with pytest.raises(NotFoundError):
             service.summary(Actor.human(user_a), private_b.id, date(2026, 1, 1))
+        with pytest.raises(NotFoundError):
+            service.year_summary(Actor.human(user_a), private_b.id, 2026)
 
 
 def test_human_category_is_authoritative_and_agent_batch_idempotent(admin, shared_account) -> None:

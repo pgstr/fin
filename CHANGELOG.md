@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0-rc.1 — 2026-07-31
+
+- Added the concise documentation wiki, repository agent navigation, and a
+  deterministic internal-Markdown-link check.
+- Added reconciled 12-month year summaries, the authorized `get_year_summary`
+  MCP tool, and localized annual HTML reports with saved monthly reviews.
+- Added A4 print styling for annual reports and monthly overviews, suitable for
+  browser Print-to-PDF without a PDF runtime dependency.
+- Added a separate budget-adjusted balance trajectory and excluded transactions
+  categorized as internal transfers or `Nicht budgetwirksam` from forecast
+  history while preserving the DKB-reconciling account balance.
+
 ## 1.1.0 — 2026-07-31
 
 This release finishes the open correctness, security, testing, and operational

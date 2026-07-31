@@ -38,6 +38,7 @@
             <nav class="primary-nav" aria-label="{{ t('nav.main') }}">
               <a href="/accounts/{{ account.id }}/overview{{ month_query }}" {% if '/overview' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">◫</span>{{ t("nav.overview") }}</a>
               <a href="/accounts/{{ account.id }}/transactions{{ month_query }}" {% if '/transactions' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↕</span>{{ t("nav.transactions") }}</a>
+              <a href="/accounts/{{ account.id }}/report{% if month %}?year={{ month.year }}{% endif %}" {% if '/report' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">▤</span>{{ t("nav.report") }}</a>
               <a href="/accounts/{{ account.id }}/forecast{{ month_query }}" {% if '/forecast' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">⌁</span>{{ t("nav.forecast") }}</a>
               <a href="/accounts/{{ account.id }}/trends" {% if '/trends' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">⌁</span>{{ t("trend.title") }}</a>
               <a href="/accounts/{{ account.id }}/recurring" {% if '/recurring' in request.url.path %}aria-current="page"{% endif %}><span aria-hidden="true">↻</span>{{ t("nav.recurring") }}</a>
@@ -92,6 +93,7 @@
               <summary>{{ t("nav.secondary") }}</summary>
               <div class="mobile-menu-panel">
                 <a href="/accounts/{{ account.id }}/trends">{{ t("trend.title") }}</a>
+                <a href="/accounts/{{ account.id }}/report{% if month %}?year={{ month.year }}{% endif %}">{{ t("nav.report") }}</a>
                 {% if is_admin %}<a href="/categories">{{ t("nav.categories") }}</a>{% endif %}
                 <a href="/accounts/{{ account.id }}/import">{{ t("nav.import") }}</a>
                 <a href="/accounts/{{ account.id }}/recurring">{{ t("nav.recurring") }}</a>

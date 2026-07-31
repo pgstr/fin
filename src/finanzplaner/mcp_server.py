@@ -158,6 +158,19 @@ def serialize_transaction(transaction: Transaction, locale: str, full: bool = Fa
     return data
 
 
+def serialize_year_summary(summary: dict[str, Any]) -> dict[str, Any]:
+    data = {key: value for key, value in summary.items() if key != "review_count"}
+    data["months"] = [
+        {
+            key: value
+            for key, value in month.items()
+            if key not in {"recent_transactions", "review"}
+        }
+        for month in summary["months"]
+    ]
+    return data
+
+
 @mcp.tool(description="List accounts visible to this agent token.")
 def list_accounts() -> dict[str, Any]:
     return tool_call(lambda service, principal: [serialize_account(a) for a in service.list_accounts(principal)])
@@ -313,6 +326,15 @@ def get_month_summary(account_id: str, month: str) -> dict[str, Any]:
         }
 
     return tool_call(run)
+
+
+@mcp.tool(description="Get 12 reconciled calendar-month summaries and annual totals for one account.")
+def get_year_summary(account_id: str, year: int) -> dict[str, Any]:
+    return tool_call(
+        lambda service, principal: serialize_year_summary(
+            service.year_summary(principal, account_id, year)
+        )
+    )
 
 
 @mcp.tool(description="Get up to 12 complete months and the simple linear category trend.")

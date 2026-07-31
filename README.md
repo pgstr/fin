@@ -14,9 +14,10 @@ SQLite.
 - Supports human- or agent-authored categories, notes, tags, and versioned
   monthly reviews without automatic categorization.
 - Detects recurring entries, links unambiguous internal transfers, shows
-  category trends, and creates a deterministic annual balance forecast for the
-  remaining months through December.
-- Exposes 15 scoped MCP tools over stateless Streamable HTTP at `/mcp`.
+  category trends, creates printable annual reports, contrasts the actual
+  balance with a budget-adjusted trajectory, and forecasts account balances
+  for the remaining months through December.
+- Exposes 16 scoped MCP tools over stateless Streamable HTTP at `/mcp`.
 - Creates verified online SQLite backups with daily and monthly retention.
 
 ## Local development
@@ -34,7 +35,8 @@ Run the deterministic suite:
 
 ```sh
 uv run pytest
-uv run ruff check src tests
+uv run ruff check src tests migrations scripts
+uv run python scripts/check_markdown_links.py
 ```
 
 The MCP tests bind a temporary loopback port. Environments that sandbox
@@ -48,6 +50,8 @@ uv run pytest tests/test_browser.py
 
 ## Documentation
 
+- [Wiki home](docs/index.md): task-oriented navigation across product,
+  architecture, domain, interface, development, and operations contracts.
 - [Development plan](PLAN.md): authoritative product decisions, ordered work,
   and release gates.
 - [Changelog](CHANGELOG.md): released corrections and verification outcomes.

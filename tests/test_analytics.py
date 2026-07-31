@@ -7,9 +7,12 @@ from sqlalchemy import select
 
 from finanzplaner.analytics import (
     balance_forecast,
+    balance_on,
+    budget_balance_on,
     category_trend,
     complete_coverage,
     month_summary,
+    year_summary,
 )
 from finanzplaner.categories import stable_category_id
 from finanzplaner.db import SessionLocal
@@ -176,6 +179,255 @@ def test_internal_transfers_are_excluded_from_budget_totals(admin, shared_accoun
         assert summary["outgoing_cents"] == 4_567
         assert summary["net_cents"] == -4_567
         assert {item["key"] for item in summary["breakdown"]} == {"groceries"}
+
+
+def test_budget_balance_excludes_non_budget_transactions_without_changing_real_balance(
+    admin, shared_account
+) -> None:
+    rows = [
+        [
+            "10.01.26",
+            "10.01.26",
+            "Gebucht",
+            "Arbeitgeber",
+            "",
+            "Einnahme",
+            "Überweisung",
+            "",
+            "500,00",
+            "",
+            "",
+            "",
+        ],
+        [
+            "20.01.26",
+            "20.01.26",
+            "Gebucht",
+            "",
+            "Umbuchung",
+            "Nicht budgetwirksam",
+            "Überweisung",
+            "",
+            "-100,00",
+            "",
+            "",
+            "",
+        ],
+    ]
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        service.import_dkb(
+            Actor.human(admin),
+            dkb_csv(rows, balance="1.000,00"),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+        transfer = db.scalar(
+            select(Transaction).where(Transaction.display_counterparty == "Umbuchung")
+        )
+        service.categorize(
+            Actor.human(admin),
+            transfer.id,
+            stable_category_id("transfers.non-budget"),
+            transfer.revision,
+        )
+        db.commit()
+
+        actual, _snapshot_date, actual_reliable = balance_on(
+            db, shared_account.id, date(2026, 1, 31)
+        )
+        budget, budget_reliable = budget_balance_on(
+            db,
+            shared_account.id,
+            date(2026, 1, 1),
+            date(2026, 1, 31),
+        )
+
+        assert actual_reliable
+        assert actual == 100_000
+        assert budget_reliable
+        assert budget == 110_000
+
+        chart = build_chart(
+            db,
+            shared_account.id,
+            {},
+            date(2026, 1, 1),
+            today=date(2026, 1, 31),
+        )
+        assert [point["value"] for point in chart["actual"]] == [100_000]
+        assert [point["value"] for point in chart["budget"]] == [110_000]
+
+
+def test_forecast_history_excludes_non_budget_transactions(admin, shared_account) -> None:
+    rows = []
+    for month in range(1, 7):
+        rows.extend(
+            [
+                [
+                    f"05.{month:02d}.26",
+                    f"05.{month:02d}.26",
+                    "Gebucht",
+                    "Einnahme",
+                    "",
+                    "Budgetwirksam",
+                    "Überweisung",
+                    "",
+                    "100,00",
+                    "",
+                    "",
+                    "",
+                ],
+                [
+                    f"20.{month:02d}.26",
+                    f"20.{month:02d}.26",
+                    "Gebucht",
+                    "",
+                    "Umbuchung",
+                    "Nicht budgetwirksam",
+                    "Überweisung",
+                    "",
+                    "-1.000,00",
+                    "",
+                    "",
+                    "",
+                ],
+            ]
+        )
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        service.import_dkb(
+            Actor.human(admin),
+            dkb_csv(
+                rows,
+                start="01.01.26",
+                end="30.06.26",
+                balance_date="30.06.26",
+            ),
+            max_bytes=10_000_000,
+            expected_account_id=shared_account.id,
+        )
+        for transaction in db.scalars(
+            select(Transaction).where(Transaction.display_counterparty == "Umbuchung")
+        ):
+            service.categorize(
+                Actor.human(admin),
+                transaction.id,
+                stable_category_id("transfers.non-budget"),
+                transaction.revision,
+            )
+        db.commit()
+
+        forecast = balance_forecast(db, shared_account.id, today=date(2026, 7, 15))
+
+        assert forecast["available"]
+        assert [point["variable_cashflow_cents"] for point in forecast["points"][1:]] == [
+            10_000
+        ] * 6
+
+
+def test_year_summary_reconciles_months_categories_coverage_and_reviews(
+    admin, shared_account
+) -> None:
+    actor = Actor.human(admin)
+    groceries_id = stable_category_id("groceries.general")
+    imports = [
+        (
+            "01.01.26",
+            "31.01.26",
+            [
+                ["05.01.26", "05.01.26", "Gebucht", "Arbeitgeber", "", "Januar", "Überweisung", "", "500,00", "", "", ""],
+                ["10.01.26", "10.01.26", "Gebucht", "", "Markt", "Januar", "Karte", "", "-100,00", "", "", ""],
+            ],
+        ),
+        (
+            "01.02.26",
+            "28.02.26",
+            [
+                ["05.02.26", "05.02.26", "Gebucht", "Arbeitgeber", "", "Februar", "Überweisung", "", "600,00", "", "", ""],
+                ["10.02.26", "10.02.26", "Gebucht", "", "Markt", "Februar", "Karte", "", "-200,00", "", "", ""],
+                ["12.02.26", "12.02.26", "Gebucht", "", "Sonstiges", "Februar", "Karte", "", "-50,00", "", "", ""],
+            ],
+        ),
+    ]
+
+    with SessionLocal() as db:
+        service = FinanceService(db)
+        for start, end, rows in imports:
+            service.import_dkb(
+                actor,
+                dkb_csv(
+                    rows,
+                    start=start,
+                    end=end,
+                    balance="2.000,00",
+                    balance_date=end,
+                ),
+                max_bytes=10_000_000,
+                expected_account_id=shared_account.id,
+            )
+        groceries = db.scalars(
+            select(Transaction).where(
+                Transaction.account_id == shared_account.id,
+                Transaction.display_counterparty == "Markt",
+            )
+        ).all()
+        for transaction in groceries:
+            service.categorize(actor, transaction.id, groceries_id, transaction.revision)
+        db.commit()
+        service.save_review(
+            actor,
+            shared_account.id,
+            date(2026, 1, 1),
+            "## Januar\n\nRuhiger Monat.",
+            expected_revision=0,
+        )
+
+        summary = year_summary(
+            db,
+            shared_account.id,
+            2026,
+            "de",
+            today=date(2027, 1, 1),
+        )
+
+        assert len(summary["months"]) == 12
+        assert summary["incoming_cents"] == sum(
+            month["incoming_cents"] for month in summary["months"]
+        )
+        assert summary["outgoing_cents"] == sum(
+            month["outgoing_cents"] for month in summary["months"]
+        )
+        assert summary["net_cents"] == sum(
+            month["net_cents"] for month in summary["months"]
+        )
+        assert summary["incoming_cents"] == 110_000
+        assert summary["outgoing_cents"] == 35_000
+        assert summary["net_cents"] == 75_000
+        assert summary["category_totals"] == [
+            {
+                "category_id": stable_category_id("groceries"),
+                "key": "groceries",
+                "label": "Lebensmittel",
+                "amount_cents": 30_000,
+            },
+            {
+                "category_id": None,
+                "key": None,
+                "label": None,
+                "amount_cents": 5_000,
+            },
+        ]
+        assert [month["coverage_complete"] for month in summary["months"][:2]] == [
+            True,
+            True,
+        ]
+        assert summary["incomplete_months"] == [
+            date(2026, month, 1) for month in range(3, 13)
+        ]
+        assert not summary["coverage_complete"]
+        assert summary["review_count"] == 1
+        assert summary["months"][0]["review"].content == "## Januar\n\nRuhiger Monat."
 
 
 def test_category_trend_preserves_calendar_spacing_and_archived_history(

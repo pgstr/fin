@@ -66,10 +66,11 @@
         </div>
         <div class="legend" aria-label="{{ t('common.details') }}">
           <span><i class="legend-line actual"></i>{{ t("common.observed") }}</span>
+          {% if chart.budget %}<span><i class="legend-line budget"></i>{{ t("dashboard.budget_adjusted") }}</span>{% endif %}
           <span><i class="legend-line forecast"></i>{{ t("common.estimated") }}</span>
         </div>
       </div>
-      {% if chart.actual_points or chart.forecast_points %}
+      {% if chart.actual_points or chart.budget_points or chart.forecast_points %}
         {% set chart_id = "overview-chart" %}
         {% set chart_title_key = "dashboard.balance_chart" %}
         {% include "_balance_chart.html" %}
@@ -79,6 +80,7 @@
             <thead><tr><th>{{ t("month.choose") }}</th><th class="number">{{ t("dashboard.balance") }}</th></tr></thead>
             <tbody>
               {% for point in chart.actual %}<tr><td>{{ datefmt(point.date) }}</td><td class="number">{{ money(point.value) }}</td></tr>{% endfor %}
+              {% for point in chart.budget %}<tr><td>{{ datefmt(point.date) }} · {{ t("dashboard.budget_adjusted") }}</td><td class="number">{{ money(point.value) }}</td></tr>{% endfor %}
               {% for point in chart.projected %}<tr><td>{{ datefmt(point.month, "MMM y") }} · {{ t("common.estimated") }}</td><td class="number">{{ money(point.value) }}</td></tr>{% endfor %}
             </tbody>
           </table>

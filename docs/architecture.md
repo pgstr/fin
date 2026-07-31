@@ -65,3 +65,27 @@ sanitized metadata. It omits passwords, setup/session/bearer tokens, uploaded
 files, complete transaction descriptions, notes, and review bodies. Uvicorn
 access logging is disabled in production to keep bearer headers and financial
 queries out of normal logs.
+
+## Code and tests
+
+[`security.py`](../src/finanzplaner/security.py) owns passwords and browser
+sessions; [`services.py`](../src/finanzplaner/services.py) owns visible-account
+queries, capabilities, mutations, and audit calls;
+[`mcp_server.py`](../src/finanzplaner/mcp_server.py) owns bearer authentication;
+[`web.py`](../src/finanzplaner/web.py) owns cookies, CSRF, trusted hosts, and rate
+limiting. Database connection safeguards are in
+[`db.py`](../src/finanzplaner/db.py).
+
+Privacy and capability boundaries are proved in
+[`test_authorization_and_services.py`](../tests/test_authorization_and_services.py)
+and [`test_mcp.py`](../tests/test_mcp.py). Browser authentication, session
+invalidation, CSRF, private-object denial, and secure cookies are covered by
+[`test_web_and_localization.py`](../tests/test_web_and_localization.py).
+
+## Related and unsupported behavior
+
+See the [domain model](domain-model.md), [interface map](interfaces.md),
+[MCP agent guide](mcp-agent-guide.md), and [operator guide](operator-guide.md).
+Fin does not claim cryptographic privacy from its operator, expose a
+public-internet profile, send reset email, or let administrators inspect other
+users' private accounts.

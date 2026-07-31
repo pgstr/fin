@@ -3,9 +3,9 @@ from __future__ import annotations
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from finanzplaner import models  # noqa: F401
 from finanzplaner.config import get_settings
 from finanzplaner.db import Base
-from finanzplaner import models  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_settings().database_url)

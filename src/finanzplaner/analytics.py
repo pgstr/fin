@@ -115,6 +115,33 @@ def balance_on(db: Session, account_id: str, target: date) -> tuple[int | None, 
     return snapshot.balance_cents + delta, snapshot.balance_date, reliable
 
 
+def budget_balance_on(
+    db: Session, account_id: str, start: date, target: date
+) -> tuple[int | None, bool]:
+    if target < start:
+        raise ValueError("target must not precede start")
+    opening, _snapshot_date, opening_reliable = balance_on(
+        db, account_id, start - timedelta(days=1)
+    )
+    if opening is None:
+        return None, False
+    transactions = db.scalars(
+        select(Transaction).where(
+            Transaction.account_id == account_id,
+            Transaction.booking_date >= start,
+            Transaction.booking_date <= target,
+        )
+    ).all()
+    categories = {category.id: category for category in db.scalars(select(Category)).all()}
+    budget_delta = sum(
+        transaction.amount_cents
+        for transaction in transactions
+        if not _is_budget_neutral(transaction, categories)
+    )
+    reliable = opening_reliable and complete_coverage(db, account_id, start, target)
+    return opening + budget_delta, reliable
+
+
 def _monthly_total(db: Session, account_id: str, value: date) -> int | None:
     start, end = month_range(value)
     if not complete_coverage(db, account_id, start, end):
@@ -241,6 +268,59 @@ def month_summary(
         "previous_year_net_cents": previous_year,
         "recent_transactions": transactions[:7],
         "review": review,
+    }
+
+
+def year_summary(
+    db: Session,
+    account_id: str,
+    year: int,
+    locale: str,
+    today: date | None = None,
+) -> dict:
+    months = [
+        month_summary(db, account_id, date(year, month, 1), locale, today=today)
+        for month in range(1, 13)
+    ]
+    category_totals: dict[str, dict] = {}
+    for month in months:
+        for item in month["breakdown"]:
+            identity = item["category_id"] or "__uncategorized__"
+            total = category_totals.setdefault(
+                identity,
+                {
+                    "category_id": item["category_id"],
+                    "key": item["key"],
+                    "label": item["label"],
+                    "amount_cents": 0,
+                },
+            )
+            total["amount_cents"] += item["amount_cents"]
+    incomplete_months = [month["month"] for month in months if not month["coverage_complete"]]
+    first, last = months[0], months[-1]
+    return {
+        "year": year,
+        "months": months,
+        "opening_balance_cents": first["opening_balance_cents"],
+        "closing_balance_cents": last["closing_balance_cents"],
+        "opening_balance_reliable": first["opening_balance_reliable"],
+        "closing_balance_reliable": last["closing_balance_reliable"],
+        "coverage_complete": not incomplete_months,
+        "incomplete_months": incomplete_months,
+        "incoming_cents": sum(month["incoming_cents"] for month in months),
+        "outgoing_cents": sum(month["outgoing_cents"] for month in months),
+        "net_cents": sum(month["net_cents"] for month in months),
+        "household_contribution_cents": sum(
+            month["household_contribution_cents"] for month in months
+        ),
+        "categorized_cents": sum(month["categorized_cents"] for month in months),
+        "uncategorized_cents": sum(month["uncategorized_cents"] for month in months),
+        "uncategorized_count": sum(month["uncategorized_count"] for month in months),
+        "transaction_count": sum(month["transaction_count"] for month in months),
+        "category_totals": sorted(
+            category_totals.values(), key=lambda item: item["amount_cents"], reverse=True
+        ),
+        "review_count": sum(month["review"] is not None for month in months),
     }
 
 
@@ -379,17 +459,23 @@ def balance_forecast(db: Session, account_id: str, today: date | None = None) ->
     for series in recurring:
         recurring_transaction_ids.update(series.evidence.get("transaction_ids", []))
 
+    categories = {category.id: category for category in db.scalars(select(Category)).all()}
     monthly_residual_totals: dict[date, int] = {}
     for month in complete_months:
         start, end = month_range(month)
-        query = select(func.coalesce(func.sum(Transaction.amount_cents), 0)).where(
-            Transaction.account_id == account_id,
-            Transaction.booking_date >= start,
-            Transaction.booking_date <= end,
+        transactions = db.scalars(
+            select(Transaction).where(
+                Transaction.account_id == account_id,
+                Transaction.booking_date >= start,
+                Transaction.booking_date <= end,
+            )
+        ).all()
+        monthly_residual_totals[month] = sum(
+            transaction.amount_cents
+            for transaction in transactions
+            if transaction.id not in recurring_transaction_ids
+            and not _is_budget_neutral(transaction, categories)
         )
-        if recurring_transaction_ids:
-            query = query.where(Transaction.id.not_in(recurring_transaction_ids))
-        monthly_residual_totals[month] = int(db.scalar(query) or 0)
 
     start_date = snapshot.balance_date + timedelta(days=1)
     final_month = date(snapshot.balance_date.year, 12, 1)

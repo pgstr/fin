@@ -21,14 +21,14 @@ From the repository root:
 mkdir -p dist
 docker buildx build \
   --platform linux/arm64 \
-  --tag localhost/finanzplaner:1.1.0 \
-  --output type=oci,dest=dist/finanzplaner-1.1.0-arm64.oci.tar \
+  --tag localhost/finanzplaner:1.2.0-rc.1 \
+  --output type=oci,dest=dist/finanzplaner-1.2.0-rc.1-arm64.oci.tar \
   .
-podium load dist/finanzplaner-1.1.0-arm64.oci.tar
+podium load dist/finanzplaner-1.2.0-rc.1-arm64.oci.tar
 ```
 
 Podium does not build Compose projects. The stack uses the exact image name
-`localhost/finanzplaner:1.1.0`; if the builder records another reference,
+`localhost/finanzplaner:1.2.0-rc.1`; if the builder records another reference,
 change the stack's two `image` fields to the reference printed by
 `podium load`.
 
@@ -39,6 +39,12 @@ The exported OCI archive SHA-256 was
 `0ab97046ea557bc7b69bef21894802930afbb2a13ef164df30b4b96deb5a2a57`.
 Rebuilds must be treated as different artifacts even when they use the same
 source and tag.
+
+For the `1.2.0-rc.1` prerelease build verified on 2026-07-31, the ARM64 OCI
+manifest digest is
+`sha256:2e74869625175a71f9390577f443a31aa3e70b1f6036a4441c90d83939e00a0c`.
+The exported OCI archive SHA-256 is
+`cf9afdd1b22eecf92f3d0898dd3f4a294d0c2e7a147f1c82ab24ae8f7214f9bd`.
 
 ## 3. Create file secrets
 
@@ -271,3 +277,14 @@ before touching a live stack.
   its account scope; these cases are intentionally indistinguishable.
 - **Backup did not run:** verify the host timezone and inspect the scheduled
   service's last run and events.
+
+## Related engineering contracts
+
+See the [development map](development.md) for local release checks, the
+[architecture and security guide](architecture.md) for runtime boundaries, and
+the [domain model](domain-model.md) for migration ownership.
+[`test_operations.py`](../tests/test_operations.py),
+[`test_backup.py`](../tests/test_backup.py), and
+[`container_smoke.py`](../scripts/container_smoke.py) prove the checked-in
+operational contract. Live deployment, publication, backup restoration, and
+household-data validation still require explicit operator confirmation.

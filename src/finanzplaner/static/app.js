@@ -11,6 +11,10 @@
     input.addEventListener("change", () => input.form?.requestSubmit());
   });
 
+  document.querySelectorAll("[data-print]").forEach((button) => {
+    button.addEventListener("click", () => window.print());
+  });
+
   document.querySelectorAll("[data-balance-chart]").forEach((chart) => {
     const tooltip = chart.querySelector("[data-chart-tooltip]");
     if (!tooltip) return;

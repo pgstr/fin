@@ -184,7 +184,7 @@ def test_native_podium_stack_has_required_operational_contract() -> None:
         {"host": "m1-pro.local", "service": "app", "port": 8080},
     ]
     assert {service["image"] for service in services.values()} == {
-        "localhost/finanzplaner:1.1.0"
+        "localhost/finanzplaner:1.2.0-rc.1"
     }
 
 
@@ -208,7 +208,7 @@ def test_podium_acceptance_stack_is_host_only_and_isolated() -> None:
     services = {service["id"]: service for service in stack["services"]}
     assert set(services) == {"app", "backup"}
     assert {service["image"] for service in services.values()} == {
-        "localhost/finanzplaner:1.1.0"
+        "localhost/finanzplaner:1.2.0-rc.1"
     }
     assert services["backup"]["schedule"] == "15 3 * * *"
     assert {

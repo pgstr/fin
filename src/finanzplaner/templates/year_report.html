@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="annual-report">
+    <header class="page-heading report-heading split">
+      <div>
+        <p class="eyebrow">{{ account.display_name }} · {{ t("account." ~ account.visibility) }}</p>
+        <h1>{{ t("report.title") }} {{ year }}</h1>
+        <p class="lede">{{ t("report.intro") }}</p>
+      </div>
+      <div class="report-actions no-print">
+        <div class="year-nav" aria-label="{{ t('report.choose_year') }}">
+          <a class="icon-button" href="/accounts/{{ account.id }}/report?year={{ year - 1 }}" aria-label="{{ t('report.previous') }}">‹</a>
+          <form method="get">
+            <label class="sr-only" for="year-picker">{{ t("report.choose_year") }}</label>
+            <input id="year-picker" name="year" type="number" min="1900" max="9999" value="{{ year }}" data-auto-submit>
+          </form>
+          <a class="icon-button" href="/accounts/{{ account.id }}/report?year={{ year + 1 }}" aria-label="{{ t('report.next') }}">›</a>
+        </div>
+        <button class="button" type="button" data-print>{{ t("report.print") }}</button>
+      </div>
+    </header>
+
+    <section class="summary-grid report-summary" aria-label="{{ t('report.title') }}">
+      <article class="summary-item incoming">
+        <span class="summary-icon" aria-hidden="true">↙</span>
+        <div><p>{{ t("dashboard.incoming") }}</p><strong>+{{ money(summary.incoming_cents) }}</strong><small>{{ summary.transaction_count }} {{ t("report.transactions") }}</small></div>
+      </article>
+      <article class="summary-item outgoing">
+        <span class="summary-icon" aria-hidden="true">↗</span>
+        <div><p>{{ t("dashboard.outgoing") }}</p><strong>−{{ money(summary.outgoing_cents) }}</strong><small>{{ t("dashboard.uncategorized_count", count=summary.uncategorized_count) }}</small></div>
+      </article>
+      <article class="summary-item balance">
+        <span class="summary-icon" aria-hidden="true">Σ</span>
+        <div><p>{{ t("dashboard.net") }}</p><strong>{{ money(summary.net_cents) }}</strong><small>{{ summary.review_count }} {{ t("report.reviews_count") }}</small></div>
+      </article>
+    </section>
+
+    {% if not summary.coverage_complete %}
+      <div class="alert warning" role="status"><strong>{{ t("common.incomplete") }}.</strong> {{ t("report.incomplete") }}</div>
+    {% endif %}
+
+    <section class="section report-section" aria-labelledby="monthly-title">
+      <div class="section-heading">
+        <h2 id="monthly-title">{{ t("report.monthly") }}</h2>
+        <p>{{ t("report.monthly_intro") }}</p>
+      </div>
+      <div class="table-wrap">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>{{ t("report.month") }}</th>
+              <th class="number">{{ t("dashboard.incoming") }}</th>
+              <th class="number">{{ t("dashboard.outgoing") }}</th>
+              <th class="number">{{ t("dashboard.net") }}</th>
+              <th class="number">{{ t("dashboard.closing_balance") }}</th>
+              <th>{{ t("report.coverage") }}</th>
+              <th>{{ t("dashboard.review") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in summary.months %}
+              <tr>
+                <td><a href="/accounts/{{ account.id }}/overview?month={{ item.month.strftime('%Y-%m') }}">{{ datefmt(item.month, "MMMM") }}</a></td>
+                <td class="number">{{ money(item.incoming_cents) }}</td>
+                <td class="number">{{ money(item.outgoing_cents) }}</td>
+                <td class="number">{{ money(item.net_cents) }}</td>
+                <td class="number">{{ money(item.closing_balance_cents) if item.closing_balance_reliable else "—" }}</td>
+                <td><span class="badge {% if not item.coverage_complete %}muted{% endif %}">{{ t("report.coverage_complete") if item.coverage_complete else t("report.coverage_incomplete") }}</span></td>
+                <td>{% if item.review %}<a href="/accounts/{{ account.id }}/review?month={{ item.month.strftime('%Y-%m') }}">{{ t("review.revision", revision=item.review.revision) }}</a>{% else %}—{% endif %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>{{ t("report.total") }}</th>
+              <th class="number">{{ money(summary.incoming_cents) }}</th>
+              <th class="number">{{ money(summary.outgoing_cents) }}</th>
+              <th class="number">{{ money(summary.net_cents) }}</th>
+              <th class="number">{{ money(summary.closing_balance_cents) if summary.closing_balance_reliable else "—" }}</th>
+              <th colspan="2"></th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <section class="section report-section" aria-labelledby="categories-title">
+      <div class="section-heading"><h2 id="categories-title">{{ t("report.categories") }}</h2></div>
+      <div class="table-wrap">
+        <table class="report-table compact">
+          <thead><tr><th>{{ t("transactions.category") }}</th><th class="number">{{ t("transactions.amount") }}</th></tr></thead>
+          <tbody>
+            {% for item in summary.category_totals %}
+              <tr><td>{{ item.label or t("category.uncategorized") }}</td><td class="number">{{ money(item.amount_cents) }}</td></tr>
+            {% else %}
+              <tr><td colspan="2" class="empty-cell">{{ t("transactions.no_results") }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="report-reviews" aria-labelledby="reviews-title">
+      <div class="section-heading"><h2 id="reviews-title">{{ t("report.reviews") }}</h2></div>
+      {% for item in summary.months %}
+        {% if item.review %}
+          <article class="editorial report-review">
+            <div class="section-heading split">
+              <h3>{{ datefmt(item.month, "MMMM y") }}</h3>
+              <small>{{ t("review.revision", revision=item.review.revision) }} · {{ datetimefmt(item.review.created_at) }}</small>
+            </div>
+            <div class="prose">{{ markdown(item.review.content)|safe }}</div>
+          </article>
+        {% endif %}
+      {% endfor %}
+      {% if not summary.review_count %}<p class="empty-inline">{{ t("report.no_reviews") }}</p>{% endif %}
+    </section>
+  </div>
+{% endblock %}
